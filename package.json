@@ -26,8 +26,5 @@
 	},
 	"nodemonConfig": {
 		"ext": "js, hbs, css"
-	},
-	"scripts": {
-		"prestart-dev": "sudo service mongodb stop && sudo mongod --fork --logpath /var/log/mongod.log"
 	}
 }
