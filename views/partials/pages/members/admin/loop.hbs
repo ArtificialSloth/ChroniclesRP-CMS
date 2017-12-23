@@ -1,0 +1,43 @@
+<div class="table-row {{_this._id}} {{#if _this.locked}}locked{{/if}}" onclick="$(this).next().toggleClass('active')">
+	<div class="table-data login">{{_this.login}}</div>
+	<div class="table-data email">{{_this.email}}</div>
+	<div class="table-data role">{{_this.role}}</div>
+</div>
+
+<form class="user-settings-form">
+	<label for="user_login">Username: </label>
+	<input type="text" name="user_login" class="user_login" value="{{_this.login}}" />
+	
+	<input type="checkbox" name="user_locked" class="user_locked" {{#if _this.locked}}checked{{/if}} />
+	<span> Locked</span>
+	
+	<br />
+	
+	<label for="display_name">Display Name: </label>
+	<input type="text" name="display_name" class="display_name" value="{{_this.display_name}}" />
+	
+	<br />
+	
+	<label for="user_email">Email: </label>
+	<input type="text" name="user_email" class="user_email" value="{{_this.email}}" />
+	
+	<br />
+	
+	<label for="user_role">Role: </label>
+	<select name="user_role" class="user_role">
+		<option value="member" {{#ifMember _this._id req}}selected{{/ifMember}}>Member</option>
+		<option value="chapter_leader" {{#ifChapterLeader _this._id req}}selected{{/ifChapterLeader}}>Chapter Leader</option>
+		<option value="administrator" {{#ifAdmin _this._id req}}selected{{/ifAdmin}}>Administrator</option>
+	</select>
+	
+	<br />
+	
+	<input type="hidden" name="user_id" class="user_id" value="{{_this._id}}" />
+	
+	<input type="submit" value="Save" />
+	<span class="user-saved">Saved!</span>
+	
+	<div class="user-actions">
+		<a onclick="usersRemove('{{_this._id}}')">delete</a>
+	</div>
+</form>

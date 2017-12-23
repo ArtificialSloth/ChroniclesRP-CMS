@@ -1,0 +1,30 @@
+{{#unless req.user}}
+	<form id="register-form" class="standard-form">
+		<label for="user_login" required>Username</label>
+		<div class="standard-input">
+			<input type="text" name="user_login" class="user_login" />
+			<span class="input-error"></span>
+		</div>
+		
+		<label for="user_email" required>Email Address</label>
+		<div class="standard-input">
+			<input type="text" name="user_email" class="user_email" />
+			<span class="input-error"></span>
+		</div>
+		
+		<label for="user_pass" required>Choose a Password</label>
+		<div class="standard-input">
+			<input type="password" name="user_pass" class="user_pass" />
+			<span class="input-error"></span>
+		</div>
+		
+		<label for="user_pass_confirm" required>Confirm Password</label>
+		<div class="standard-input">
+			<input type="password" name="user_pass_confirm" class="user_pass_confirm" />
+			<span class="input-error"></span>
+		</div>
+
+		<input type="submit" value="Complete Signup" />
+	</form>
+	<script src="/js/members/register.js"></script>
+{{/unless}}

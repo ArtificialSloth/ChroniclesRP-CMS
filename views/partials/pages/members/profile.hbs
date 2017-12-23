@@ -1,0 +1,34 @@
+<div class="profile">
+	<link rel="stylesheet" href="/css/members/profile.css">
+
+	<div class="profile-header">
+		<div class="header-cover-image" style="background-image:url('{{user.meta.cover_pic}}')"></div>
+		<div class="header-meta">
+			<img class="profile-pic" src="{{user.meta.profile_pic}}" />
+			<div class="profile-details">
+				<a class="profile-name" onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
+				<span class="profile-tagline">{{user.meta.tagline}}</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="profile-content">
+		<div class="top-bar"></div>
+		
+		<div class="containor">
+			{{html subPage}}
+		</div>
+		
+		<div class="nav">
+			<a onclick="crpGetSubPage('/members/{{user.nicename}}', '.profile-content .containor', true)">Activity</a>
+			<a>Info</a>
+			<a>Friends</a>
+			<a>Groups</a>
+			{{#ifIsUser user req}}
+				<a>Messages</a>
+				<a onclick="crpGetSubPage('/members/{{user.nicename}}/account', '.profile-content .containor', true)">Account</a>
+				<a>Settings</a>
+			{{/ifIsUser}}
+		</div>
+	</div>
+</div>

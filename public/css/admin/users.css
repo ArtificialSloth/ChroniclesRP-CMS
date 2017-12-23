@@ -1,0 +1,148 @@
+.users-menu {
+	font-size:0;
+}
+
+.users-menu input[type=button] {
+	background-color:#242424;
+	border:none;
+	border-radius:0;
+	font-size:16px;
+	margin-left:1px;
+}
+
+.users-menu input[type=button].active {
+	background-color:#323232;
+}
+
+.users-menu input[type=button]:hover {
+	color:#E0E0E0;
+	background-color:#323232;
+}
+
+.users-content .table {
+	margin-left:1px;
+	width:100%;
+}
+
+.users-content .table .filter {
+	display:none;
+}
+
+.users-content .table .filter.active {
+	display:block;
+}
+
+.users-content .table .table-row {
+	background-color:#242424;
+	cursor:pointer;
+	display:flex;
+	justify-content:space-evenly;
+	margin-bottom:1px;
+}
+
+.users-content .table .table-row.table-header {
+	background-color:#323232;
+	cursor:auto;
+}
+
+.users-content .table .table-row:hover:not(.table-header) {
+	background-color:#323232;
+}
+
+.users-content .table .table-row .table-header-data {
+	flex:1;
+	padding:10px;
+	text-align:left;
+}
+
+.users-content .table .table-row .table-data {
+	flex:1;
+	padding:10px;
+}
+
+.users-content .table .table-row.locked .table-data {
+	color:#999;
+}
+
+.users-content .table form {
+	background-color:#242424;
+	height:0;
+	overflow:hidden;
+	transition:all 0.2s ease-in-out;
+	visibility:hidden;
+}
+
+.users-content .table form.active {
+	height:240px;
+	margin-bottom:1px;
+	margin-top:-1px;
+	padding:10px;
+	visibility:initial;
+}
+
+.users-content .table form label {
+	display:inline-block;
+	width:15%;
+}
+
+.users-content .table form select,
+.users-content .table form input {
+	margin-bottom:15px;
+}
+
+.users-content .table form input[type=submit] {
+	float:right;
+}
+
+.users-content .table form .user-saved {
+	color:#55ff55;
+	display:none;
+	float:right;
+	padding:5px 10px;
+}
+
+.users-content .table form .user-saved.active {
+	display:initial;
+}
+
+.users-content .table form .user-actions {
+	display:block;
+	margin-top:16px;
+}
+
+.users-content .table form .user-actions a:nth-child(2) {
+	border-left:1px solid #999;
+	padding-left:4px;
+}
+
+.users-content .table form .user-actions a {
+	cursor:pointer;
+}
+
+.users-content .table form .user-actions a:hover {
+	text-decoration:underline;
+}
+
+.add-user {
+	border:1px solid #585858;
+	margin:15px 30px 30px 30px;
+	padding:25px;
+}
+
+.add-user legend {
+	background-color:#242424;
+    padding:5px;
+}
+
+.add-user form label {
+	display:inline-block;
+	width:15%;
+}
+
+.add-user form input {
+	margin-bottom:15px;
+}
+
+.add-user form input[type=submit] {
+	float:right;
+}

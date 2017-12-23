@@ -1,0 +1,96 @@
+#login {
+	display:flex;
+	flex-direction:column;
+	height:100%;
+	justify-content:center;
+	opacity:0;
+	position:fixed;
+	transition:all 0.2s ease-in-out;
+	width:100%;
+	visibility:hidden;
+	z-index:4;
+}
+
+#login.active {
+	opacity:1;
+	visibility:initial;
+}
+
+#login .login-background {
+	position:absolute;
+	background-color:rgba(0, 0, 0, 0.75);	
+	height:100%;
+	width:100%;
+}
+
+#login form {
+	background-color:#141414;
+	font-family:Droid Serif, Georgia, serif;
+	margin:auto;
+	padding:10px;
+	width:330px;
+}
+
+#login form h1 {
+	font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
+	font-size:24px;
+	font-weight:bold;
+	margin-bottom:30px;
+	text-align:center;
+}
+
+#login form label {
+	color:#999;
+	font-size:18px;
+}
+
+#login form input[type=text],
+#login form input[type=password] {
+	display:block;
+	margin-top:0.5em;
+	margin-bottom:1.25em;
+	width:318px;
+}
+
+#login form input.input-error {
+	border:1px solid #ff0000;
+}
+
+#login form input[type=checkbox] + input[type=button] {
+	background-color:transparent;
+	border:none;
+	color:#3bc492;
+	padding:0;
+}
+
+#login form .error-message {
+	background-color: #9D3834;
+	border:1px dashed #fff;
+	display:none;
+	margin-bottom:1.25em;
+	padding:10px;
+	text-align:center;
+}
+
+#login.error form .error-message {
+	display:block;
+	position:relative;
+}
+
+#login form input[type=submit] {
+	float:right;
+}
+
+.wiggle {
+	animation-name:wiggle;
+	animation-duration:250ms;
+	animation-iteration-count:2;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes wiggle {
+	0% {left: 0;}
+	25% {left: -5px;}
+	75% {left: 5px}
+	100% {left: 0}
+}

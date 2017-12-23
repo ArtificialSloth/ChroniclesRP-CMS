@@ -1,0 +1,34 @@
+<div class="table-row {{_this._id}}" onclick="$(this).next().toggleClass('active')">
+	<div class="table-data title">{{_this.title}}</div>
+	<div class="table-data slug">{{_this.slug}}</div>
+	<div class="table-data date">{{dateToStr _this.date}}</div>
+</div>
+<form class="post-settings-form">
+	<label for="post_title">Title: </label>
+	<input type="text" name="post_title" class="post_title" value="{{_this.title}}" />
+	
+	<br />
+	
+	<label for="post_slug">Slug: </label>
+	<input type="text" name="post_slug" class="post_slug" value="{{_this.slug}}" />
+	
+	<br />
+	
+	<label for="post_img">Featured Image: </label>
+	<input type="text" name="post_img" class="post_img" value="{{_this.img}}" />
+	
+	<br />
+	
+	<textarea name="post_content" class="post_content tinymce">{{_this.content}}</textarea>
+	
+	<br />
+	
+	<input type="hidden" name="post_id" class="post_id" value="{{_this._id}}" />
+	
+	<input type="submit" value="Save" />
+	<span class="post-saved">Saved!</span>
+	
+	<div class="post-actions">
+		<a onclick="postsRemove('{{_this._id}}')">delete</a>
+	</div>
+</form>

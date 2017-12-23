@@ -1,0 +1,32 @@
+.header {
+	padding:70px 0;
+}
+
+.header.section-inner {
+	position:relative;
+	width: 325px;
+	top:60px;
+}
+
+.site-title {
+	font-size:1.75em;
+	font-style:normal;
+	text-transform:uppercase;
+	text-align:center;
+	text-shadow:0 1px 1px rgba(0,0,0,0.2);
+}
+
+.site-title a {
+	color:#fff;
+	text-decoration:none;
+}
+
+.site-description {
+	margin-top:25px;
+	color:#fff;
+	line-height:145%;
+	font-family:Droid Serif, Georgia, serif;
+	font-size:18px;
+	text-align:center;
+	text-shadow:0 1px 0 rgba(0,0,0,0.2);
+}

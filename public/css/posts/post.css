@@ -1,0 +1,48 @@
+.post {
+	padding:30px;
+}
+
+.post-header img {
+	display:block;
+	margin:auto;
+	max-width:100%;
+}
+
+.post-header h1.post-title {
+	display:block;
+	font-size:24px;
+	font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
+	margin-top:50px;
+	margin-bottom:25px;
+	text-align:center;
+	text-transform:uppercase;
+}
+
+.post-content {
+	padding:0px 30px 30px 30px;
+}
+
+.post-content h2 {
+	font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
+	font-size:1em;
+	margin-bottom:25px;
+	text-transform:uppercase;
+}
+
+.post-content h3 {
+	font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
+	font-size:0.8em;
+	margin:25px 0;
+	text-transform:uppercase;
+}
+
+.post-content p {
+	font-size:18px;
+	margin-bottom:20px;
+}
+
+.post-content hr {
+	border-bottom:2px solid #E0E0E0;
+	display:block;
+	margin:25px 0;
+}

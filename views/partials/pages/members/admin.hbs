@@ -1,0 +1,86 @@
+<div class="users-menu">
+	<input type="button" class="all active" onclick="usersToggleRoleFilter(this, 'all')" value="All ({{crp.global.users.length}})" />
+	
+	{{#ifHasMembers 'administrator' req}}
+		<input type="button" class="administrator" onclick="usersToggleRoleFilter(this, 'administrator')" value="Administrators ({{users.length}})" />
+	{{/ifHasMembers}}
+	
+	{{#ifHasMembers 'chapter_leader' req}}
+		<input type="button" class="chapter-leader" onclick="usersToggleRoleFilter(this, 'chapter-leader')" value="Chapter Leaders ({{users.length}})" />
+	{{/ifHasMembers}}
+	
+	{{#ifHasMembers 'member' req}}
+		<input type="button" class="member" onclick="usersToggleRoleFilter(this, 'member')" value="Members ({{users.length}})" />
+	{{/ifHasMembers}}
+	
+	{{#ifHasMembers 'pending' req}}
+		<input type="button" class="pending" onclick="usersToggleRoleFilter(this, 'pending')" value="Pending ({{users.length}})" />
+	{{/ifHasMembers}}
+</div>
+
+<div class="users-content">
+	<div class="table">
+		<div class="table-row table-header">
+			<div class="table-header-data">Username</div>
+			<div class="table-header-data">Email</div>
+			<div class="table-header-data">Role</div>
+		</div>
+		<div class="filter all active">
+			{{#ifHasMembers '*' req}}
+				{{#each users}}
+					{{render 'pages/members/admin/loop' req this}}
+				{{/each}}
+			{{/ifHasMembers}}
+		</div>
+		<div class="filter administrator">
+			{{#ifHasMembers 'administrator' req}}
+				{{#each users}}
+					{{render 'pages/members/admin/loop' req this}}
+				{{/each}}
+			{{/ifHasMembers}}
+		</div>
+		<div class="filter chapter-leader">
+			{{#ifHasMembers 'chapter_leader' req}}
+				{{#each users}}
+					{{render 'pages/members/admin/loop' req this}}
+				{{/each}}
+			{{/ifHasMembers}}
+		</div>
+		<div class="filter member">
+			{{#ifHasMembers 'member' req}}
+				{{#each users}}
+					{{render 'pages/members/admin/loop' req this}}
+				{{/each}}
+			{{/ifHasMembers}}
+		</div>
+		<div class="filter pending">
+			{{#ifHasMembers 'pending' req}}
+				{{#each users}}
+					{{render 'pages/members/admin/loop' req this}}
+				{{/each}}
+			{{/ifHasMembers}}
+		</div>
+	</div>
+</div>
+
+<fieldset class="add-user">
+	<legend>Add a New User</legend>
+	<form>
+		<label for="user_login">Username: </label>
+		<input type="text" name="user_login" class="user_login" autocomplete="off" />
+		<br />
+		<label for="user_email">Email: </label>
+		<input type="text" name="user_email" class="user_email" autocomplete="off" />
+		<br />
+		<label for="user_pass">Password: </label>
+		<input type="password" name="user_pass" class="user_pass" autocomplete="off" />
+		<input type="checkbox" name="encrypted" class="encrypted" autocomplete="off" />
+		<label for="encrypted">Encrypted</label>
+		<br />
+		<label for="register_date">Registration Date: </label>
+		<input type="text" name="register_date" class="register_date" autocomplete="off" />
+		
+		<input type="submit" value="Add User" />
+	</form>
+</fieldset>
+<script src="/js/admin/users.js"></script>

@@ -1,0 +1,120 @@
+.posts-content .table {
+	margin-left:1px;
+	width:100%;
+}
+
+.posts-content .table .table-row {
+	background-color:#242424;
+	cursor:pointer;
+	display:flex;
+	justify-content:space-evenly;
+	margin-bottom:1px;
+}
+
+.posts-content .table .table-row.table-header {
+	background-color:#323232;
+	cursor:auto;
+}
+
+.posts-content .table .table-row:hover:not(.table-header) {
+	background-color:#323232;
+}
+
+.posts-content .table .table-row .table-header-data {
+	flex:1;
+	padding:10px;
+	text-align:left;
+}
+
+.posts-content .table .table-row .table-data {
+	flex:1;
+	padding:10px;
+}
+
+.posts-content .table .table-row.locked .table-data {
+	color:#999;
+}
+
+.posts-content .table form {
+	background-color:#242424;
+	height:0;
+	overflow:hidden;
+	transition:all 0.2s ease-in-out;
+	visibility:hidden;
+}
+
+.posts-content .table form.active {
+	height:520px;
+	margin-bottom:1px;
+	margin-top:-1px;
+	padding:10px;
+	visibility:initial;
+}
+
+.posts-content .table form label {
+	display:inline-block;
+	width:15%;
+}
+
+.posts-content .table form select,
+.posts-content .table form input {
+	margin-bottom:15px;
+}
+
+.posts-content .table form input[type=submit] {
+	float:right;
+}
+
+.posts-content .table form .post-saved {
+	color:#55ff55;
+	display:none;
+	float:right;
+	padding:5px 10px;
+}
+
+.posts-content .table form .post-saved.active {
+	display:initial;
+}
+
+.posts-content .table form .post-actions {
+	display:block;
+	margin-top:16px;
+}
+
+.posts-content .table form .post-actions a:nth-child(2) {
+	border-left:1px solid #999;
+	padding-left:4px;
+}
+
+.posts-content .table form .post-actions a {
+	cursor:pointer;
+}
+
+.posts-content .table form .post-actions a:hover {
+	text-decoration:underline;
+}
+
+.add-post {
+	border:1px solid #585858;
+	margin:15px 30px 30px 30px;
+	padding:25px;
+}
+
+.add-post legend {
+	background-color:#242424;
+    padding:5px;
+}
+
+.add-post form label {
+	display:inline-block;
+	width:15%;
+}
+
+.add-post form input,
+.add-post form textarea {
+	margin-bottom:15px;
+}
+
+.add-post form input[type=submit] {
+	float:right;
+}
