@@ -3,7 +3,16 @@ module.exports = (crp) => {
 		if (err) throw err;
 		
 		crp.global.users = result;						
-		for (var k in crp.global.users) {		
+		for (var k in crp.global.users) {
+			var profilePages = [
+				'/info',
+				'/friends',
+				'/groups',
+				'/messages',
+				'/account',
+				'/settings'
+			];
+			
 			crp.global.pages.push({
 				slug: '/members/' + crp.global.users[k].nicename,
 				path: '/members/profile',
@@ -14,15 +23,17 @@ module.exports = (crp) => {
 				}
 			});
 			
-			crp.global.pages.push({
-				slug: '/members/' + crp.global.users[k].nicename + '/account',
-				path: '/members/profile',
-				subPage: crp.PAGESDIR + '/members/profile/account',
-				context: {
-					key: 'user',
-					val: crp.global.users[k]
-				}
-			});
+			for (var i in profilePages) {
+				crp.global.pages.push({
+					slug: '/members/' + crp.global.users[k].nicename + profilePages[i],
+					path: '/members/profile',
+					subPage: crp.PAGESDIR + '/members/profile' + profilePages[i],
+					context: {
+						key: 'user',
+						val: crp.global.users[k]
+					}
+				});
+			}
 		}
 			
 		crp.global.pages.push({

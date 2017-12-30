@@ -21,13 +21,13 @@
 		
 		<div class="nav">
 			<a onclick="crpGetSubPage('/members/{{user.nicename}}', '.profile-content .containor', true)">Activity</a>
-			<a>Info</a>
-			<a>Friends</a>
-			<a>Groups</a>
+			<a onclick="crpGetSubPage('/members/{{user.nicename}}/info', '.profile-content .containor', true)">Info</a>
+			<a onclick="crpGetSubPage('/members/{{user.nicename}}/friends', '.profile-content .containor', true)">Friends</a>
+			<a onclick="crpGetSubPage('/members/{{user.nicename}}/groups', '.profile-content .containor', true)">Groups</a>
 			{{#ifIsUser user req}}
-				<a>Messages</a>
+				<a onclick="crpGetSubPage('/members/{{user.nicename}}/messages', '.profile-content .containor', true)">Messages</a>
 				<a onclick="crpGetSubPage('/members/{{user.nicename}}/account', '.profile-content .containor', true)">Account</a>
-				<a>Settings</a>
+				<a onclick="crpGetSubPage('/members/{{user.nicename}}/settings', '.profile-content .containor', true)">Settings</a>
 			{{/ifIsUser}}
 		</div>
 	</div>
