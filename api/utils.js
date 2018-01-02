@@ -96,6 +96,16 @@ module.exports = (crp) => {
 			if (err) throw err;
 		});
 	};
+	
+	crp.util.mail = (to, subject, msg) => {
+		crp.mail.send({
+			to: to,
+			from: 'no_reply@chroniclesrp.com',
+			subject: subject,
+			text: msg,
+			html: msg
+		});
+	};
 		
 	crp.util.requireFiles('/utils.js');
 };
