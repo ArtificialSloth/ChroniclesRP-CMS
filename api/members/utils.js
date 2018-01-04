@@ -123,7 +123,7 @@ module.exports = (crp) => {
 			role: data.role || 'pending',
 			locked: data.locked || false,
 			meta: data.meta || {
-				timezone: crp.moment().tz.guess()
+				timezone: crp.moment.tz.guess()
 			}
 		};
 		

@@ -1,6 +1,7 @@
 module.exports = (crp, callback) => {
 	var bodyParser = require('body-parser');
 	var multer = require('multer');
+	var recaptcha = require('recaptcha2');
 	
 	crp.express = require('express');
 	crp.express.exphbs = require('express-handlebars');
@@ -9,6 +10,10 @@ module.exports = (crp, callback) => {
 	crp.express.hbs = crp.express.exphbs.create({
 		extname: '.hbs',
 		defaultLayout: 'main'
+	});
+	crp.express.recaptcha = new recaptcha({
+		siteKey: '6Lf0MT8UAAAAAJ48jzvBm-QGZpB0Fer8WsGpguMS',
+		secretKey: process.env.RECAPTCHA_SECRET
 	});
 	crp.express.upload = multer({
 		dest: crp.PUBLICDIR + '/uploads',

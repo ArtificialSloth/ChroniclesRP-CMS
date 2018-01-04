@@ -25,25 +25,29 @@ module.exports = (crp) => {
 	});
 	
 	crp.express.app.post('/api/register', (req, res) => {
-		var userData = {
-			login: req.body.user_login,
-			pass: req.body.user_pass,
-			email: req.body.user_email
-		};
-		var newUser = crp.util.addUser(userData);
-		
-		if (newUser._id) {
-			req.login(newUser, (err) => {
-				if (err) {
-					newUser = 'generic';
+		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
+			var userData = {
+				login: req.body.user_login,
+				pass: req.body.user_pass,
+				email: req.body.user_email
+			};
+			var newUser = crp.util.addUser(userData);
+			
+			if (newUser._id) {
+				req.login(newUser, (err) => {
+					if (err) {
+						newUser = 'generic';
+						return;
+					}
+					
 					return;
-				}
-				
-				return;					
-			});
-		}
-		
-		res.send(newUser);
+				});
+			}
+			
+			res.send(newUser);
+		}).catch((err) => {
+			res.send('noCaptcha');
+		});
 	});
 	
 	var editUser = crp.express.upload.fields([

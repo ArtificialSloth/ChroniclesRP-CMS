@@ -1,5 +1,8 @@
 {{#unless req.user}}
+	<link rel="stylesheet" href="/css/members/register.css">
 	<form id="register-form" class="standard-form">
+		<div class="g-recaptcha" data-sitekey="6Lf0MT8UAAAAAJ48jzvBm-QGZpB0Fer8WsGpguMS"></div>	
+	
 		<label for="user_login" required>Username</label>
 		<div class="standard-input">
 			<input type="text" name="user_login" class="user_login" />
@@ -23,7 +26,7 @@
 			<input type="password" name="user_pass_confirm" class="user_pass_confirm" />
 			<span class="input-error"></span>
 		</div>
-
+		
 		<input type="submit" value="Complete Signup" />
 	</form>
 	<script src="/js/members/register.js"></script>
