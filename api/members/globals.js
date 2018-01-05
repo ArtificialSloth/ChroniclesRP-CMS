@@ -4,36 +4,7 @@ module.exports = (crp) => {
 		
 		crp.global.users = result;						
 		for (var k in crp.global.users) {
-			var profilePages = [
-				'/info',
-				'/friends',
-				'/groups',
-				'/messages',
-				'/account',
-				'/settings'
-			];
-			
-			crp.global.pages.push({
-				slug: '/members/' + crp.global.users[k].nicename,
-				path: '/members/profile',
-				subPage: crp.PAGESDIR + '/members/profile/activity',
-				context: {
-					key: 'user',
-					val: crp.global.users[k]
-				}
-			});
-			
-			for (var i in profilePages) {
-				crp.global.pages.push({
-					slug: '/members/' + crp.global.users[k].nicename + profilePages[i],
-					path: '/members/profile',
-					subPage: crp.PAGESDIR + '/members/profile' + profilePages[i],
-					context: {
-						key: 'user',
-						val: crp.global.users[k]
-					}
-				});
-			}
+			crp.util.addProfilePage(crp.global.users[k]);
 		}
 			
 		crp.global.pages.push({

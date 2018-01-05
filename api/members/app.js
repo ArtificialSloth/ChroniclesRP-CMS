@@ -37,9 +37,11 @@ module.exports = (crp) => {
 				req.login(newUser, (err) => {
 					if (err) {
 						newUser = 'generic';
+						console.log(err);
 						return;
 					}
 					
+					crp.util.mail(newUser.email, 'Welcome ' + newUser.login + '!', '<span style="color:#ff0000">PLACEHOLDER</span>');
 					return;
 				});
 			}

@@ -76,12 +76,15 @@ $('#register-form').submit((e) => {
 		$('#register-form .user_email').parent().removeClass('error');
 		$('#register-form .user_pass').parent().removeClass('error');
 	
-		if (response == 'loginLength') {
+		if (response == 'noCaptcha') {
+			$('#register-form .g-recaptcha').parent().addClass('error');
+			$('#register-form .g-recaptcha + .input-error').html('Please click the captcha first.');
+		} else if (response == 'loginLength') {
 			$('#register-form .user_login').parent().addClass('error');
 			$('#register-form .user_login + .input-error').html('Username must be at least 4 characters!');
 		} else if (response == 'loginTaken') {
 			$('#register-form .user_login').parent().addClass('error');
-			$('#register-form .user_login + .input-error').html('Username is already on use!');
+			$('#register-form .user_login + .input-error').html('Username is already in use!');
 		} else if (response == 'passLength') {
 			$('#register-form .user_pass').parent().addClass('error');
 			$('#register-form .user_pass + .input-error').html('Password must be at least 6 characters!');

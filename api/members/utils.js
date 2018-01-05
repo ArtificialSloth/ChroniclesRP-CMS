@@ -151,6 +151,7 @@ module.exports = (crp) => {
 		
 		crp.db.collection(crp.db.PREFIX + 'users').insertOne(user);
 		crp.global.users.push(user);
+		crp.util.addProfilePage(user);
 		
 		return user;
 	};
@@ -186,5 +187,38 @@ module.exports = (crp) => {
 	
 	crp.util.roleHasUsers = (role) => {
 		return crp.util.getUsersByRole(role).length !== 0;
+	};
+	
+	crp.util.addProfilePage = (user) => {
+		var profilePages = [
+			'/info',
+			'/friends',
+			'/groups',
+			'/messages',
+			'/account',
+			'/settings'
+		];
+		
+		crp.global.pages.push({
+			slug: '/members/' + user.nicename,
+			path: '/members/profile',
+			subPage: crp.PAGESDIR + '/members/profile/activity',
+			context: {
+				key: 'user',
+				val: user
+			}
+		});
+		
+		for (var i in profilePages) {
+			crp.global.pages.push({
+				slug: '/members/' + user.nicename + profilePages[i],
+				path: '/members/profile',
+				subPage: crp.PAGESDIR + '/members/profile' + profilePages[i],
+				context: {
+					key: 'user',
+					val: user
+				}
+			});
+		}
 	};
 };
