@@ -33,6 +33,14 @@ module.exports = (crp) => {
 		return object;
 	};
 	
+	crp.util.parseString = (str, keys) => {
+		for (var i in keys) {
+			str = str.replace(new RegExp(keys[i][0], 'g'), keys[i][1]);
+		}
+		
+		return str;
+	};
+	
 	crp.util.dateToStr = (date) => {
 		return crp.moment(date).utcOffset('-05:00').format('LLL');
 	};
@@ -97,15 +105,18 @@ module.exports = (crp) => {
 		});
 	};
 	
-	crp.util.mail = (to, subject, msg) => {
-		crp.mail.send({
-			to: to,
-			from: 'no_reply@chroniclesrp.com',
-			subject: subject,
-			text: msg,
-			html: msg
-		});
-	};
+	crp.util.editSite = (site) => {
+		var newSite = {
+			name: site.name || crp.global.site.name,
+			tagline: site.tagline || crp.global.site.tagline,
+			mail_template: site.mail_template || crp.global.site.mail_template
+		};
 		
+		newSite = crp.util.sanitizeObject(newSite);
+		crp.db.collection(crp.db.PREFIX + 'site').replaceOne({}, newSite);
+		
+		return crp.global.site = newSite;
+	};
+
 	crp.util.requireFiles('/utils.js');
 };

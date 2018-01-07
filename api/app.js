@@ -56,6 +56,16 @@ module.exports = (crp, callback) => {
 			
 			res.send(page.context.subPage);
 		});
+		
+		crp.express.app.post('/api/admin/edit-site', (req, res) => {
+			var site = {
+				name: req.body.site_name,
+				tagline: req.body.site_tagline,
+				mail_template: req.body.mail_template
+			};
+			
+			res.send(crp.util.editSite(site));
+		});
 	};
 	
 	callback(null, crp);

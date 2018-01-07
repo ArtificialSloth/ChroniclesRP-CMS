@@ -7,7 +7,6 @@ module.exports = (crp, callback) => {
 		
 		db.PREFIX = 'CRP_';
 		db.objectID = mongodb.ObjectId;
-		db.mongoExpress = require('./mongo-express.js')(crp);
 		db.sanitize = require('mongo-sanitize');
 		
 		crp.db = db;

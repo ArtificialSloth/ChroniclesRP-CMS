@@ -20,7 +20,7 @@ async.waterfall([
 		require('./api/database/db.js')(crp, callback);
 	},
 	(crp, callback) => {
-		require('./api/mail.js')(crp, callback);
+		require('./api/mail/mail.js')(crp, callback);
 	},
 	(crp, callback) => {
 		require('./api/members/passport.js')(crp, callback);
