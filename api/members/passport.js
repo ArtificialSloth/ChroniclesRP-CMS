@@ -2,11 +2,12 @@ module.exports = (crp, callback) => {
 	crp.auth = {};
 	
 	crp.auth.bcrypt = require('bcrypt');
+	crp.auth.crypto = require('crypto');
 	crp.auth.session = require('express-session');
 	crp.auth.mongoStore = require('connect-mongo')(crp.auth.session);
 	crp.auth.passport = require('passport');
 	crp.auth.strategy = require('passport-local').Strategy;
-	
+		
 	crp.express.app.use(crp.auth.session({
 		secret: process.env.SESSION_SECRET,
 		resave: false,

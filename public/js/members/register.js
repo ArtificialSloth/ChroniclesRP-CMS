@@ -95,7 +95,7 @@ $('#register-form').submit((e) => {
 			$('#register-form .user_login').parent().addClass('error');
 			$('#register-form .user_login + .input-error').html('Something went wrong :(');
 		} else {
-			window.location.replace('/registered');
+			window.location.replace('/members/' + response.nicename);
 		}
 	});
 });

@@ -122,6 +122,7 @@ module.exports = (crp) => {
 			nicename: data.nicename || data.login.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
 			role: data.role || 'pending',
 			locked: data.locked || false,
+			activation_code: crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase(),
 			meta: data.meta || {
 				timezone: crp.moment.tz.guess()
 			}

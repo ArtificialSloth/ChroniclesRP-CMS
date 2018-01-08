@@ -58,6 +58,16 @@ function crpTinyMCE(selector) {
 	});
 }
 
+function crpActivateUser(code) {	
+	crpAjax('/api/activate', {code: code}, (response) => {
+		if (response == 'valid') {
+			location.reload();
+		} else {
+			
+		}
+	});
+}
+
 window.onpopstate = (e) => {
 	if (e.state) {
 		var page = e.state.page;

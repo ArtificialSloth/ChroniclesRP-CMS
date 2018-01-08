@@ -23,7 +23,7 @@ module.exports = (crp) => {
 		req.logout();
 		res.redirect('/');
 	});
-	
+		
 	crp.express.app.post('/api/register', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
 			var userData = {
@@ -41,8 +41,11 @@ module.exports = (crp) => {
 						return;
 					}
 					
-					crp.util.mail(newUser.email, 'Welcome ' + newUser.login + '!', '<span style="color:#ff0000">PLACEHOLDER</span>');
-					return;
+					var subject = 'Welcome to the Chronicles ' + newUser.login + '!';
+					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code - <span style="font-size:20px">' + newUser.activation_code + '</span>';
+					crp.util.mail(newUser.email, subject, msg);
+					
+					return newUser;
 				});
 			}
 			
@@ -50,6 +53,17 @@ module.exports = (crp) => {
 		}).catch((err) => {
 			res.send('noCaptcha');
 		});
+	});
+	
+	crp.express.app.post('/api/activate', (req, res) => {
+		var user = crp.util.getUserData(req.user);
+		
+		if (user && user.activation_code == req.body.code) {
+			crp.util.setUserData(user._id, {user_role: 'member'}, true);
+			res.send('valid');
+		} else {
+			res.send('invalid');
+		}
 	});
 	
 	var editUser = crp.express.upload.fields([
