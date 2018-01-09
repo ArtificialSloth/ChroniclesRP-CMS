@@ -1,20 +1,22 @@
 module.exports = (crp, callback) => {
 	crp.auth = {};
 	
+	crp.auth.failedLogins = {};
 	crp.auth.bcrypt = require('bcrypt');
 	crp.auth.crypto = require('crypto');
+	
 	crp.auth.session = require('express-session');
-	crp.auth.mongoStore = require('connect-mongo')(crp.auth.session);
+	crp.auth.redisStore = require('connect-redis')(crp.auth.session);
+	
 	crp.auth.passport = require('passport');
 	crp.auth.strategy = require('passport-local').Strategy;
 		
 	crp.express.app.use(crp.auth.session({
+		name: 'crp.sid',
 		secret: process.env.SESSION_SECRET,
 		resave: false,
 		saveUninitialized: false,
-		store: new crp.auth.mongoStore({
-			db: crp.db
-		})
+		store: new crp.auth.redisStore({client: crp.redis})
 	}));
 	crp.express.app.use(crp.auth.passport.initialize());
 	crp.express.app.use(crp.auth.passport.session());

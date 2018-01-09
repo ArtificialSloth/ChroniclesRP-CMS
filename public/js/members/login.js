@@ -17,9 +17,11 @@ $(() => {
 		
 		var formData = $('#login-form').serialize();
 		crpAjax('/login', formData, (response) => {
-			if (response.status === true) {
+			if (response == 'valid') {
 				location.reload();
-			} else if (response.status == 'locked') {
+			} else if (response == 'tooMany') {
+				loginShowError('Too many failed login attempts. Please wait 5 minutes then try again.');
+			} else if (response == 'locked') {
 				loginShowError('Your account has been locked.');
 			} else {
 				loginShowError('Incorrect username or password');

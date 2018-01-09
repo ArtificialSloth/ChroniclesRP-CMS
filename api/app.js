@@ -1,12 +1,21 @@
 module.exports = (crp, callback) => {
 	var bodyParser = require('body-parser');
-	var multer = require('multer');
 	var recaptcha = require('recaptcha2');
+	var multer = require('multer');
+	var helmet = require('helmet');
 	
 	crp.express = require('express');
 	crp.express.exphbs = require('express-handlebars');
 	
 	crp.express.app = crp.express();
+	crp.express.limiter = require('express-limiter')(crp.express.app, crp.redis);
+	crp.express.limiter({
+		path: '*',
+		method: 'all',
+		lookup: ['connection.remoteAddress'],
+		total: 30,
+		expire: 1000
+	});
 	crp.express.hbs = crp.express.exphbs.create({
 		extname: '.hbs',
 		defaultLayout: 'main'
@@ -36,6 +45,13 @@ module.exports = (crp, callback) => {
 	crp.express.app.use(crp.express.static('public'));
 	crp.express.app.use(bodyParser.urlencoded({extended: false}));
 	crp.express.app.use('/jquery', crp.express.static(crp.ROOT + '/node_modules/jquery/dist/'));
+	crp.express.app.use(helmet({
+		expectCt: {
+			maxAge: 123
+		},
+		hsts: false,
+		noCache: true
+	}));
 	
 	crp.express.ready = () => {
 		crp.util.requireFiles('/app.js');

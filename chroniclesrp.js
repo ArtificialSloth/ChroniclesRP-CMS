@@ -8,8 +8,9 @@ async.waterfall([
 			PAGESDIR: __dirname + '/views/partials/pages',
 			async: async,
 			fs: require('fs'),
+			handlebars: require('handlebars'),
 			moment: require('moment-timezone'),
-			handlebars: require('handlebars')
+			redis: require('redis').createClient()
 		});
 	},
 	(crp, callback) => {

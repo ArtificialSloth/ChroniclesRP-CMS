@@ -2,8 +2,23 @@ module.exports = (crp) => {
 	crp.express.app.post('/login', (req, res, next) => {
 		crp.auth.passport.authenticate('local', (err, user) => {
 			if (err) return next(err);
+			var address = req.connection.remoteAddress;
 			
-			if (!user) return res.send({status: false});
+			if (!crp.auth.failedLogins[address]) crp.auth.failedLogins[address] = {count: 0, timeout: null};
+			if (crp.auth.failedLogins[address].count >= 5) {
+				if (!crp.auth.failedLogins[address].timeout) {
+					crp.auth.failedLogins[address].timeout = setTimeout(() => {
+						crp.auth.failedLogins[address] = {count: 0, timeout: null};
+					}, 5 * 60 * 1000);
+				}
+				
+				return res.send('tooMany');
+			}
+			
+			if (!user) {
+				crp.auth.failedLogins[address].count += 1;
+				return res.send('invalid');
+			}
 			if (req.body.remember_me) {
 				req.session.cookie.maxAge = 90 * 24 * 60 * 60 * 1000;
 			} else {
@@ -12,9 +27,9 @@ module.exports = (crp) => {
 			
 			req.login(user, (err) => {
 				if (err) return next(err);
-				if (user.locked) return res.send({status: 'locked'});
+				if (user.locked) return res.send('locked');
 
-				return res.send({status: true});					
+				return res.send('valid');					
 			});
 		})(req, res, next);
 	});
@@ -42,7 +57,7 @@ module.exports = (crp) => {
 					}
 					
 					var subject = 'Welcome to the Chronicles ' + newUser.login + '!';
-					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code - <span style="font-size:20px">' + newUser.activation_code + '</span>';
+					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code. <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
 					crp.util.mail(newUser.email, subject, msg);
 					
 					return newUser;
