@@ -15,7 +15,7 @@ $(() => {
 			return;
 		}
 		
-		var formData = $('#login-form').serialize();
+		var formData = $(e.target).serialize();
 		crpAjax('/login', formData, (response) => {
 			if (response == 'valid') {
 				location.reload();

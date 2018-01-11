@@ -12,9 +12,13 @@ module.exports = (crp, callback) => {
 	crp.express.limiter({
 		path: '*',
 		method: 'all',
-		lookup: ['connection.remoteAddress'],
-		total: 30,
-		expire: 1000
+		lookup: ['ip'],
+		total: 180,
+		expire: 60 * 1000,
+		onRateLimited: (req, res, next) => {
+			console.log(req.ip + ' limited')
+			res.redirect(429, '/');
+		}
 	});
 	crp.express.hbs = crp.express.exphbs.create({
 		extname: '.hbs',

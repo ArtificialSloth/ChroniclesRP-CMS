@@ -1,14 +1,12 @@
 module.exports = (crp) => {
 	crp.express.app.post('/login', (req, res, next) => {
 		crp.auth.passport.authenticate('local', (err, user) => {
-			if (err) return next(err);
-			var address = req.connection.remoteAddress;
-			
-			if (!crp.auth.failedLogins[address]) crp.auth.failedLogins[address] = {count: 0, timeout: null};
-			if (crp.auth.failedLogins[address].count >= 5) {
-				if (!crp.auth.failedLogins[address].timeout) {
-					crp.auth.failedLogins[address].timeout = setTimeout(() => {
-						crp.auth.failedLogins[address] = {count: 0, timeout: null};
+			if (err) return next(err);			
+			if (!crp.auth.failedLogins[req.ip]) crp.auth.failedLogins[req.ip] = {count: 0, timeout: null};
+			if (crp.auth.failedLogins[req.ip].count >= 5) {
+				if (!crp.auth.failedLogins[req.ip].timeout) {
+					crp.auth.failedLogins[req.ip].timeout = setTimeout(() => {
+						crp.auth.failedLogins[req.ip] = {count: 0, timeout: null};
 					}, 5 * 60 * 1000);
 				}
 				
@@ -16,7 +14,7 @@ module.exports = (crp) => {
 			}
 			
 			if (!user) {
-				crp.auth.failedLogins[address].count += 1;
+				crp.auth.failedLogins[req.ip].count += 1;
 				return res.send('invalid');
 			}
 			if (req.body.remember_me) {

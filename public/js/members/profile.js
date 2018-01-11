@@ -37,6 +37,15 @@ $('.user-account-form').submit((e) => {
 	});
 });
 
+$('.user-settings-form').submit((e) => {
+	e.preventDefault();
+
+	var formData = $(e.target).serialize();
+	crpAjaxUpload('/api/admin/edit-user', formData, (response) => {
+		console.log(response);
+	});
+});
+
 $(() => {
 	$('.user_timezone').val($('.timezone').val());
 	$('.user_gender').val($('.gender').val());

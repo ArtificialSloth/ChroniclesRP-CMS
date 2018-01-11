@@ -45,7 +45,7 @@ module.exports = (crp) => {
 		var user = crp.util.getUserData(userid);
 		if (user) {
 			var newUser = user;
-			
+
 			newUser.login = data.user_login || user.login;
 			newUser.pass = data.user_pass || user.pass;
 			newUser.email = data.user_email || user.email;
@@ -74,8 +74,10 @@ module.exports = (crp) => {
 				newUser.nicename = newUser.login.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 			}
 			
-			if (newUser.pass.length < 6) return 'passLength';
-			newUser.pass = crp.auth.bcrypt.hashSync(newUser.pass, 10);
+			if (newUser.pass != user.pass) {
+				if (newUser.pass.length < 6) return 'passLength';
+				newUser.pass = crp.auth.bcrypt.hashSync(newUser.pass, 10);
+			}
 			
 			if (!crp.util.validateEmail(newUser.email)) return 'emailInvalid';
 			

@@ -70,7 +70,7 @@ $('#register-form').submit((e) => {
 	if (!verifyPass()) return;
 	if (!confirmPass()) return;
 	
-	var formData = $('#register-form').serialize();
+	var formData = $(e.target).serialize();
 	crpAjax('/api/register', formData, (response) => {
 		$('#register-form .user_login').parent().removeClass('error');
 		$('#register-form .user_email').parent().removeClass('error');
