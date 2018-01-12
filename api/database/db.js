@@ -3,7 +3,7 @@ module.exports = (crp, callback) => {
 	var mongoClient = mongodb.MongoClient;
 	
 	mongoClient.connect(process.env.MONGODB_URL, (err, db) => {
-		if (err) throw err;
+		if (err) return console.error(err);
 		
 		db.PREFIX = 'CRP_';
 		db.objectID = mongodb.ObjectId;

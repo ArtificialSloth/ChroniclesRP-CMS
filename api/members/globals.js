@@ -1,6 +1,6 @@
 module.exports = (crp) => {
 	crp.db.collection(crp.db.PREFIX + 'users').find({}).toArray((err, result) => {
-		if (err) throw err;
+		if (err) return console.error(err);
 		
 		crp.global.users = result;						
 		for (var k in crp.global.users) {

@@ -97,11 +97,11 @@ module.exports = (crp) => {
 	
 	crp.util.replaceFile = (oldFile, newFile, newPath) => {
 		crp.fs.unlink(oldFile, (err) => {
-			if (err) throw err;
+			if (err) return console.error(err);
 		});
 		
 		crp.fs.rename(newFile, newPath, (err) => {
-			if (err) throw err;
+			if (err) return console.error(err);
 		});
 	};
 	

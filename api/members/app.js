@@ -72,8 +72,9 @@ module.exports = (crp) => {
 		var user = crp.util.getUserData(req.user);
 		
 		if (user && user.activation_code == req.body.code) {
-			crp.util.setUserData(user._id, {user_role: 'member'}, true);
-			res.send('valid');
+			crp.util.setUserData(user._id, {user_role: 'member'}, true, (newUser) => {
+				res.send(newUser);	
+			});
 		} else {
 			res.send('invalid');
 		}
@@ -90,8 +91,9 @@ module.exports = (crp) => {
 				if (req.files.cover_pic) req.body.cover_pic = req.files.cover_pic;
 			}
 			
-			var newUser = crp.util.setUserData(req.body.user_id, req.body, crp.util.isUserAdmin(req.user));
-			res.send(newUser);
+			crp.util.setUserData(req.body.user_id, req.body, crp.util.isUserAdmin(req.user), (newUser) => {
+				res.send(newUser);
+			});
 		}
 	});
 	

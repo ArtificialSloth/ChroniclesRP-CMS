@@ -44,7 +44,7 @@ module.exports = (crp, callback) => {
 			if (!user) return done(null, false, {message: 'Incorrect username.'});
 			
 			crp.auth.bcrypt.compare(password, user.pass, (err, isValid) => {
-				if (err) throw err;
+				if (err) return done(err, false);
 				if (!isValid) {
 					return done(null, false, {message: 'Incorrect password.'});
 				}

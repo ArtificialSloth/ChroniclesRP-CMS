@@ -40,9 +40,31 @@ $('.user-account-form').submit((e) => {
 $('.user-settings-form').submit((e) => {
 	e.preventDefault();
 
-	var formData = $(e.target).serialize();
+	var formData = new FormData(e.target);
 	crpAjaxUpload('/api/admin/edit-user', formData, (response) => {
-		console.log(response);
+		$('.user-settings-form .user_email').parent().removeClass('error');
+		$('.user-settings-form .old_pass').parent().removeClass('error');
+		$('.user-settings-form .new_pass').parent().removeClass('error');
+		$('.user-settings-form .confirm_new_pass').parent().removeClass('error');
+		
+		if (response == 'emailInvalid') {
+			$('.user-settings-form .user_email').parent().addClass('error');
+			$('.user-settings-form .user_email + .input-error').html('Email address invalid!');
+		} else if (response == 'passMismatch') {
+			$('.user-settings-form .old_pass').parent().addClass('error');
+			$('.user-settings-form .old_pass + .input-error').html('Wrong password!');
+		} else if (response == 'passLength') {
+			$('.user-settings-form .new_pass').parent().addClass('error');
+			$('.user-settings-form .new_pass + .input-error').html('New password must be at least 6 characters!');
+		} else if (response == 'newPassMismatch') {
+			$('.user-settings-form .confirm_new_pass').parent().addClass('error');
+			$('.user-settings-form .confirm_new_pass + .input-error').html('Passwords don\'t match!');
+		} else if (response == 'hashingError') {
+			$('.user-settings-form .new_pass').parent().addClass('error');
+			$('.user-settings-form .new_pass + .input-error').html('Something went wrong!');
+		} else {
+			location.assign('/logout');
+		}
 	});
 });
 

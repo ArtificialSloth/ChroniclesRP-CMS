@@ -41,77 +41,101 @@ module.exports = (crp) => {
 		return crp.util.getUsers({filter: ['_id', userid]})[0];
 	};
 	
-	crp.util.setUserData = (userid, data, admin) => {
+	crp.util.setUserData = (userid, data, admin, cb) => {
 		var user = crp.util.getUserData(userid);
-		if (user) {
-			var newUser = user;
-
-			newUser.login = data.user_login || user.login;
-			newUser.pass = data.user_pass || user.pass;
-			newUser.email = data.user_email || user.email;
-			newUser.register_date = user.register_date;
-			newUser.display_name = data.display_name || user.display_name;
-			newUser.nicename = data.nicename || user.nicename;
-			
-			if (admin) {
-				newUser.role = data.user_role || user.role;
-				newUser.locked = data.user_locked || false;
-			}
-			
-			newUser.meta = user.meta || {};
-			newUser.meta.date_of_birth = data.user_dob || user.meta.date_of_birth;
-			newUser.meta.timezone = data.user_timezone || user.meta.timezone;
-			newUser.meta.gender = data.user_gender || user.meta.gender;
-			newUser.meta.tagline = data.user_tagline || user.meta.tagline;
-			newUser.meta.about = data.user_about || user.meta.about;
-			
-			if (newUser.login != user.login) {
-				if (newUser.login.length < 4) return 'loginLength';
-				if (crp.util.getUsers({filter: ['login', newUser.login]}).length > 0) {
-					return 'loginTaken';
+		if (!user) return cb('noUser');
+		
+		crp.async.waterfall([
+			(callback) => {
+				var newUser = user;
+				
+				newUser.display_name = data.display_name || user.display_name;
+				newUser.meta = user.meta || {};
+				newUser.meta.tagline = data.user_tagline || user.meta.tagline;
+				newUser.meta.about = data.user_about || user.meta.about;
+				
+				if (admin) {
+					newUser.role = data.user_role || user.role;
+					newUser.locked = data.user_locked || user.locked;
 				}
 				
-				newUser.nicename = newUser.login.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-			}
-			
-			if (newUser.pass != user.pass) {
-				if (newUser.pass.length < 6) return 'passLength';
-				newUser.pass = crp.auth.bcrypt.hashSync(newUser.pass, 10);
-			}
-			
-			if (!crp.util.validateEmail(newUser.email)) return 'emailInvalid';
-			
-			if (!crp.moment(new Date(newUser.meta.date_of_birth)).isValid()) return 'dobInvalid';
-			newUser.meta.date_of_birth = crp.moment(new Date(newUser.meta.date_of_birth)).format('MM/DD/YYYY');
-			
-			if (!crp.moment.tz.names().includes(newUser.meta.timezone)) return 'tzInvalid';
-			
-			if (data.profile_pic) {
-				var path = '/img/members/' + newUser.nicename + '/' + data.profile_pic[0].originalname;
+				if (data.user_login && data.user_login != user.login) {
+					if (data.user_login < 4) return callback('loginLength');
+					if (crp.util.getUsers({filter: ['login', data.user_login]}).length > 0) {
+						return callback('loginTaken');
+					}
+						
+					newUser.login = data.user_login;
+					newUser.nicename = newUser.login.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+				}
 				
-				crp.util.replaceFile(crp.PUBLICDIR + user.meta.profile_pic, data.profile_pic[0].path, crp.PUBLICDIR + path);
+				if (data.user_email && data.user_email != user.email) {
+					if (!crp.util.validateEmail(data.user_email)) return callback('emailInvalid');
+					
+					newUser.email = data.user_email;
+				}
 				
-				newUser.meta.profile_pic = path;
+				if (data.user_dob && data.user_dob != user.meta.date_of_birth) {
+					if (!crp.moment(new Date(data.user_dob)).isValid()) return callback('dobInvalid');
+					
+					newUser.meta.date_of_birth = crp.moment(new Date(data.user_dob)).format('MM/DD/YYYY');
+				}
+				
+				if (data.user_timezone && data.user_timezone != user.meta.timezone) {
+					if (!crp.moment.tz.names().includes(data.user_timezone)) return callback('tzInvalid');
+
+					newUser.meta.timezone = data.user_timezone;
+				}
+				
+				if (data.user_gender && data.user_gender != user.meta.gender) {
+					var genders = ['---', 'Bolian', 'Female', 'Male'];
+					if (!genders.includes(data.user_gender)) return callback('genderInvalid');
+					
+					newUser.meta.gender = data.user_gender;
+				}
+				
+				if (data.profile_pic) {
+					var path = '/img/members/' + newUser.nicename + '/' + data.profile_pic[0].originalname;
+					
+					crp.util.replaceFile(crp.PUBLICDIR + user.meta.profile_pic, data.profile_pic[0].path, crp.PUBLICDIR + path);
+					newUser.meta.profile_pic = path;
+				}
+				
+				if (data.cover_pic) {
+					var path = '/img/members/' + newUser.nicename + '/' + data.cover_pic[0].originalname;
+					
+					crp.util.replaceFile(crp.PUBLICDIR + user.meta.cover_pic, data.cover_pic[0].path, crp.PUBLICDIR + path);
+					newUser.meta.cover_pic = path;
+				}
+				
+				callback(null, newUser);
+			},
+			(newUser, callback) => {
+				if (!data.old_pass || !data.new_pass) return callback(null, newUser);
+				crp.auth.bcrypt.compare(data.old_pass, user.pass, (err, isValid) => {
+					if (err || !isValid) return callback('passMismatch');
+					if (data.new_pass.length < 6) return callback('passLength');
+					if (data.new_pass != data.confirm_new_pass) return callback('newPassMismatch');
+					
+					crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
+						if (err) return callback('hashingError');
+						
+						newUser.pass = hash;
+						callback(null, newUser);
+					});
+				});
 			}
-			
-			if (data.cover_pic) {
-				var path = '/img/members/' + newUser.nicename + '/' + data.cover_pic[0].originalname;
-				
-				crp.util.replaceFile(crp.PUBLICDIR + user.meta.cover_pic, data.cover_pic[0].path, crp.PUBLICDIR + path);
-				
-				newUser.meta.cover_pic = path;
-			}
-			
-			var genders = ['---', 'Bolian', 'Female', 'Male'];
-			if (!genders.includes(newUser.meta.gender)) return 'genderInvalid';
+		], (err, newUser) => {
+			if (err) return cb(err);
 			
 			userid = crp.db.sanitize(userid);
 			newUser = crp.util.sanitizeObject(newUser);
 			
 			crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: crp.db.objectID(userid)}, newUser);
+			crp.global.users[crp.global.users.indexOf(user)] = newUser;
 			
-			return crp.global.users[crp.global.users.indexOf(user)] = newUser;
-		}
+			return cb(newUser);
+		});
 	};
 	
 	crp.util.addUser = (data) => {
