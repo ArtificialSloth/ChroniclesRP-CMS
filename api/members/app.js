@@ -72,9 +72,16 @@ module.exports = (crp) => {
 		var user = crp.util.getUserData(req.user);
 		
 		if (user && user.activation_code == req.body.code) {
-			crp.util.setUserData(user._id, {user_role: 'member'}, true, (newUser) => {
-				res.send(newUser);	
-			});
+			if (user.role == 'pending') {
+				crp.util.setUserData(user._id, {user_role: 'member'}, true, (newUser) => {
+					res.send(newUser);	
+				});
+			} else {
+				crp.util.setUserData(user._id, {user_email: user.new_email}, true, (newUser) => {
+					crp.util.removeUserData(newUser._id, ['new_email', 'activation_code']);
+					res.send(newUser);
+				});
+			}
 		} else {
 			res.send('invalid');
 		}

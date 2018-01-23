@@ -12,6 +12,14 @@ module.exports = (crp) => {
 		return false;
 	};
 	
+	crp.util.emailConfirmCode = (userid) => {
+		setTimeout(() => {
+			crp.util.removeUserData(userid, ['new_email', 'activation_code']);
+		}, 15 * 60 * 1000);
+		
+		return crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase();
+	};
+	
 	crp.util.getUsers = (args) => {
 		if (!args) args = {};
 		args = {
@@ -72,7 +80,16 @@ module.exports = (crp) => {
 				if (data.user_email && data.user_email != user.email) {
 					if (!crp.util.validateEmail(data.user_email)) return callback('emailInvalid');
 					
-					newUser.email = data.user_email;
+					if (admin) {
+						newUser.email = data.user_email;
+					} else {
+						newUser.new_email = data.user_email;
+						newUser.activation_code = crp.util.emailConfirmCode(newUser._id);
+							
+						var subject = 'Confirm your new email address';
+						var msg = 'Please use the following code to confirm your new email address <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
+						crp.util.mail(newUser.new_email, subject, msg);
+					}
 				}
 				
 				if (data.user_dob && data.user_dob != user.meta.date_of_birth) {
@@ -136,6 +153,26 @@ module.exports = (crp) => {
 			
 			return cb(newUser);
 		});
+	};
+	
+	crp.util.removeUserData = (userid, keys) => {
+		var user = crp.util.getUserData(userid);
+		if (!user) return;
+		
+		var newUser = {};
+		for (var k in user) {
+			if (keys.includes(k)) continue;
+		
+			newUser[k] = user[k];
+		}
+		
+		userid = crp.db.sanitize(userid);
+		newUser = crp.util.sanitizeObject(newUser);
+		
+		crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: userid}, newUser);
+		crp.global.users[crp.global.users.indexOf(user)] = newUser;
+		
+		return newUser;
 	};
 	
 	crp.util.addUser = (data) => {

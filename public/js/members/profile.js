@@ -63,7 +63,11 @@ $('.user-settings-form').submit((e) => {
 			$('.user-settings-form .new_pass').parent().addClass('error');
 			$('.user-settings-form .new_pass + .input-error').html('Something went wrong!');
 		} else {
-			location.assign('/logout');
+			if ($('.user-settings-form .new_pass').val()) {
+				location.assign('/logout');
+			} else {
+				crpGetPage('/members/' + response.nicename + '/settings');
+			}
 		}
 	});
 });

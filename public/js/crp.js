@@ -60,7 +60,8 @@ function crpTinyMCE(selector) {
 
 function crpActivateUser(code) {	
 	crpAjax('/api/activate', {code: code}, (response) => {
-		if (response == 'valid') {
+		console.log(response);
+		if (response._id) {
 			location.reload();
 		} else {
 			
