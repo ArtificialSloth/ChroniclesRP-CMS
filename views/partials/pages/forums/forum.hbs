@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="/css/forums/forum.css">
+<div class="forum">
+	<table>
+	{{#each crp.global.categories}}
+		<tr class="category">
+			<th>{{this.name}}</th>
+			<td>Topics</td>
+			<td>Posts</td>
+			<td>Most Recent</td>
+		</tr>
+	{{/each}}
+	</table>
+</div>

@@ -10,7 +10,7 @@ async.waterfall([
 			fs: require('fs'),
 			handlebars: require('handlebars'),
 			moment: require('moment-timezone'),
-			redis: require('redis').createClient()
+			redis: require('redis').createClient(6379, process.env.REDIS_URL)
 		});
 	},
 	(crp, callback) => {

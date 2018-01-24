@@ -1,5 +1,5 @@
-package-lock.json
 chroniclesrp.sh
+chroniclesrp.bat
 /node_modules
 /public/tinymce
 /public/uploads
