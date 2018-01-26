@@ -30,7 +30,7 @@ module.exports = (crp) => {
 		
 		var users = crp.global.users;
 		if (args.filter) {
-			users = crp.util.filterObject(crp.global.users, args.filter[0], args.filter[1].toString());
+			users = crp.util.filterObject(users, args.filter[0], args.filter[1].toString());
 		}
 		
 		if (args.sortBy) {

@@ -8,8 +8,14 @@ module.exports = (crp) => {
 		crp.global.categories = result;
 	});
 	
+	crp.db.collection(crp.db.PREFIX + 'forums').find({}).toArray((err, result) => {
+		if (err) return console.error(err);
+		
+		crp.global.forums = result;
+	});
+	
 	crp.global.pages.push({
 		slug: '/forums',
-		path: '/forums/forum'
+		path: '/forums/forums'
 	});
 }
