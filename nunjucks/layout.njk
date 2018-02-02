@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{{crp.global.site.name}} - {{crp.global.site.tagline}}</title>
+
+		<link rel="icon" href="/img/ico.png" type="image/png">
+
+		<link rel="stylesheet" href="/css/header.css">
+		<link rel="stylesheet" href="/css/content.css">
+		<link rel="stylesheet" href="/css/footer.css">
+
+		<script src="/jquery/jquery.js"></script>
+		<script src="/tinymce/tinymce.min.js"></script>
+		<script src="nunjucks.js"></script>
+		<script src='https://www.google.com/recaptcha/api.js'></script>
+
+		{% include "./script.njk" %}
+	</head>
+	<body>
+		{% block body %}{% endblock %}
+		<script src="{{crp.browserRefresh}}"></script>
+	</body>
+</html>

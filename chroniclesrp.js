@@ -8,7 +8,6 @@ async.waterfall([
 			PAGESDIR: __dirname + '/views/partials/pages',
 			async: async,
 			fs: require('fs'),
-			handlebars: require('handlebars'),
 			moment: require('moment-timezone'),
 			redis: require('redis').createClient(6379, process.env.REDIS_URL),
 			browserRefresh: process.env.BROWSER_REFRESH_URL
@@ -28,7 +27,7 @@ async.waterfall([
 		require('./api/members/passport.js')(crp, callback);
 	},
 	(crp, callback) => {
-		require('./api/helpers.js')(crp);
+		//require('./api/helpers.js')(crp);
 		callback(null, crp);
 	},
 ], (err, crp) => {

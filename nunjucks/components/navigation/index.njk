@@ -1,0 +1,71 @@
+<div id="navigation">
+	{% include "./style.njk" %}
+	
+	<ul class="main-menu">
+		<li class="menu-item"><a onclick="crpGetPage('/')">Home</a></li>
+		<li class="menu-item"><a onclick="crpGetPage('/forums')">Forums</a></li>
+		<li class="menu-item menu-has-childred">
+			<a onclick="crpGetPage('/about')">About</a>
+			<ul class="sub-menu">
+				<li class="menu-item"><a onclick="crpGetPage('/about')">What is The Chronicles</a></li>
+				<li class="menu-item"><a onclick="crpGetPage('/about-chapters')">Chapters</a></li>
+				<li class="menu-item"><a onclick="crpGetPage('/join-us')">Join Us</a></li>
+			</ul>
+		</li>
+		<li class="menu-item menu-has-childred">
+			<a onclick="crpGetPage('/resources')">Resources</a>
+			<ul class="sub-menu">
+				<li class="menu-item"><a onclick="crpGetPage('/resources')">Mod Suggestions</a></li>
+				<li class="menu-item"><a onclick="crpGetPage('/events')">Chronicles Events</a></li>
+				{% if user.role == "administrator" %}
+					<li class="menu-item"><a onclick="crpGetPage('/global-blacklist')">Global Blacklist</a></li>
+				{% endif %}
+			</ul>
+		</li>
+		<li class="menu-item menu-has-childred">
+			<a onclick="crpGetPage('/chapters')">Chapters</a>
+			<ul class="sub-menu">
+			{% for game in crp.global.games %}
+				<li class="menu-item page-has-childred">
+					<a><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
+					{% for chapter in crp.global.chapters %}
+						{% if chapter.game == game.name %}
+							<ul class="sub-menu">
+								<li class="menu-item"><a onclick="crpGetPage('/{{chapter.slug}}')">{{chapter.name}}</a></li>
+							</ul>
+						{% endif %}
+					{% endfor %}
+				</li>
+			{% endfor %}
+			</ul>
+		</li>
+		{% if user %}
+			<li class="menu-item menu-has-childred">
+				<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
+				<ul class="sub-menu">
+					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/activity')">Activity</a></li>
+					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/account')">Account</a></li>
+					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/settings')">Settings</a></li>
+					{% if user.role == "administrator" %}
+						<li class="menu-item"><a onclick="crpGetPage('/admin/users')">Admin</a></li>
+					{% endif %}
+				</ul>
+			</li>
+			<li class="menu-item"><a href="/logout">Logout</a></li>
+		{% else %}
+			<li class="menu-item"><a onclick="crpGetPage('/register')">Register</a></li>
+			<li class="menu-item"><a onclick="$('#login').toggleClass('active')">Login</a></li>
+		{% endif %}
+	</ul>
+
+	{% if user.role == "pending" %}
+		<div class="activate">
+			<span>You're not done! You need to use the code we sent to you're email address to activate you're account and complete the registration process.</span>
+
+			<div>
+				<input type="text" name="activation_code" class="activation_code" maxlength="6" placeholder="ACTIVATION CODE" />
+				<button onclick="crpActivateUser($('.activation_code').val())">Activate</button>
+			</div>
+		</div>
+	{% endif %}
+</div>

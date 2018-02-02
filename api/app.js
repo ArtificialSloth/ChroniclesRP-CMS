@@ -1,8 +1,9 @@
 module.exports = (crp, callback) => {
 	crp.express = require('express');
-	crp.express.exphbs = require('express-handlebars');
-
 	crp.express.app = crp.express();
+
+	require('nunjucks').configure('nunjucks', {express: crp.express.app});
+
 	crp.express.limiter = require('express-limiter')(crp.express.app, crp.redis);
 	crp.express.limiter({
 		path: '*',
@@ -14,10 +15,6 @@ module.exports = (crp, callback) => {
 			console.log(req.ip + ' limited')
 			res.redirect(429, '/');
 		}
-	});
-	crp.express.hbs = crp.express.exphbs.create({
-		extname: '.hbs',
-		defaultLayout: 'main'
 	});
 	crp.express.recaptcha = new require('recaptcha2')({
 		siteKey: '6Lf0MT8UAAAAAJ48jzvBm-QGZpB0Fer8WsGpguMS',
@@ -38,9 +35,6 @@ module.exports = (crp, callback) => {
 		}
 	});
 
-	crp.express.app.engine('.hbs', crp.express.hbs.engine);
-	crp.express.app.set('view engine', '.hbs');
-
 	crp.express.app.use(crp.express.static('public'));
 	crp.express.app.use(require('body-parser').urlencoded({extended: false}));
 	crp.express.app.use('/jquery', crp.express.static(crp.ROOT + '/node_modules/jquery/dist/'));
@@ -56,8 +50,8 @@ module.exports = (crp, callback) => {
 		crp.util.requireFiles('/app.js');
 
 		crp.express.app.get('/*', (req, res) => {
-			var context = {crp: crp, req: req};
-			res.render('index', context);
+			var context = {crp: crp, user: crp.util.getUserData(req.user)};
+			res.render('index.njk', context);
 		});
 
 		crp.express.app.post('/api/get-page', (req, res) => {
