@@ -1,18 +1,18 @@
 module.exports = (crp) => {
 	crp.util = {};
-	
+
 	crp.util.filterObject = (object, key, filter) => {
 		var result = [];
-		
+
 		for (var k in object) {
 			if (object[k][key] == filter) {
 				result.push(object[k]);
 			}
 		}
-		
+
 		return result;
 	};
-		
+
 	crp.util.findObjectInArray = (array, key, val) => {
 		for (var i = 0; i < array.length; i++) {
 			if (array[i][key] == val) {
@@ -20,7 +20,7 @@ module.exports = (crp) => {
 			}
 		}
 	};
-	
+
 	crp.util.sanitizeObject = (object) => {
 		for (var k in object) {
 			if (typeof object[k] == 'object') {
@@ -29,92 +29,84 @@ module.exports = (crp) => {
 				object[k] = crp.db.sanitize(object[k]);
 			}
 		}
-		
+
 		return object;
 	};
-	
+
 	crp.util.parseString = (str, keys) => {
 		for (var i in keys) {
 			str = str.replace(new RegExp(keys[i][0], 'g'), keys[i][1]);
 		}
-		
+
 		return str;
 	};
-	
+
 	crp.util.dateToStr = (date) => {
 		return crp.moment(date).utcOffset('-05:00').format('LLL');
 	};
-	
+
 	crp.util.requireFiles = (file, callback) => {
 		var files = crp.fs.readdirSync(crp.ROOT + '/api/');
-			
+
 		for (var i = 0; i < files.length; i++) {
 			if (files[i].includes('.js')) continue;
-			
+
 			if (crp.fs.existsSync(crp.ROOT + '/api/' + files[i] + file)) {
 				require(crp.ROOT + '/api/' + files[i] + file)(crp);
 			}
 		}
 	};
-	
-	crp.util.renderFile = (path, context) => {
-		var content = crp.fs.readFileSync(path + '.hbs', 'utf8');
-				
-		content = content.replace(/({{>)(.*)(}})/g, (match, p1, p2, p3) => {
-			return crp.util.renderFile(crp.ROOT + '/views/partials/' + p2, context);
-		});
-						
-		var rendered = crp.handlebars.compile(content)(context);
-		
-		return rendered;
-	};
-	
-	crp.util.processPage = (path, req) => {		
-		var context = {crp: crp, req: req};
+
+	crp.util.processPage = (path, req) => {
+		var context = {
+			crp: crp,
+			user: crp.util.getUserData(req.user)
+		};
 		var page = crp.util.findObjectInArray(crp.global.pages, 'slug', path);
 		var post = crp.util.findObjectInArray(crp.global.posts, 'slug', path);
-		
+
 		if (page) {
 			var canView = true;
 			if (page.role && !crp.util.userIsRole(req.user, page.role)) canView = false;
-			
+
 			if (canView || crp.util.isUserAdmin(req.user)) {
 				path = page.path;
-				if (page.context) context[page.context.key] = page.context.val;
-				if (page.subPage) context.subPage = crp.util.renderFile(page.subPage, context);
+				if (page.subPage) context.subPage = page.subPage;
+				if (page.context) context = Object.assign(context, page.context);
 			} else {
-				path = '/404';
+				path = '/404/index.njk';
 			}
 		} else if (post) {
-			path = '/posts/post';
-			context['post'] = post;
+			path = '/posts/index.njk';
+			context.post = post;
 		} else {
-			path = '/404';
+			path = '/404/index.njk';
 		}
-		
+
+		context.path = path;
 		return {path: path, context: context};
 	};
-	
+
 	crp.util.replaceFile = (oldFile, newFile, newPath) => {
 		crp.fs.unlink(oldFile, (err) => {
 			if (err) return console.error(err);
 		});
-		
+
 		crp.fs.rename(newFile, newPath, (err) => {
 			if (err) return console.error(err);
 		});
 	};
-	
+
 	crp.util.editSite = (site) => {
 		var newSite = {
 			name: site.name || crp.global.site.name,
 			tagline: site.tagline || crp.global.site.tagline,
 			mail_template: site.mail_template || crp.global.site.mail_template
 		};
-		
+
 		newSite = crp.util.sanitizeObject(newSite);
 		crp.db.collection(crp.db.PREFIX + 'site').replaceOne({}, newSite);
-		
+
 		return crp.global.site = newSite;
 	};
 

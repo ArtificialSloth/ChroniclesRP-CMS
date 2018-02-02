@@ -1,0 +1,30 @@
+<ul class="forums">
+	{% include "./style.njk" %}
+
+	{% for category in crp.global.categories %}
+		<li class="category">
+			<ul>
+				<li>{{category.name}}</li>
+				<li>Topics</li>
+				<li>Posts</li>
+				<li>Most Recent</li>
+			</ul>
+		</li>
+
+		{% for forum in crp.global.forums %}
+			{% if forum.category == category._id %}
+				<li class="forum">
+					<ul>
+						<li>
+							<a class="forum-name" onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
+							<div class="forum-desc">{{forum.desc}}</div>
+						</li>
+						<li>0</li>
+						<li>0</li>
+						<li>No Topics</li>
+					</ul>
+				</li>
+			{% endif %}
+		{% endfor %}
+	{% endfor %}
+</ul>

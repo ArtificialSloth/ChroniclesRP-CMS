@@ -1,0 +1,35 @@
+{% include "./style.njk" %}
+
+<script>crpTinyMCE()</script>
+<div class="posts-content">
+	<div class="table">
+		<div class="table-row table-header">
+			<div class="table-header-data">Title</div>
+			<div class="table-header-data">Slug</div>
+			<div class="table-header-data">Date</div>
+		</div>
+		{% for post in crp.global.posts %}
+			{% include "./loop.njk" %}
+		{% endfor %}
+	</div>
+</div>
+
+<fieldset class="add-post">
+	<legend>Add New Post</legend>
+	<form>
+		<label for="post_title">Title: </label>
+		<input type="text" name="post_title" class="post_title" />
+		<br />
+		<label for="post_slug">Slug: </label>
+		<input type="text" name="post_slug" class="post_slug" />
+		<br />
+		<label for="post_img">Featured Image: </label>
+		<input type="text" name="post_img" class="post_img" />
+		<br />
+		<textarea name="post_content" class="post_content tinymce"></textarea>
+
+		<input type="submit" value="Post" />
+	</form>
+</fieldset>
+
+{% include "./script.njk" %}

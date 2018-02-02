@@ -2,7 +2,9 @@ module.exports = (crp, callback) => {
 	crp.express = require('express');
 	crp.express.app = crp.express();
 
-	require('nunjucks').configure('nunjucks', {express: crp.express.app});
+	crp.nunjucks.configure('views', {
+		express: crp.express.app
+	});
 
 	crp.express.limiter = require('express-limiter')(crp.express.app, crp.redis);
 	crp.express.limiter({
@@ -36,8 +38,9 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.use(crp.express.static('public'));
-	crp.express.app.use(require('body-parser').urlencoded({extended: false}));
-	crp.express.app.use('/jquery', crp.express.static(crp.ROOT + '/node_modules/jquery/dist/'));
+	crp.express.app.use(require('body-parser').urlencoded({
+		extended: false
+	}));
 	crp.express.app.use(require('helmet')({
 		expectCt: {
 			maxAge: 123
@@ -50,20 +53,21 @@ module.exports = (crp, callback) => {
 		crp.util.requireFiles('/app.js');
 
 		crp.express.app.get('/*', (req, res) => {
-			var context = {crp: crp, user: crp.util.getUserData(req.user)};
-			res.render('index.njk', context);
+			var page = crp.util.processPage(req.url, req);
+
+			res.render('index.njk', page.context);
 		});
 
 		crp.express.app.post('/api/get-page', (req, res) => {
 			var page = crp.util.processPage(req.body.page, req);
 
-			res.render('partials/pages' + page.path, page.context);
+			res.render('pages' + page.path, page.context);
 		});
 
 		crp.express.app.post('/api/get-subpage', (req, res) => {
 			var page = crp.util.processPage(req.body.page, req);
 
-			res.send(page.context.subPage);
+			res.send(crp.nunjucks.render('pages' + page.context.subPage, page.context));
 		});
 
 		crp.express.app.post('/api/admin/edit-site', (req, res) => {

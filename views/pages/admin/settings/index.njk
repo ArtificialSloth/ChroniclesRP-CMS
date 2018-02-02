@@ -1,0 +1,24 @@
+{% include "./style.njk" %}
+
+<script>crpTinyMCE()</script>
+<form class="site-settings-form standard-form">
+	<label for="site_name">Site Title</label>
+	<div class="standard-input">
+		<input type="text" name="site_name" class="site_name" value="{{crp.global.site.name}}" />
+	</div>
+
+	<label for="site_tagline">Site Tagline</label>
+	<div class="standard-input">
+		<input type="text" name="site_tagline" class="site_tagline" value="{{crp.global.site.tagline}}" />
+	</div>
+
+	<label for="mail_template">Email Template</label>
+	<div class="standard-input">
+		<textarea name="mail_template" class="mail_template tinymce">{{crp.global.site.mail_template}}</textarea>
+	</div>
+
+	<input type="submit" value="Save" />
+	<span class="site-saved">Saved!</span>
+</form>
+
+{% include "./script.njk" %}

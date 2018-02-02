@@ -5,12 +5,12 @@ async.waterfall([
 		callback(null, {
 			ROOT: __dirname,
 			PUBLICDIR: __dirname + '/public',
-			PAGESDIR: __dirname + '/views/partials/pages',
 			async: async,
 			fs: require('fs'),
+			nunjucks: require('nunjucks'),
 			moment: require('moment-timezone'),
-			redis: require('redis').createClient(6379, process.env.REDIS_URL),
-			browserRefresh: process.env.BROWSER_REFRESH_URL
+			browserRefresh: process.env.BROWSER_REFRESH_URL,
+			redis: require('redis').createClient(6379, process.env.REDIS_URL)
 		});
 	},
 	(crp, callback) => {
@@ -25,11 +25,7 @@ async.waterfall([
 	},
 	(crp, callback) => {
 		require('./api/members/passport.js')(crp, callback);
-	},
-	(crp, callback) => {
-		//require('./api/helpers.js')(crp);
-		callback(null, crp);
-	},
+	}
 ], (err, crp) => {
 	crp.express.app.listen(80, () => {
 		if (process.send) process.send('online');

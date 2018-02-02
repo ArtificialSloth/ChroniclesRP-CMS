@@ -1,0 +1,79 @@
+{% include "./style.njk" %}
+
+<div class="users-menu">
+	<input type="button" class="all active" onclick="usersToggleRoleFilter(this, 'all')" value="All ({{crp.global.users.length}})" />
+
+	{% if crp.util.roleHasUsers('administrator') %}
+		<input type="button" class="administrator" onclick="usersToggleRoleFilter(this, 'administrator')" value="Administrators ({{crp.util.getUsersByRole('administrator').length}})" />
+	{% endif %}
+
+	{% if crp.util.roleHasUsers('chapter_leader') %}
+		<input type="button" class="chapter-leader" onclick="usersToggleRoleFilter(this, 'chapter-leader')" value="Chapter Leaders ({{crp.util.getUsersByRole('chapter_leader').length}})" />
+	{% endif %}
+
+	{% if crp.util.roleHasUsers('member') %}
+		<input type="button" class="member" onclick="usersToggleRoleFilter(this, 'member')" value="Members ({{crp.util.getUsersByRole('member').length}})" />
+	{% endif %}
+
+	{% if crp.util.roleHasUsers('pending') %}
+		<input type="button" class="pending" onclick="usersToggleRoleFilter(this, 'pending')" value="Pending ({{crp.util.getUsersByRole('pending').length}})" />
+	{% endif %}
+</div>
+
+<div class="users-content">
+	<div class="table">
+		<div class="table-row table-header">
+			<div class="table-header-data">Username</div>
+			<div class="table-header-data">Email</div>
+			<div class="table-header-data">Role</div>
+		</div>
+		<div class="filter all active">
+			{% for user in crp.util.getUsersByRole('*') %}
+				{% include "./loop.njk" %}
+			{% endfor %}
+		</div>
+		<div class="filter administrator">
+			{% for user in crp.util.getUsersByRole('administrator') %}
+				{% include "./loop.njk" %}
+			{% endfor %}
+		</div>
+		<div class="filter chapter-leader">
+			{% for user in crp.util.getUsersByRole('chapter_leader') %}
+				{% include "./loop.njk" %}
+			{% endfor %}
+		</div>
+		<div class="filter member">
+			{% for user in crp.util.getUsersByRole('member') %}
+				{% include "./loop.njk" %}
+			{% endfor %}
+		</div>
+		<div class="filter pending">
+			{% for user in crp.util.getUsersByRole('pending') %}
+				{% include "./loop.njk" %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+<fieldset class="add-user">
+	<legend>Add a New User</legend>
+	<form>
+		<label for="user_login">Username: </label>
+		<input type="text" name="user_login" class="user_login" autocomplete="off" />
+		<br />
+		<label for="user_email">Email: </label>
+		<input type="text" name="user_email" class="user_email" autocomplete="off" />
+		<br />
+		<label for="user_pass">Password: </label>
+		<input type="password" name="user_pass" class="user_pass" autocomplete="off" />
+		<input type="checkbox" name="encrypted" class="encrypted" autocomplete="off" />
+		<label for="encrypted">Encrypted</label>
+		<br />
+		<label for="register_date">Registration Date: </label>
+		<input type="text" name="register_date" class="register_date" autocomplete="off" />
+
+		<input type="submit" value="Add User" />
+	</form>
+</fieldset>
+
+{% include "./script.njk" %}

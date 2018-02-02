@@ -1,0 +1,9 @@
+<div class="post">
+	{% include "./style.njk" %}
+
+	<div class="post-header">
+		{% if post.img %}<img src="{{post.img}}" class="post-image" />{% endif %}
+		<h1 class="post-title">{{post.title}}</h1>
+	</div>
+	<div class="post-content">{{post.content | safe}}</div>
+</div>

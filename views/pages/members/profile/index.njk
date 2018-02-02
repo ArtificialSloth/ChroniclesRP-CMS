@@ -1,0 +1,45 @@
+<div class="profile">
+	{% include "./style.njk" %}
+
+	<div class="profile-header">
+		<div class="header-cover-image" style="background-image:url('{{profile.user.meta.cover_pic}}')"></div>
+		<div class="header-meta">
+			<img class="profile-pic" src="{{profile.user.meta.profile_pic}}" />
+			<div class="profile-details">
+				<a class="profile-name" onclick="crpGetPage('/members/{{profile.user.nicename}}')">{{profile.user.display_name}}</a>
+				<span class="profile-tagline">{{profile.user.meta.tagline}}</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="profile-content">
+		<div class="top-bar"></div>
+
+		<div class="containor">
+			{% include "pages" + subPage %}
+		</div>
+
+		<div class="nav">
+			<a onclick="crpGetSubPage('/members/{{profile.user.nicename}}', '.profile-content .containor', true)">Activity</a>
+			<a onclick="crpGetSubPage('/members/{{profile.user.nicename}}/info', '.profile-content .containor', true)">Info</a>
+			<a onclick="crpGetSubPage('/members/{{profile.user.nicename}}/friends', '.profile-content .containor', true)">Friends</a>
+			<a onclick="crpGetSubPage('/members/{{profile.user.nicename}}/chapters', '.profile-content .containor', true)">Chapters</a>
+			{% if profile.user._id == user._id %}
+				<a onclick="crpGetSubPage('/members/{{profile.user.nicename}}/messages', '.profile-content .containor', true)">Messages</a>
+				<a onclick="crpGetSubPage('/members/{{profile.user.nicename}}/account', '.profile-content .containor', true)">Account</a>
+				<a onclick="crpGetSubPage('/members/{{profile.user.nicename}}/settings', '.profile-content .containor', true)">Settings</a>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+{% if profile.user.new_email %}
+	<div class="activate">
+		<span>Validate you new email using the code we sent to {{profile.user.new_email}}.</span>
+
+		<div>
+			<input type="text" name="activation_code" class="activation_code" maxlength="6" placeholder="ACTIVATION CODE" />
+			<button onclick="crpActivateUser($('.activation_code').val())">Activate</button>
+		</div>
+	</div>
+{% endif %}
