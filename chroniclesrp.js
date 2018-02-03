@@ -27,7 +27,7 @@ async.waterfall([
 		require('./api/members/passport.js')(crp, callback);
 	}
 ], (err, crp) => {
-	crp.express.app.listen(80, () => {
+	crp.express.app.listen(process.env.PORT || 80, () => {
 		if (process.send) process.send('online');
 
 		console.log('The Chronicles RP is up and running!');
