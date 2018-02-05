@@ -25,12 +25,14 @@
 
 	body a {
 		color:#3bc492;
+		text-decoration:none;
 		transition:all 0.2s ease-in-out;
 	}
 
 	body a:hover {
 		color:#3bc492;
-		text-decoration:none;
+		cursor:pointer;
+		text-decoration:underline;
 	}
 
 	body input[type="password"],
@@ -223,6 +225,31 @@
 	.standard-form input[type=submit] {
 		float:right;
 		margin:30px 0;
+	}
+
+	.new-post {
+		border:1px solid #585858;
+		margin-top:15px;
+		padding:25px;
+	}
+
+	.new-post legend {
+		background-color:#242424;
+		display:block;
+		padding:5px;
+	}
+
+	.new-post form input {
+		display:block;
+		margin-bottom:8px;
+		width:100%;
+	}
+
+	.new-post form input[type=submit] {
+		display:inline-block;
+		float:right;
+		margin-top:8px;
+		width:auto;
 	}
 
 	.tinymce {

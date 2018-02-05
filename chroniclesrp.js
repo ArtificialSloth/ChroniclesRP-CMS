@@ -14,7 +14,9 @@ async.waterfall([
 		});
 	},
 	(crp, callback) => {
-		require('./api/utils.js')(crp);
+		require('./api/utils.js')(crp, callback);
+	},
+	(crp, callback) => {
 		require('./api/app.js')(crp, callback);
 	},
 	(crp, callback) => {
@@ -27,9 +29,15 @@ async.waterfall([
 		require('./api/members/passport.js')(crp, callback);
 	}
 ], (err, crp) => {
-	crp.express.app.listen(process.env.PORT || 80, () => {
-		if (process.send) process.send('online');
+	if (err) return console.error(err);
 
-		console.log('The Chronicles RP is up and running!');
+	crp.express.ready().then(() => {
+		crp.express.app.listen(process.env.PORT || 80, () => {
+			if (process.send) process.send('online');
+
+			console.log('\nThe Chronicles RP is up and running!');
+		});
+	}).catch((err) => {
+		if (err) return console.error(err);
 	});
 });

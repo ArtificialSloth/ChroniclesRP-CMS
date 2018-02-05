@@ -1,4 +1,4 @@
-module.exports = (crp) => {
+module.exports = (crp, callback) => {
 	crp.util = {};
 
 	crp.util.filterObject = (object, key, filter) => {
@@ -45,16 +45,25 @@ module.exports = (crp) => {
 		return crp.moment(date).utcOffset('-05:00').format('LLL');
 	};
 
-	crp.util.requireFiles = (file, callback) => {
-		var files = crp.fs.readdirSync(crp.ROOT + '/api/');
+	crp.util.requireFiles = (file) => {
+		return new Promise((resolve, reject) => {
+			crp.fs.readdir(crp.ROOT + '/api/', (err, files) => {
+				if (err) return reject(err);
 
-		for (var i = 0; i < files.length; i++) {
-			if (files[i].includes('.js')) continue;
+				crp.async.each(files, (dir, cb) => {
+					try {
+						require(crp.ROOT + '/api/' + dir + file)(crp, cb);
+					} catch(err) {
+						if (err.code != 'MODULE_NOT_FOUND') return cb(err);
+						return cb();
+					}
+				}, (err) => {
+					if (err) return reject(err);
 
-			if (crp.fs.existsSync(crp.ROOT + '/api/' + files[i] + file)) {
-				require(crp.ROOT + '/api/' + files[i] + file)(crp);
-			}
-		}
+					return resolve();
+				});
+			});
+		});
 	};
 
 	crp.util.processPage = (path, req) => {
@@ -110,5 +119,9 @@ module.exports = (crp) => {
 		return crp.global.site = newSite;
 	};
 
-	crp.util.requireFiles('/utils.js');
+	crp.util.requireFiles('/utils.js').then(() => {
+		callback(null, crp);
+	}).catch((err) => {
+		callback(err, crp);
+	});
 };

@@ -13,15 +13,22 @@
 
 		{% for forum in crp.global.forums %}
 			{% if forum.category == category._id %}
+				{% set topics = crp.util.getTopicsByForum(forum._id) %}
 				<li class="forum">
 					<ul>
 						<li>
 							<a class="forum-name" onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
 							<div class="forum-desc">{{forum.desc}}</div>
 						</li>
+						<li>{{topics.length}}</li>
 						<li>0</li>
-						<li>0</li>
-						<li>No Topics</li>
+						<li>
+							{% if topics[0] %}
+								<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topics[0]._id}}')">{{topics[0].title}}</a> by <a onclick="crpGetPage('/members/{{crp.util.getUserData(topics[0].author).nicename}}')">{{crp.util.getUserData(topics[0].author).display_name}}</a>
+							{% else %}
+								No Topics
+							{% endif %}
+						</li>
 					</ul>
 				</li>
 			{% endif %}

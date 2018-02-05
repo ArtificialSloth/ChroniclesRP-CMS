@@ -1,4 +1,4 @@
-module.exports = (crp) => {
+module.exports = (crp, callback) => {
 	crp.util.validateEmail = (email) => {
 		var domain = email.split('@')
 
@@ -287,4 +287,6 @@ module.exports = (crp) => {
 			});
 		}
 	};
+
+	callback();
 };

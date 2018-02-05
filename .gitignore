@@ -1,5 +1,6 @@
 chroniclesrp.sh
 chroniclesrp.bat
 /node_modules
-/public/tinymce
 /public/uploads
+/public/js/tinymce
+/public/js/nunjucks.js

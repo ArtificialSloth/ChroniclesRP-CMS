@@ -10,23 +10,36 @@ module.exports = (crp, callback) => {
 		}
 	];
 
-	crp.db.collection(crp.db.PREFIX + 'site').find({}).toArray((err, result) => {
-		if (err) return console.error(err);
+	crp.async.parallel([
+		(cb) => {
+			crp.db.collection(crp.db.PREFIX + 'site').find({}).toArray((err, result) => {
+				if (err) return console.error(err);
 
-		crp.global.site = result[0];
-	});
+				crp.global.site = result[0];
+				cb();
+			});
+		},
+		(cb) => {
+			crp.db.collection(crp.db.PREFIX + 'games').find({}).toArray((err, result) => {
+				if (err) return console.error(err);
 
-	crp.db.collection(crp.db.PREFIX + 'games').find({}).toArray((err, result) => {
-		if (err) return console.error(err);
+				crp.global.games = result.sort((a, b) => {
+					return a.name > b.name;
+				});
+				cb();
+			});
+		},
+		(cb) => {
+			crp.db.collection(crp.db.PREFIX + 'chapters').find({}).toArray((err, result) => {
+				if (err) return console.error(err);
 
-		crp.global.games = result.sort((a, b) => {
-			return a.name > b.name;
-		});
-	});
+				crp.global.chapters = result;
+				cb();
+			});
+		}
+	], (err, results) => {
+		if (err) callback(err);
 
-	crp.db.collection(crp.db.PREFIX + 'chapters').find({}).toArray((err, result) => {
-		if (err) return console.error(err);
-
-		crp.global.chapters = result;
+		callback();
 	});
 }

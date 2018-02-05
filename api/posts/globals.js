@@ -1,4 +1,4 @@
-module.exports = (crp) => {
+module.exports = (crp, callback) => {
 	crp.db.collection(crp.db.PREFIX + 'posts').find({}).toArray((err, result) => {
 		if (err) return console.error(err);
 
@@ -10,5 +10,7 @@ module.exports = (crp) => {
 			role: 'administrator',
 			subPage: '/posts/admin/index.njk'
 		});
+
+		callback();
 	});
 };

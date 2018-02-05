@@ -1,6 +1,6 @@
-module.exports = (crp) => {
+module.exports = (crp, callback) => {
 	crp.db.collection(crp.db.PREFIX + 'users').find({}).toArray((err, result) => {
-		if (err) return console.error(err);
+		if (err) return callback(err);
 
 		crp.global.users = result;
 		for (var k in crp.global.users) {
@@ -23,5 +23,7 @@ module.exports = (crp) => {
 			slug: '/registered',
 			path: '/members/registered/index.njk'
 		});
+
+		callback();
 	});
 };

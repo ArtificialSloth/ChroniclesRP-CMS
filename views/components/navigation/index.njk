@@ -1,6 +1,6 @@
 <div id="navigation">
 	{% include "./style.njk" %}
-	
+
 	<ul class="main-menu">
 		<li class="menu-item"><a onclick="crpGetPage('/')">Home</a></li>
 		<li class="menu-item"><a onclick="crpGetPage('/forums')">Forums</a></li>
@@ -17,7 +17,7 @@
 			<ul class="sub-menu">
 				<li class="menu-item"><a onclick="crpGetPage('/resources')">Mod Suggestions</a></li>
 				<li class="menu-item"><a onclick="crpGetPage('/events')">Chronicles Events</a></li>
-				{% if user.role == "administrator" %}
+				{% if crp.util.isUserAdmin(user._id) %}
 					<li class="menu-item"><a onclick="crpGetPage('/global-blacklist')">Global Blacklist</a></li>
 				{% endif %}
 			</ul>
@@ -46,7 +46,7 @@
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/activity')">Activity</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/account')">Account</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/settings')">Settings</a></li>
-					{% if user.role == "administrator" %}
+					{% if crp.util.isUserAdmin(user._id) %}
 						<li class="menu-item"><a onclick="crpGetPage('/admin/users')">Admin</a></li>
 					{% endif %}
 				</ul>

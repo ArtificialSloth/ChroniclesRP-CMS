@@ -50,34 +50,40 @@ module.exports = (crp, callback) => {
 	}));
 
 	crp.express.ready = () => {
-		crp.util.requireFiles('/app.js');
+		return new Promise((resolve, reject) => {
+			crp.util.requireFiles('/app.js').then(() => {
+				crp.express.app.get('/*', (req, res) => {
+					var page = crp.util.processPage(req.url, req);
 
-		crp.express.app.get('/*', (req, res) => {
-			var page = crp.util.processPage(req.url, req);
+					res.render('index.njk', page.context);
+				});
 
-			res.render('index.njk', page.context);
-		});
+				crp.express.app.post('/api/get-page', (req, res) => {
+					var page = crp.util.processPage(req.body.page, req);
 
-		crp.express.app.post('/api/get-page', (req, res) => {
-			var page = crp.util.processPage(req.body.page, req);
+					res.render('pages' + page.path, page.context);
+				});
 
-			res.render('pages' + page.path, page.context);
-		});
+				crp.express.app.post('/api/get-subpage', (req, res) => {
+					var page = crp.util.processPage(req.body.page, req);
 
-		crp.express.app.post('/api/get-subpage', (req, res) => {
-			var page = crp.util.processPage(req.body.page, req);
+					res.send(crp.nunjucks.render('pages' + page.context.subPage, page.context));
+				});
 
-			res.send(crp.nunjucks.render('pages' + page.context.subPage, page.context));
-		});
+				crp.express.app.post('/api/admin/edit-site', (req, res) => {
+					var site = {
+						name: req.body.site_name,
+						tagline: req.body.site_tagline,
+						mail_template: req.body.mail_template
+					};
 
-		crp.express.app.post('/api/admin/edit-site', (req, res) => {
-			var site = {
-				name: req.body.site_name,
-				tagline: req.body.site_tagline,
-				mail_template: req.body.mail_template
-			};
+					res.send(crp.util.editSite(site));
+				});
 
-			res.send(crp.util.editSite(site));
+				return resolve();
+			}).catch((err) => {
+				return reject(err);
+			});
 		});
 	};
 

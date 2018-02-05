@@ -1,14 +1,14 @@
-module.exports = (crp) => {
+module.exports = (crp, callback) => {
 	crp.util.msgTemplate = (subject, msg) => {
 		var keys = [
 			['SITENAME', crp.global.site.name],
 			['SUBJECT', subject],
 			['MESSAGE', msg]
 		];
-		
+
 		return crp.util.parseString(crp.global.site.mail_template, keys);
 	};
-	
+
 	crp.util.mail = (to, subject, msg) => {
 		crp.mail.send({
 			to: to,
@@ -18,4 +18,6 @@ module.exports = (crp) => {
 			html: crp.util.msgTemplate(subject, msg)
 		});
 	};
+
+	callback();
 };
