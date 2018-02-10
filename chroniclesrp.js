@@ -10,7 +10,7 @@ async.waterfall([
 			nunjucks: require('nunjucks'),
 			moment: require('moment-timezone'),
 			browserRefresh: process.env.BROWSER_REFRESH_URL,
-			redis: require('redis').createClient(6379, process.env.REDIS_URL)
+			redis: require('redis').createClient(process.env.REDIS_URL)
 		});
 	},
 	(crp, callback) => {

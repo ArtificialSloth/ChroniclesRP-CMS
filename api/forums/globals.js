@@ -28,23 +28,20 @@ module.exports = (crp, callback) => {
 					});
 				}
 
-				cb();
-			});
-		},
-		(cb) => {
-			crp.db.collection(crp.db.PREFIX + 'topics').find({}).toArray((err, result) => {
-				if (err) return cb(err);
+				crp.db.collection(crp.db.PREFIX + 'topics').find({}).toArray((err, result) => {
+					if (err) return cb(err);
 
-				crp.global.topics = result;
-				for (var i in crp.global.topics) {
-					var parent = crp.util.getForumData(crp.global.topics[i].parent);
+					crp.global.topics = result;
+					for (var i in crp.global.topics) {
+						var parent = crp.util.getForumData(crp.global.topics[i].parent);
 
-					crp.global.pages.push({
-						slug: '/forums/' + parent.slug + '/' + crp.global.topics[i]._id,
-						path: '/forums/topic/index.njk',
-						context: {topic: crp.global.topics[i]}
-					});
-				}
+						crp.global.pages.push({
+							slug: '/forums/' + parent.slug + '/' + crp.global.topics[i]._id,
+							path: '/forums/topic/index.njk',
+							context: {topic: crp.global.topics[i]}
+						});
+					}
+				});
 
 				cb();
 			});
