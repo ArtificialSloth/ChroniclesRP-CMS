@@ -64,6 +64,7 @@ module.exports = (crp, callback) => {
 
 			res.send(newUser);
 		}).catch((err) => {
+			console.log(err);
 			res.send('noCaptcha');
 		});
 	});

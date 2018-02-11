@@ -18,10 +18,13 @@ module.exports = (crp, callback) => {
 			res.redirect(429, '/');
 		}
 	});
-	crp.express.recaptcha = new require('recaptcha2')({
+
+	var recaptcha = require('recaptcha2');
+	crp.express.recaptcha = new recaptcha({
 		siteKey: '6Lf0MT8UAAAAAJ48jzvBm-QGZpB0Fer8WsGpguMS',
 		secretKey: process.env.RECAPTCHA_SECRET
 	});
+
 	crp.express.upload = require('multer')({
 		dest: crp.PUBLICDIR + '/uploads',
 		limits: {
