@@ -9,7 +9,7 @@
 
 		<label for="user_dob">Date of Birth</label>
 		<div class="standard-input">
-			<input type="text" name="user_dob" class="user_dob" value="{{user.meta.date_of_birth}}" />
+			<input type="text" name="user_dob" class="user_dob" value="{{user.date_of_birth}}" />
 			<span class="input-error"></span>
 		</div>
 
@@ -17,7 +17,7 @@
 		<div class="standard-input">
 			<select name="user_timezone" class="user_timezone">
 				{% for tz in timezones %}
-					<option value="{{tz}}" {% if tz == user.meta.timezone %}selected{% endif %}>{{tz.replace('_', ' ')}}</option>
+					<option value="{{tz}}" {% if tz == user.timezone %}selected{% endif %}>{{tz.replace('_', ' ')}}</option>
 				{% endfor %}
 			</select>
 			<span class="input-error"></span>
@@ -26,24 +26,24 @@
 		<label for="user_gender">Gender</label>
 		<div class="standard-input">
 			<select name="user_gender" class="user_gender">
-				<option value="---" {% if user.meta.gender == '---' %}selected{% endif %}>---</option>
-				<option value="Female" {% if user.meta.gender == 'Female' %}selected{% endif %}>Female</option>
-				<option value="Male" {% if user.meta.gender == 'Male' %}selected{% endif %}>Male</option>
-				<option value="Bolian" {% if user.meta.gender == 'Bolian' %}selected{% endif %}>Bolian</option>
+				<option value="---" {% if user.gender == '---' %}selected{% endif %}>---</option>
+				<option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+				<option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+				<option value="Bolian" {% if user.gender == 'Bolian' %}selected{% endif %}>Bolian</option>
 			</select>
 			<span class="input-error"></span>
 		</div>
 
 		<label for="user_tagline">Tagline</label>
 		<div class="standard-input">
-			<input type="text" name="user_tagline" class="user_tagline" value="{{user.meta.tagline}}" />
+			<input type="text" name="user_tagline" class="user_tagline" value="{{user.tagline}}" />
 			<span class="input-error"></span>
 		</div>
 
 		<label for="profile_pic">Profile Picture</label>
 		<div class="standard-input">
-			{% if user.meta.profile_pic %}
-				<img class="profile-pic" src="{{user.meta.profile_pic}}" width="150px" height="150px" />
+			{% if user.img.profile %}
+				<img class="profile-pic" src="{{user.img.profile}}" width="150px" height="150px" />
 			{% endif %}
 			<input type="file" name="profile_pic" class="profile_pic" />
 			<span class="input-error"></span>
@@ -51,8 +51,8 @@
 
 		<label for="cover_pic">Cover Image</label>
 		<div class="standard-input">
-			{% if user.meta.cover_pic %}
-				<img class="cover-pic" src="{{user.meta.cover_pic}}" height="150px" />
+			{% if user.img.cover %}
+				<img class="cover-pic" src="{{user.img.cover}}" height="150px" />
 			{% endif %}
 			<input type="file" name="cover_pic" class="cover_pic" />
 			<span class="input-error"></span>
@@ -60,7 +60,7 @@
 
 		<label for="user_about" class="fill">About Me</label>
 		<div class="standard-input fill">
-			<textarea name="user_about" class="user_about tinymce">{{user.meta.about}}</textarea>
+			<textarea name="user_about" class="user_about tinymce">{{user.about}}</textarea>
 			<span class="input-error"></span>
 		</div>
 

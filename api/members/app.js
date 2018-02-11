@@ -73,11 +73,11 @@ module.exports = (crp, callback) => {
 
 		if (user && user.activation_code == req.body.code) {
 			if (user.role == 'pending') {
-				crp.util.setUserData(user._id, {user_role: 'member'}, true, (newUser) => {
+				crp.util.setUserData(user._id, {role: 'member'}, true, (newUser) => {
 					res.send(newUser);
 				});
 			} else {
-				crp.util.setUserData(user._id, {user_email: user.new_email}, true, (newUser) => {
+				crp.util.setUserData(user._id, {email: user.new_email}, true, (newUser) => {
 					crp.util.removeUserData(newUser._id, ['new_email', 'activation_code']);
 					res.send(newUser);
 				});
@@ -93,12 +93,29 @@ module.exports = (crp, callback) => {
 	]);
 	crp.express.app.post('/api/admin/edit-user', editUser, (req, res) => {
 		if (req.body.user_id == req.user || crp.util.isUserAdmin(req.user)) {
+			var userData = {
+				login: req.body.user_login,
+				old_pass: req.body.old_pass,
+				new_pass: req.body.new_pass,
+				confirm_new_pass: req.body.confirm_new_pass,
+				email: req.body.user_email,
+				display_name: req.body.display_name,
+				role: req.body.user_role,
+				locked: req.body.user_locked,
+				timezone: req.body.user_timezone,
+				date_of_birth: req.body.user_dob,
+				gender: req.body.user_gender,
+				tagline: req.body.user_tagline,
+				about: req.body.user_about,
+				img: {}
+			};
+
 			if (req.files) {
-				if (req.files.profile_pic) req.body.profile_pic = req.files.profile_pic;
-				if (req.files.cover_pic) req.body.cover_pic = req.files.cover_pic;
+				if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
+				if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
 			}
 
-			crp.util.setUserData(req.body.user_id, req.body, crp.util.isUserAdmin(req.user), (newUser) => {
+			crp.util.setUserData(req.body.user_id, userData, crp.util.isUserAdmin(req.user), (newUser) => {
 				res.send(newUser);
 			});
 		}

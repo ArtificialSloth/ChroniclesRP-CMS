@@ -2,12 +2,12 @@
 	{% include "./style.njk" %}
 
 	<div class="profile-header">
-		<div class="header-cover-image" style="background-image:url('{{profile.user.meta.cover_pic}}')"></div>
+		<div class="header-cover-image" style="background-image:url('{{profile.user.img.cover or '/img/members/cover.png'}}')"></div>
 		<div class="header-meta">
-			<img class="profile-pic" src="{{profile.user.meta.profile_pic}}" />
+			<img class="profile-pic" src="{{profile.user.img.profile or '/img/members/profile.png'}}" />
 			<div class="profile-details">
 				<a class="profile-name" onclick="crpGetPage('/members/{{profile.user.nicename}}')">{{profile.user.display_name}}</a>
-				<span class="profile-tagline">{{profile.user.meta.tagline}}</span>
+				<span class="profile-tagline">{{profile.user.tagline}}</span>
 			</div>
 		</div>
 	</div>

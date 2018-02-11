@@ -47,41 +47,60 @@ module.exports = (crp, callback) => {
 		return crp.util.getUsers({filter: ['_id', userid.toString()]})[0];
 	};
 
+	crp.util.newUserObject = (user) => {
+		return {
+			_id: user._id,
+			login: user.login,
+			pass: user.pass,
+			email: user.email,
+			register_date: user.register_date || Date.now(),
+			display_name: user.display_name || user.login,
+			nicename: user.nicename || data.login.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+			role: user.role || 'pending',
+			locked: user.locked || false,
+			timezone: user.timezone || crp.moment.tz.guess(),
+			date_of_birth: user.date_of_birth,
+			gender: user.gender || '---',
+			tagline: user.tagline,
+			about: user.about,
+			img: user.img || {}
+		};
+	};
+
 	crp.util.setUserData = (userid, data, admin, cb) => {
 		var user = crp.util.getUserData(userid);
 		if (!user) return cb('noUser');
 
 		crp.async.waterfall([
 			(callback) => {
-				var newUser = user;
+				var newUser = crp.util.newUserObject(user);
 
 				newUser.display_name = data.display_name || user.display_name;
-				newUser.meta = user.meta || {};
-				newUser.meta.tagline = data.user_tagline || user.meta.tagline;
-				newUser.meta.about = data.user_about || user.meta.about;
+				newUser.tagline = data.tagline || user.tagline;
+				newUser.about = data.about || user.about;
 
 				if (admin) {
-					newUser.role = data.user_role || user.role;
-					newUser.locked = data.user_locked || user.locked;
+					newUser.role = data.role || user.role;
+					newUser.locked = data.locked || user.locked;
 				}
 
-				if (data.user_login && data.user_login != user.login) {
-					if (data.user_login < 4) return callback('loginLength');
-					if (crp.util.getUsers({filter: ['login', data.user_login]}).length > 0) {
+				if (data.login && data.login != user.login) {
+					if (data.login < 4) return callback('loginLength');
+					if (crp.util.getUsers({filter: ['login', data.login]}).length > 0) {
 						return callback('loginTaken');
 					}
 
-					newUser.login = data.user_login;
+					newUser.login = data.login;
 					newUser.nicename = newUser.login.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 				}
 
-				if (data.user_email && data.user_email != user.email) {
-					if (!crp.util.validateEmail(data.user_email)) return callback('emailInvalid');
+				if (data.email && data.email != user.email) {
+					if (!crp.util.validateEmail(data.email)) return callback('emailInvalid');
 
 					if (admin) {
-						newUser.email = data.user_email;
+						newUser.email = data.email;
 					} else {
-						newUser.new_email = data.user_email;
+						newUser.new_email = data.email;
 						newUser.activation_code = crp.util.emailConfirmCode(newUser._id);
 
 						var subject = 'Confirm your new email address';
@@ -90,37 +109,37 @@ module.exports = (crp, callback) => {
 					}
 				}
 
-				if (data.user_dob && data.user_dob != user.meta.date_of_birth) {
-					if (!crp.moment(new Date(data.user_dob)).isValid()) return callback('dobInvalid');
+				if (data.date_of_birth && data.date_of_birth != user.date_of_birth) {
+					if (!crp.moment(new Date(data.date_of_birth)).isValid()) return callback('dobInvalid');
 
-					newUser.meta.date_of_birth = crp.moment(new Date(data.user_dob)).format('MM/DD/YYYY');
+					newUser.date_of_birth = crp.moment(new Date(data.date_of_birth)).format('MM/DD/YYYY');
 				}
 
-				if (data.user_timezone && data.user_timezone != user.meta.timezone) {
-					if (!crp.moment.tz.names().includes(data.user_timezone)) return callback('tzInvalid');
+				if (data.timezone && data.timezone != user.timezone) {
+					if (!crp.moment.tz.names().includes(data.timezone)) return callback('tzInvalid');
 
-					newUser.meta.timezone = data.user_timezone;
+					newUser.timezone = data.timezone;
 				}
 
-				if (data.user_gender && data.user_gender != user.meta.gender) {
+				if (data.gender && data.gender != user.gender) {
 					var genders = ['---', 'Bolian', 'Female', 'Male'];
-					if (!genders.includes(data.user_gender)) return callback('genderInvalid');
+					if (!genders.includes(data.gender)) return callback('genderInvalid');
 
-					newUser.meta.gender = data.user_gender;
+					newUser.gender = data.gender;
 				}
 
-				if (data.profile_pic) {
-					var path = '/img/members/' + newUser.nicename + '/' + data.profile_pic[0].originalname;
+				if (data.img && data.img.profile) {
+					var path = '/img/members/' + newUser.nicename + '/' + data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.meta.profile_pic, data.profile_pic[0].path, crp.PUBLICDIR + path);
-					newUser.meta.profile_pic = path;
+					crp.util.replaceFile(crp.PUBLICDIR + user.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
+					newUser.img.profile = path;
 				}
 
-				if (data.cover_pic) {
-					var path = '/img/members/' + newUser.nicename + '/' + data.cover_pic[0].originalname;
+				if (data.img && data.img.cover) {
+					var path = '/img/members/' + newUser.nicename + '/' + data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.meta.cover_pic, data.cover_pic[0].path, crp.PUBLICDIR + path);
-					newUser.meta.cover_pic = path;
+					crp.util.replaceFile(crp.PUBLICDIR + user.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
+					newUser.img.cover = path;
 				}
 
 				callback(null, newUser);
@@ -148,6 +167,7 @@ module.exports = (crp, callback) => {
 
 			crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: crp.db.objectID(userid)}, newUser);
 			crp.global.users[crp.global.users.indexOf(user)] = newUser;
+			crp.util.resetProfilePage(user, newUser);
 
 			return cb(newUser);
 		});
@@ -169,6 +189,7 @@ module.exports = (crp, callback) => {
 
 		crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: userid}, newUser);
 		crp.global.users[crp.global.users.indexOf(user)] = newUser;
+		crp.util.resetProfilePage(user, newUser);
 
 		return newUser;
 	};
@@ -179,14 +200,7 @@ module.exports = (crp, callback) => {
 			pass: data.pass,
 			email: data.email,
 			register_date: data.register_date,
-			display_name: data.display_name || data.login,
-			nicename: data.nicename || data.login.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-			role: data.role || 'pending',
-			locked: data.locked || false,
-			activation_code: crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase(),
-			meta: data.meta || {
-				timezone: crp.moment.tz.guess()
-			}
+			activation_code: crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase()
 		};
 
 		if (user.login.length < 4) return 'loginLength';
@@ -205,10 +219,9 @@ module.exports = (crp, callback) => {
 
 		if (user.register_date) {
 			user.register_date = Date.parse(user.register_date);
-		} else {
-			user.register_date = Date.now();
 		}
 
+		user = crp.util.newUserObject(user);
 		user = crp.util.sanitizeObject(user);
 
 		crp.db.collection(crp.db.PREFIX + 'users').insertOne(user);
@@ -286,6 +299,30 @@ module.exports = (crp, callback) => {
 				}, profilePages[i].context)
 			});
 		}
+	};
+
+	crp.util.removeProfilePage = (user) => {
+		var profilePages = [
+			'/info',
+			'/friends',
+			'/chapters',
+			'/messages',
+			'/account',
+			'/settings'
+		];
+
+		var index = crp.global.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename));
+		if (index > -1) crp.global.pages.splice(index, 1);
+
+		for (var i in profilePages) {
+			index = crp.global.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename + profilePages[i]));
+			if (index > -1) crp.global.pages.splice(index, 1);
+		}
+	};
+
+	crp.util.resetProfilePage = (oldUser, newUser) => {
+		crp.util.removeProfilePage(oldUser);
+		crp.util.addProfilePage(newUser);
 	};
 
 	callback();

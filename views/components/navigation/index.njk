@@ -29,7 +29,7 @@
 				<li class="menu-item page-has-childred">
 					<a><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
 					{% for chapter in crp.global.chapters %}
-						{% if chapter.game == game.name %}
+						{% if chapter.game == game._id %}
 							<ul class="sub-menu">
 								<li class="menu-item"><a onclick="crpGetPage('/{{chapter.slug}}')">{{chapter.name}}</a></li>
 							</ul>
@@ -43,7 +43,7 @@
 			<li class="menu-item menu-has-childred">
 				<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
 				<ul class="sub-menu">
-					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/activity')">Activity</a></li>
+					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}')">Activity</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/account')">Account</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/settings')">Settings</a></li>
 					{% if crp.util.isUserAdmin(user._id) %}

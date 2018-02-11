@@ -1,28 +1,30 @@
 <ul class="forum">
 	{% include "./style.njk" %}
 
-	<li class="header">
-		<ul>
-			<li>Topic</li>
-			<li>Replies</li>
-			<li>Most Recent</li>
-		</ul>
-	</li>
-
-	{% for topic in crp.util.getTopicsByForum(forum._id) %}
-		<li class="topic">
+	{% if crp.util.getTopicsByForum(forum._id).length != 0 %}
+		<li class="header">
 			<ul>
-				<li>
-					<a class="topic-name" onclick="crpGetPage('/forums/{{crp.util.getForumData(topic.parent).slug}}/{{topic._id}}')">{{topic.title}}</a>
-					<div class="topic-author">
-						Started By: <a onclick="crpGetPage('/members/{{crp.util.getUserData(topic.author).nicename}}')">{{crp.util.getUserData(topic.author).display_name}}</a>
-					</div>
-				</li>
-				<li>0</li>
-				<li>No Replies</li>
+				<li>Topic</li>
+				<li>Replies</li>
+				<li>Most Recent</li>
 			</ul>
 		</li>
-	{% endfor %}
+
+		{% for topic in crp.util.getTopicsByForum(forum._id) %}
+			<li class="topic">
+				<ul>
+					<li>
+						<a class="topic-name" onclick="crpGetPage('/forums/{{crp.util.getForumData(topic.parent).slug}}/{{topic._id}}')">{{topic.title}}</a>
+						<div class="topic-author">
+							Started By: <a onclick="crpGetPage('/members/{{crp.util.getUserData(topic.author).nicename}}')">{{crp.util.getUserData(topic.author).display_name}}</a>
+						</div>
+					</li>
+					<li>0</li>
+					<li>No Replies</li>
+				</ul>
+			</li>
+		{% endfor %}
+	{% endif %}
 
 	{% if user and user.role != 'pending' %}
 		<script>crpTinyMCE()</script>
