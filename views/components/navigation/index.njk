@@ -67,5 +67,14 @@
 				<button onclick="crpActivateUser($('.activation_code').val())">Activate</button>
 			</div>
 		</div>
+	{% elseif profile.user.new_email != profile.user.email %}
+		<div class="activate">
+			<span>Validate you new email using the code we sent to {{profile.user.new_email}}.</span>
+
+			<div>
+				<input type="text" name="activation_code" class="activation_code" maxlength="6" placeholder="ACTIVATION CODE" />
+				<button onclick="crpActivateUser($('.activation_code').val())">Activate</button>
+			</div>
+		</div>
 	{% endif %}
 </div>

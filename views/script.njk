@@ -44,11 +44,9 @@
 		});
 	}
 
-	function crpTinyMCE(selector) {
-		if (!selector) selector = '.tinymce';
-
+	function crpTinyMCE() {
 		tinymce.init({
-			selector: selector,
+			selector: '.tinymce',
 			plugins: 'textcolor colorpicker help link paste code hr table',
 			forced_root_blocks: false,
 			menubar: false,

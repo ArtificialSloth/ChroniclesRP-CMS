@@ -45,6 +45,16 @@ module.exports = (crp, callback) => {
 		return crp.moment(date).utcOffset('-05:00').format('LLL');
 	};
 
+	crp.util.wait = (time, cb) => {
+		new Promise((resolve, reject) => {
+			setTimeout(() => {
+				resolve();
+			}, time);
+		}).then(cb).catch((err) => {
+			return callback(err, crp);
+		});
+	};
+
 	crp.util.requireFiles = (file) => {
 		return new Promise((resolve, reject) => {
 			crp.fs.readdir(crp.ROOT + '/api/', (err, files) => {

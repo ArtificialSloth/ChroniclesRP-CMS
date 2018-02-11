@@ -48,15 +48,14 @@ module.exports = (crp, callback) => {
 
 			if (newUser._id) {
 				req.login(newUser, (err) => {
-					if (err) {
-						newUser = 'generic';
-						console.log(err);
-						return;
-					}
+					if (err) return 'generic';
 
 					var subject = 'Welcome to the Chronicles ' + newUser.login + '!';
 					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code. <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
 					crp.util.mail(newUser.email, subject, msg);
+					crp.util.wait(15 * 60 * 1000, () => {
+						crp.util.removeUserData(newUser._id, ['new_email', 'activation_code']);
+					});
 
 					return newUser;
 				});
@@ -64,7 +63,6 @@ module.exports = (crp, callback) => {
 
 			res.send(newUser);
 		}).catch((err) => {
-			console.log(err);
 			res.send('noCaptcha');
 		});
 	});
@@ -79,7 +77,6 @@ module.exports = (crp, callback) => {
 				});
 			} else {
 				crp.util.setUserData(user._id, {email: user.new_email}, true, (newUser) => {
-					crp.util.removeUserData(newUser._id, ['new_email', 'activation_code']);
 					res.send(newUser);
 				});
 			}

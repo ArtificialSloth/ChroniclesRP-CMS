@@ -48,14 +48,14 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.newUserObject = (user) => {
-		return {
+		var newUser = {
 			_id: user._id,
 			login: user.login,
 			pass: user.pass,
 			email: user.email,
 			register_date: user.register_date || Date.now(),
 			display_name: user.display_name || user.login,
-			nicename: user.nicename || data.login.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+			nicename: user.nicename || user.login.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
 			role: user.role || 'pending',
 			locked: user.locked || false,
 			timezone: user.timezone || crp.moment.tz.guess(),
@@ -63,8 +63,13 @@ module.exports = (crp, callback) => {
 			gender: user.gender || '---',
 			tagline: user.tagline,
 			about: user.about,
-			img: user.img || {}
+			img: user.img || {},
 		};
+
+		if (user.activation_code) newUser.activation_code = user.activation_code;
+		if (user.new_email) newUser.new_email = user.new_email;
+
+		return newUser;
 	};
 
 	crp.util.setUserData = (userid, data, admin, cb) => {
@@ -73,7 +78,7 @@ module.exports = (crp, callback) => {
 
 		crp.async.waterfall([
 			(callback) => {
-				var newUser = crp.util.newUserObject(user);
+				var newUser = user;
 
 				newUser.display_name = data.display_name || user.display_name;
 				newUser.tagline = data.tagline || user.tagline;
@@ -106,6 +111,9 @@ module.exports = (crp, callback) => {
 						var subject = 'Confirm your new email address';
 						var msg = 'Please use the following code to confirm your new email address <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
 						crp.util.mail(newUser.new_email, subject, msg);
+						crp.util.wait(15 * 60 * 1000, () => {
+							crp.util.removeUserData(newUser._id, ['new_email', 'activation_code']);
+						});
 					}
 				}
 
@@ -162,10 +170,10 @@ module.exports = (crp, callback) => {
 		], (err, newUser) => {
 			if (err) return cb(err);
 
-			userid = crp.db.sanitize(userid);
+			newUser = crp.util.newUserObject(newUser);
 			newUser = crp.util.sanitizeObject(newUser);
 
-			crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: crp.db.objectID(userid)}, newUser);
+			crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: user._id}, newUser);
 			crp.global.users[crp.global.users.indexOf(user)] = newUser;
 			crp.util.resetProfilePage(user, newUser);
 
@@ -184,10 +192,10 @@ module.exports = (crp, callback) => {
 			newUser[k] = user[k];
 		}
 
-		userid = crp.db.sanitize(userid);
+		newUser = crp.util.newUserObject(newUser);
 		newUser = crp.util.sanitizeObject(newUser);
 
-		crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: userid}, newUser);
+		crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: user._id}, newUser);
 		crp.global.users[crp.global.users.indexOf(user)] = newUser;
 		crp.util.resetProfilePage(user, newUser);
 
