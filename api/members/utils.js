@@ -13,9 +13,9 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.emailConfirmCode = (userid) => {
-		setTimeout(() => {
-			crp.util.removeUserData(userid, ['new_email', 'activation_code']);
-		}, 15 * 60 * 1000);
+		crp.util.wait(15 * 60 * 1000, () => {
+			crp.util.removeUserData(newUser._id, ['new_email', 'activation_code']);
+		});
 
 		return crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase();
 	};
@@ -111,9 +111,6 @@ module.exports = (crp, callback) => {
 						var subject = 'Confirm your new email address';
 						var msg = 'Please use the following code to confirm your new email address <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
 						crp.util.mail(newUser.new_email, subject, msg);
-						crp.util.wait(15 * 60 * 1000, () => {
-							crp.util.removeUserData(newUser._id, ['new_email', 'activation_code']);
-						});
 					}
 				}
 

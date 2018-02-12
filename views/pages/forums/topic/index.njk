@@ -1,1 +1,28 @@
-{{topic.title}}
+<ul class="topic">
+	{% include "./style.njk" %}
+
+	<li class="header">
+		<ul>
+			<li>Author</li>
+		</ul>
+	</li>
+
+	<li class="sub-header">
+		<ul>
+			<li>{{crp.util.dateToStr(topic.date)}}</li>
+		</ul>
+	</li>
+
+	<li class="body">
+		<ul>
+			<li>
+				{% set author = crp.util.getUserData(topic.author) %}
+
+				<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
+				<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+				<div class="role">{{author.role.replace('_', ' ')}}</div>
+			</li>
+			<li>{{topic.content | safe}}</li>
+		</ul>
+	</li>
+</ul>
