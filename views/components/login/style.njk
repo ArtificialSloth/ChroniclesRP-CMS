@@ -1,13 +1,10 @@
 <style>
 	#login {
-		display:flex;
-		flex-direction:column;
-		height:100%;
-		justify-content:center;
+		height:100vh;
 		opacity:0;
 		position:fixed;
 		transition:all 0.2s ease-in-out;
-		width:100%;
+		width:100vw;
 		visibility:hidden;
 		z-index:4;
 	}
@@ -18,43 +15,46 @@
 	}
 
 	#login .login-background {
-		position:absolute;
 		background-color:rgba(0, 0, 0, 0.75);
-		height:100%;
-		width:100%;
+		height:100vh;
+		position:absolute;
+		width:100vw;
 	}
 
 	#login form {
 		background-color:#141414;
 		font-family:Droid Serif, Georgia, serif;
-		margin:auto;
-		padding:10px;
-		width:330px;
+		left:50%;
+		padding:0.625em; /* 10/16 */
+		position:absolute;
+		top:50%;
+		transform:translate(-50%, -50%);
+		width:20.625em; /* 330/16 */
 	}
 
 	#login form h1 {
 		font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
-		font-size:24px;
+		font-size:1.5em; /* 24/16 */
 		font-weight:bold;
-		margin-bottom:30px;
+		margin-bottom:1.875em; /* 30/16 */
 		text-align:center;
 	}
 
 	#login form label {
 		color:#999;
-		font-size:18px;
+		font-size:1.125em; /* 18/16 */
 	}
 
 	#login form input[type=text],
 	#login form input[type=password] {
 		display:block;
-		margin-top:0.5em;
-		margin-bottom:1.25em;
-		width:310px;
+		margin-top:0.5em; /* 8/16 */
+		margin-bottom:1.25em; /* 20/16 */
+		width:19.375em; /* 310/16 */
 	}
 
 	#login form input.input-error {
-		border:1px solid #ff0000;
+		border:0.0625em solid #ff0000; /* 1/16 */
 	}
 
 	#login form input[type=checkbox] + input[type=button] {
@@ -66,10 +66,10 @@
 
 	#login form .error-message {
 		background-color: #9D3834;
-		border:1px dashed #fff;
+		border:0.0625em dashed #fff; /* 1/16 */
 		display:none;
-		margin-bottom:1.25em;
-		padding:10px;
+		margin-bottom:1.25em; /* 20/16 */
+		padding:0.625em; /* 10/16 */
 		text-align:center;
 	}
 
@@ -91,8 +91,8 @@
 
 	@keyframes wiggle {
 		0% {left: 0;}
-		25% {left: -5px;}
-		75% {left: 5px}
+		25% {left: -0.3125em; }/* 5/16 */
+		75% {left: 0.3125em}/* 5/16 */
 		100% {left: 0}
 	}
 </style>

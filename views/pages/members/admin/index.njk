@@ -1,22 +1,22 @@
 {% include "./style.njk" %}
 
 <div class="users-menu">
-	<input type="button" class="all active" onclick="usersToggleRoleFilter(this, 'all')" value="All ({{crp.global.users.length}})" />
+	<button class="filter all active" onclick="usersToggleRoleFilter(this, 'all')">All ({{crp.global.users.length}})</button>
 
 	{% if crp.util.roleHasUsers('administrator') %}
-		<input type="button" class="administrator" onclick="usersToggleRoleFilter(this, 'administrator')" value="Administrators ({{crp.util.getUsersByRole('administrator').length}})" />
+		<button class="filter administrator" onclick="usersToggleRoleFilter(this, 'administrator')">Administrators ({{crp.util.getUsersByRole('administrator').length}})</button>
 	{% endif %}
 
 	{% if crp.util.roleHasUsers('chapter_leader') %}
-		<input type="button" class="chapter-leader" onclick="usersToggleRoleFilter(this, 'chapter-leader')" value="Chapter Leaders ({{crp.util.getUsersByRole('chapter_leader').length}})" />
+		<button class="filter chapter-leader" onclick="usersToggleRoleFilter(this, 'chapter-leader')">Chapter Leaders ({{crp.util.getUsersByRole('chapter_leader').length}})</button>
 	{% endif %}
 
 	{% if crp.util.roleHasUsers('member') %}
-		<input type="button" class="member" onclick="usersToggleRoleFilter(this, 'member')" value="Members ({{crp.util.getUsersByRole('member').length}})" />
+		<button class="filter member" onclick="usersToggleRoleFilter(this, 'member')">Members ({{crp.util.getUsersByRole('member').length}})</button>
 	{% endif %}
 
 	{% if crp.util.roleHasUsers('pending') %}
-		<input type="button" class="pending" onclick="usersToggleRoleFilter(this, 'pending')" value="Pending ({{crp.util.getUsersByRole('pending').length}})" />
+		<button class="filter pending" onclick="usersToggleRoleFilter(this, 'pending')">Pending ({{crp.util.getUsersByRole('pending').length}})</button>
 	{% endif %}
 </div>
 

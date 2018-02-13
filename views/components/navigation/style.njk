@@ -2,9 +2,9 @@
 	#navigation {
 		position:fixed;
 		background-color:#141414;
-		font-size:14px;
-		height:60px;
-		min-width:860px;
+		font-size:0.875em; /* 14/16 */
+		height:4.285714285714286em; /* 60/14 */
+		min-width:61.42857142857143em; /* 860/14 */
 		top:0;
 		width:100%;
 		z-index:3;
@@ -21,7 +21,7 @@
 
 	#navigation ul li a {
 		display:block;
-		padding:23px 0;
+		padding:1.6428571428571428em 0; /* 23/14 */
 		color:#999;
 		cursor:pointer;
 		text-decoration:none;
@@ -35,16 +35,16 @@
 
 	#navigation ul.main-menu > li {
 		display:inline-block;
-		margin-left:40px;
+		margin-left:2.857142857142857em; /* 40/14 */
 	}
 
 	#navigation ul.main-menu > li + li:before {
 		position:absolute;
 		content:"/";
 		color:#3d3d3d;
-		margin-top:-7px;
+		margin-top:-0.5em; /* 7/14 */
 		top:50%;
-		left:-25px;
+		left:-1.7857142857142858em; /* 25/14 */
 	}
 
 	#navigation ul > li:hover > a {
@@ -52,16 +52,16 @@
 	}
 
 	#navigation ul li.menu-has-childred {
-		padding-right:15px;
+		padding-right:1.0714285714285714em; /* 15/14 */
 	}
 
 	#navigation ul > li.menu-has-childred > a:before {
 		display:block;
 		position:absolute;
 		content:"";
-		border:6px solid transparent;
+		border:0.42857142857142855em solid transparent; /* 6/14 */
 		border-top-color:#1d1d1d;
-		margin-left:-6px;
+		margin-left:-0.42857142857142855em; /* 6/14 */
 		left:50%;
 		bottom:0;
 		transition:all 0.2s ease-in-out;
@@ -69,16 +69,16 @@
 	}
 
 	#navigation ul > li.menu-has-childred:hover > a:before {
-		bottom:-9px;
+		bottom:-0.6428571428571429em; /* 9/14 */
 	}
 
 	#navigation ul > li.menu-has-childred > a:after {
 	    display:block;
 	    position:absolute;
 		content:"";
-	    border:4px solid transparent;
+	    border:0.2857142857142857em solid transparent; /* 4/14 */
 	    border-top-color:#999;
-	    margin-top:-2px;
+	    margin-top:-0.14285714285714285em; /* 2/14 */
 	    top:50%;
 	    right:0;
 		transition:all 0.1s ease-in-out;
@@ -93,31 +93,31 @@
 		position:absolute;
 		padding:0;
 		opacity:0;
-		left:-9999px;
-		top:65px;
+		left:-714.2142857142857em; /* 9999/14 */
+		top:4.642857142857143em; /* 65/14 */
 		transition:opacity 0.3s ease-in-out, top 0.3s ease-in-out;
 	}
 
 	#navigation ul li.menu-has-childred:hover > ul {
 		opacity:1;
-		margin-left:-100px;
+		margin-left:-7.142857142857143em; /* 100/14 */
 		left:50%;
-		top:60px;
+		top:4.285714285714286em; /* 60/14 */
 	}
 
 	#navigation ul li.menu-has-childred ul li {
 	    background:#2d2d2d;
-		width:200px;
+		width:14.285714285714286em; /* 200/14 */
 	}
 
 	#navigation ul li.menu-has-childred ul li + li {
-	    border-top:1px solid rgba(255,255,255,0.075);
+	    border-top:0.07142857142857142em solid rgba(255,255,255,0.075); /* 1/14 */
 	}
 
 	#navigation ul li.menu-has-childred ul li a {
 	    display:block;
-	    padding:16px;
-	    font-size:16px;
+	    padding:1em; /* 16/16 */
+	    font-size:1.1428571428571428em; /* 16/14 */
 	    line-height:130%;
 	    text-align:center;
 	    text-transform:none;
@@ -127,9 +127,9 @@
 	    display:block;
 	    position:absolute;
 		content:"";
-	    border:4px solid transparent;
+	    border:0.25em solid transparent; /* 4/16 */
 	    border-top-color:#999;
-	    margin-top:-2px;
+	    margin-top:-0.125em; /* 2/16 */
 	    top:50%;
 	    right:0;
 		transition:all 0.2s ease-in-out;
@@ -140,14 +140,14 @@
 		position:absolute;
 		padding:0;
 		opacity:0;
-		left:-9999px;
-		top:5px;
+		left:-714.2142857142857em; /* 9999/14 */
+		top:0.35714285714285715em; /* 5/14 */
 		transition:opacity 0.3s ease-in-out, top 0.3s ease-in-out;
 	}
 
 	#navigation ul li.page-has-childred:hover > ul {
 		opacity:1;
-	    left:200px;
+	    left:14.285714285714286em; /* 200/14 */
 	    top:50%;
 		transform:translate(0, -50%);
 	}
@@ -157,36 +157,36 @@
 	}
 
 	#navigation ul > li.page-has-childred > a:after {
-		margin-top:-3px;
+		margin-top:-0.21428571428571427em; /* 3/14 */
 		border-top-color:transparent;
 		border-left-color:#999;
-		right:10px;
+		right:0.7142857142857143em; /* 10/14 */
 		z-index:2;
 	}
 
 	#navigation ul > li.page-has-childred:hover > a:after {
-		border-width:5px;
+		border-width:0.35714285714285715em; /* 5/14 */
 		border-top-color:transparent;
 		border-left-color:#2d2d2d;
-		margin-top:-4px;
-		right:-10px;
+		margin-top:-0.2857142857142857em; /* 4/14 */
+		right:-0.625em; /* 10/16 */
 	}
 
 	.activate {
 		background-color:#ffffe0;
-		border:1px solid #e6db55;
-		border-radius:3px;
+		border:0.07142857142857142em solid #e6db55; /* 1/14 */
+		border-radius:0.21428571428571427em; /* 3/14 */
 		float:left;
 		margin-left:5%;
-		padding:10px;
+		padding:0.7142857142857143em; /* 10/14 */
 		width:90%;
 	}
 
 	.activate span {
 		color:#000;
 		font-family:'Droid Serif', Georgia, serif;
-		font-size:16px;
-		line-height:30px;
+		font-size:1.1428571428571428em; /* 16/14 */
+		line-height:2.142857142857143em; /* 30/14 */
 	}
 
 	.activate div {
