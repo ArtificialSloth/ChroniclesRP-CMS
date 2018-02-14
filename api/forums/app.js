@@ -11,5 +11,23 @@ module.exports = (crp, callback) => {
 		res.send(crp.util.addTopic(topicData));
 	});
 
+	crp.express.app.post('/api/new-reply', (req, res) => {
+		var replyData = {
+			author: req.user,
+			content: req.body.reply,
+			parent: req.body.parent
+		};
+
+		res.send(crp.util.addReply(replyData));
+	});
+
+	crp.express.app.post('/api/remove-reply', (req, res) => {
+		var reply = crp.util.getReplyData(req.body.replyid);
+
+		if (reply && reply.author == req.user || reply && crp.util.isUserAdmin(req.user)) {
+			res.send(crp.util.removeReply(reply._id));
+		}
+	});
+
 	callback()
 };

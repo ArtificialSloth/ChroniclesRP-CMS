@@ -18,8 +18,8 @@
 	}
 
 	.topic li ul li {
-		text-align:left;
-		width:82%;
+		text-align:right;
+		width:85%;
 	}
 
 	.topic .header {
@@ -40,6 +40,15 @@
 		width:25%;
 	}
 
+	.topic .sub-header ul li {
+		width:75%;
+	}
+
+	.topic .sub-header.reply {
+		border:none;
+		margin-top:0.0625em; /* 1/16 */
+	}
+
 	.topic .body {
 		background-color:#323232;
 		padding:0.5em; /* 8/16 */
@@ -58,6 +67,11 @@
 	.topic .body ul li:first-child .role {
 		font-size:0.75em; /* 12/16 */
 		font-style:italic;
+	}
+
+	.topic .body ul li {
+		text-align:left;
+		width:82%;
 	}
 
 	.topic .body ul li p {

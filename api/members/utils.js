@@ -240,8 +240,6 @@ module.exports = (crp, callback) => {
 		var user = crp.util.getUserData(userid);
 
 		if (user) {
-			userid = crp.db.sanitize(userid);
-
 			crp.db.collection(crp.db.PREFIX + 'users').deleteOne({_id: user._id});
 			crp.global.users.splice(crp.global.users.indexOf(user), 1);
 

@@ -11,7 +11,7 @@
 			</ul>
 		</li>
 
-		{% for forum in crp.global.forums %}
+		{% for forum in crp.util.getForums() %}
 			{% if forum.category == category._id %}
 				{% set topics = crp.util.getTopicsByForum(forum._id) %}
 				<li class="forum">
