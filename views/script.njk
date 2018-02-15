@@ -68,6 +68,12 @@
 		});
 	}
 
+	function crpScrollTo(selector) {
+		$('html, body').animate({
+	        scrollTop: $(selector).offset().top
+	    }, 250);
+	}
+
 	window.onpopstate = (e) => {
 		if (e.state) {
 			var page = e.state.page;

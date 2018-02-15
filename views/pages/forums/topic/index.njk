@@ -11,9 +11,7 @@
 	<li class="sub-header">
 		<ul>
 			<li>{{crp.util.dateToStr(topic.date)}}</li>
-			{% if topic.author == user._id or crp.util.isUserAdmin(user._id) %}
-				<li><a>Edit</a> | <a>Delete</a> | <a>Reply</a></li>
-			{% endif %}
+			<li>{% if topic.author == user._id or crp.util.isUserAdmin(user._id) %}<a>Edit</a> | <a>Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 		</ul>
 	</li>
 
@@ -34,9 +32,7 @@
 		<li class="sub-header reply">
 			<ul>
 				<li>{{crp.util.dateToStr(reply.date)}}</li>
-				{% if topic.author == user._id or crp.util.isUserAdmin(user._id) %}
-					<li><a>Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | <a>Reply</a></li>
-				{% endif %}
+				<li>{% if topic.author == user._id or crp.util.isUserAdmin(user._id) %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 			</ul>
 		</li>
 

@@ -1,10 +1,12 @@
 <script>
 	function removeReply(replyid) {
-		crpAjax('/api/remove-reply', {replyid: replyid}, (response) => {
-			if (response) {
-				location.reload();
-			}
-		});
+		if (window.confirm('Are you sure?')) {
+			crpAjax('/api/remove-reply', {replyid: replyid}, (response) => {
+				if (response) {
+					location.reload();
+				}
+			});
+		}
 	}
 
 	$('.new-post form').submit((e) => {
