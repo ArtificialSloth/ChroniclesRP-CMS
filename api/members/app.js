@@ -53,6 +53,7 @@ module.exports = (crp, callback) => {
 					var subject = 'Welcome to the Chronicles ' + newUser.login + '!';
 					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code. <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
 					crp.util.mail(newUser.email, subject, msg);
+					crp.util.adminNotify('New User: ' + newUser.display_name, 'Username: ' + newUser.login + '<br>Email: ' + newUser.email);
 
 					return newUser;
 				});

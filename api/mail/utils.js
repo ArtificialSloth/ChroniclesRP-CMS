@@ -19,5 +19,15 @@ module.exports = (crp, callback) => {
 		});
 	};
 
+	crp.util.adminNotify = (subject, msg) => {
+		var admins = crp.util.getUsersByRole('administrator');
+		var to = []
+		for (var i in admins) {
+			to.push(admins[i].email);
+		}
+
+		crp.util.mail(to, subject, msg);
+	};
+
 	callback();
 };
