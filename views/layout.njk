@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>{{crp.global.site.name}} - {{crp.global.site.tagline}}</title>
+		{% lookup 'site', {}, {}, 'site' %}
+		<title>{{site.name}} - {{site.tagline}}</title>
 		<link rel="icon" href="/img/ico.png" type="image/png">
 
 		<script src="/js/nunjucks.js"></script>

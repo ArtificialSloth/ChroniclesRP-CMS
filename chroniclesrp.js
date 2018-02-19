@@ -31,13 +31,13 @@ async.waterfall([
 ], (err, crp) => {
 	if (err) return console.error(err);
 
-	crp.express.ready().then(() => {
+	crp.express.ready((err) => {
+		if (err) return console.error(err);
+
 		crp.express.app.listen(process.env.PORT || 80, () => {
 			if (process.send) process.send('online');
 
 			console.log('\nThe Chronicles RP is up and running!');
 		});
-	}).catch((err) => {
-		if (err) return console.error(err);
 	});
 });

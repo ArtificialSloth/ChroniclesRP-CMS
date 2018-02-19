@@ -1,7 +1,9 @@
 <ul class="forum">
 	{% include "./style.njk" %}
+	{% lookup 'forums', {_id: forumid}, {}, 'forum' %}
+	{% query 'topics', {parent: forum._id}, {date: -1}, 'topics' %}
 
-	{% if crp.util.getTopicsByForum(forum._id).length != 0 %}
+	{% if topics.length != 0 %}
 		<li class="header">
 			<ul>
 				<li>Topic</li>
@@ -10,13 +12,14 @@
 			</ul>
 		</li>
 
-		{% for topic in crp.util.getTopicsByForum(forum._id) %}
+		{% for topic in topics %}
+			{% lookup 'users', {_id: topic.author}, {}, 'author' %}
 			<li class="topic">
 				<ul>
 					<li>
-						<a class="topic-name" onclick="crpGetPage('/forums/{{crp.util.getForumData(topic.parent).slug}}/{{topic._id}}')">{{topic.title}}</a>
+						<a class="topic-name" onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a>
 						<div class="topic-author">
-							Started By: <a onclick="crpGetPage('/members/{{crp.util.getUserData(topic.author).nicename}}')">{{crp.util.getUserData(topic.author).display_name}}</a>
+							Started By: <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
 						</div>
 					</li>
 					<li>0</li>
@@ -26,6 +29,7 @@
 		{% endfor %}
 	{% endif %}
 
+	{% lookup 'users', {_id: userid}, {}, 'user' %}
 	{% if user and user.role != 'pending' %}
 		<script>crpTinyMCE()</script>
 		<fieldset class="new-post">
@@ -36,7 +40,7 @@
 
 				<textarea name="topic_body" class="topic_body tinymce"></textarea>
 
-				{% if user.role == chapter_leader or crp.util.isUserAdmin(user._id) %}
+				{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
 					<label for="topic_type">Topic Type:</label>
 					<select name="topic_type" class="topic_type">
 						<option value="normal" selected>Normal</option>

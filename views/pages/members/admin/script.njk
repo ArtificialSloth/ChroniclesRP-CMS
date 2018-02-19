@@ -3,24 +3,24 @@
 		e.preventDefault();
 
 		var formData = $(e.target).serialize();
-		crpAjax('/api/admin/edit-user', formData, (response) => {
-			if (response) {
-				$('.' + response._id).removeClass('locked');
-				$('.' + response._id).next().find('.user_locked').prop('checked', false);
-				if (response.locked) {
-					$('.' + response._id).addClass('locked');
-					$('.' + response._id).next().find('.user_locked').prop('checked', true);
+		crpAjax('/api/admin/edit-user', formData, (res) => {
+			if (res) {
+				$('.' + res._id).removeClass('locked');
+				$('.' + res._id).next().find('.user_locked').prop('checked', false);
+				if (res.locked) {
+					$('.' + res._id).addClass('locked');
+					$('.' + res._id).next().find('.user_locked').prop('checked', true);
 				}
 
-				$('.' + response._id).next().find('.user_login').val(response.login);
-				$('.' + response._id).next().find('.user_login').val(response.login);
-				$('.' + response._id).next().find('.display_name').val(response.display_name);
-				$('.' + response._id).next().find('.user_email').val(response.email);
-				$('.' + response._id).next().find('.user_role').val(response.role);
+				$('.' + res._id).next().find('.user_login').val(res.login);
+				$('.' + res._id).next().find('.user_login').val(res.login);
+				$('.' + res._id).next().find('.display_name').val(res.display_name);
+				$('.' + res._id).next().find('.user_email').val(res.email);
+				$('.' + res._id).next().find('.user_role').val(res.role);
 
-				$('.' + response._id + ' .login').html(response.login);
-				$('.' + response._id + ' .email').html(response.email);
-				$('.' + response._id + ' .role').html(response.role);
+				$('.' + res._id + ' .login').html(res.login);
+				$('.' + res._id + ' .email').html(res.email);
+				$('.' + res._id + ' .role').html(res.role);
 				$(e.target).find('.user-saved').addClass('active');
 
 				setTimeout(() => {
@@ -31,8 +31,10 @@
 	});
 
 	function usersRemove(userid) {
-		crpAjax('/api/admin/remove-user', {userid: userid}, (response) => {
-			if (response) crpGetSubPage('/admin/users', '.admin-content', true);
+		crpAjax('/api/admin/remove-user', {userid: userid}, (res) => {
+			if (typeof res != 'object') return console.error(res);
+
+			crpGetSubPage('/admin/users', '.admin-content', true);
 		});
 	}
 
@@ -48,8 +50,10 @@
 		e.preventDefault();
 
 		var formData = $(e.target).serialize();
-		crpAjax('/api/admin/add-user', formData, (response) => {
-			if (response) crpGetSubPage('/admin/users', '.admin-content', true);
+		crpAjax('/api/admin/add-user', formData, (res) => {
+			if (typeof res != 'object') return console.error(res);
+
+			crpGetSubPage('/admin/users', '.admin-content', true);
 		});
 	});
 </script>

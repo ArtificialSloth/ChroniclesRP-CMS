@@ -1,5 +1,7 @@
 <ul class="topic">
 	{% include "./style.njk" %}
+	{% lookup 'topics', {_id: topicid}, {}, 'topic' %}
+	{% lookup 'users', {_id: topic.author}, {}, 'author' %}
 
 	<li class="header">
 		<ul>
@@ -10,16 +12,16 @@
 
 	<li class="sub-header">
 		<ul>
+			{% lookup 'users', {_id: userid}, {}, 'user' %}
+
 			<li>{{crp.util.dateToStr(topic.date)}}</li>
-			<li>{% if topic.author == user._id or crp.util.isUserAdmin(user._id) %}<a>Edit</a> | <a>Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+			<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a>Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 		</ul>
 	</li>
 
 	<li class="body">
 		<ul>
 			<li>
-				{% set author = crp.util.getUserData(topic.author) %}
-
 				<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
 				<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
 				<div class="role">{{author.role.replace('_', ' ')}}</div>
@@ -28,18 +30,19 @@
 		</ul>
 	</li>
 
-	{% for reply in crp.util.getRepliesByTopic(topic._id) %}
+	{% query 'replies', {parent: topic._id}, {date: -1}, 'replies' %}
+	{% for reply in replies %}
+		{% lookup 'users', {_id: reply.author}, {}, 'author' %}
+
 		<li class="sub-header reply">
 			<ul>
 				<li>{{crp.util.dateToStr(reply.date)}}</li>
-				<li>{% if topic.author == user._id or crp.util.isUserAdmin(user._id) %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+				<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 			</ul>
 		</li>
-
 		<li class="reply body">
 			<ul>
 				<li>
-					{% set author = crp.util.getUserData(reply.author) %}
 
 					<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
 					<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>

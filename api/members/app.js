@@ -17,17 +17,17 @@ module.exports = (crp, callback) => {
 				crp.auth.failedLogins[req.ip].count += 1;
 				return res.send('invalid');
 			}
+
+			req.session.cookie.maxAge = 24 * 60 * 60 * 1000;
 			if (req.body.remember_me) {
 				req.session.cookie.maxAge = 90 * 24 * 60 * 60 * 1000;
-			} else {
-				req.session.cookie.maxAge = 24 * 60 * 60 * 1000;
 			}
 
 			req.login(user, (err) => {
 				if (err) return next(err);
 				if (user.locked) return res.send('locked');
 
-				return res.send('valid');
+				res.send('valid');
 			});
 		})(req, res, next);
 	});
@@ -44,43 +44,49 @@ module.exports = (crp, callback) => {
 				pass: req.body.user_pass,
 				email: req.body.user_email
 			};
-			var newUser = crp.util.addUser(userData);
 
-			if (newUser._id) {
-				req.login(newUser, (err) => {
-					if (err) return 'generic';
+			crp.util.addUser(userData, (err, result) => {
+				if (err) return res.send(err);
+				if (!result._id) return res.send(result);
 
-					var subject = 'Welcome to the Chronicles ' + newUser.login + '!';
-					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code. <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
-					crp.util.mail(newUser.email, subject, msg);
-					crp.util.adminNotify('New User: ' + newUser.display_name, 'Username: ' + newUser.login + '<br>Email: ' + newUser.email);
+				req.login(result, (err) => {
+					if (err) return res.send(err);
 
-					return newUser;
+					var subject = 'Welcome to the Chronicles ' + result.login + '!';
+					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code. <div style="font-size:20px; text-align:center">' + result.activation_code + '</div>';
+					crp.util.mail(result.email, subject, msg);
+					crp.util.adminNotify('New User: ' + result.display_name, 'Username: ' + result.login + '<br>Email: ' + result.email);
+
+					res.send(result);
 				});
-			}
-
-			res.send(newUser);
+			});
 		}).catch((err) => {
 			res.send('noCaptcha');
 		});
 	});
 
 	crp.express.app.post('/api/activate', (req, res) => {
-		var user = crp.util.getUserData(req.user);
+		crp.util.getUserData(req.user, (err, user) => {
+			if (err) return res.send(err);
 
-		if (user && user.activation_code == req.body.code) {
-			if (user.role == 'pending') {
-				crp.util.setUserData(user._id, {role: 'member'}, true, (newUser) => {
-					res.send(newUser);
-				});
+			if (user && user.activation_code == req.body.code) {
+				if (user.role == 'pending') {
+					crp.util.setUserData(user._id, {role: 'member'}, true, (err, result) => {
+						if (err) return res.send(err);
+
+						res.send(result);
+					});
+				} else {
+					crp.util.setUserData(user._id, {email: user.new_email}, true, (err, result) => {
+						if (err) return res.send(err);
+
+						res.send(result);
+					});
+				}
 			} else {
-				crp.util.setUserData(user._id, {email: user.new_email}, true, (newUser) => {
-					res.send(newUser);
-				});
+				res.send('invalid');
 			}
-		} else {
-			res.send('invalid');
-		}
+		});
 	});
 
 	var editUser = crp.express.upload.fields([
@@ -88,53 +94,76 @@ module.exports = (crp, callback) => {
 		{name: 'cover_pic', maxCount: 1}
 	]);
 	crp.express.app.post('/api/admin/edit-user', editUser, (req, res) => {
-		if (req.body.user_id == req.user || crp.util.isUserAdmin(req.user)) {
-			var userData = {
-				login: req.body.user_login,
-				old_pass: req.body.old_pass,
-				new_pass: req.body.new_pass,
-				confirm_new_pass: req.body.confirm_new_pass,
-				email: req.body.user_email,
-				display_name: req.body.display_name,
-				role: req.body.user_role,
-				locked: req.body.user_locked,
-				timezone: req.body.user_timezone,
-				date_of_birth: req.body.user_dob,
-				gender: req.body.user_gender,
-				tagline: req.body.user_tagline,
-				about: req.body.user_about,
-				img: {}
-			};
+		crp.util.getUserData(req.user, (err, user) => {
+			if (err) return res.send(err);
 
-			if (req.files) {
-				if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
-				if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+			if (req.body.user_id == user._id || user.role == 'administrator') {
+				var userData = {
+					login: req.body.user_login,
+					old_pass: req.body.old_pass,
+					new_pass: req.body.new_pass,
+					confirm_new_pass: req.body.confirm_new_pass,
+					email: req.body.user_email,
+					display_name: req.body.display_name,
+					role: req.body.user_role,
+					locked: req.body.user_locked,
+					timezone: req.body.user_timezone,
+					date_of_birth: req.body.user_dob,
+					gender: req.body.user_gender,
+					tagline: req.body.user_tagline,
+					about: req.body.user_about,
+					img: {}
+				};
+
+				if (req.files) {
+					if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
+					if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+				}
+
+				crp.util.setUserData(req.body.user_id, userData, (user.role == 'administrator'), (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
 			}
-
-			crp.util.setUserData(req.body.user_id, userData, crp.util.isUserAdmin(req.user), (newUser) => {
-				res.send(newUser);
-			});
-		}
+		})
 	});
 
 	crp.express.app.post('/api/admin/add-user', (req, res) => {
-		if (crp.util.isUserAdmin(req.user)) {
-			var userData = {
-				login: req.body.user_login,
-				pass: req.body.user_pass,
-				encrypted: req.body.encrypted,
-				email: req.body.user_email,
-				register_date: req.body.register_date,
-				role: 'member'
-			};
-			res.send(crp.util.addUser(userData));
-		}
+		crp.util.getUserData(req.user, (err, user) => {
+			if (err) return res.send(err);
+
+			if (user.role == 'administrator') {
+				var userData = {
+					login: req.body.user_login,
+					pass: req.body.user_pass,
+					encrypted: req.body.encrypted,
+					email: req.body.user_email,
+					register_date: req.body.register_date,
+					role: 'member'
+				};
+
+				crp.util.addUser(userData, (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
+			}
+		});
 	});
 
 	crp.express.app.post('/api/admin/remove-user', (req, res) => {
-		if (crp.util.isUserAdmin(req.user)) {
-			res.send(crp.util.removeUser(req.body.userid));
-		}
+		crp.util.getUserData(req.user, (err, user) => {
+			if (err) return res.send(err);
+
+			if (user.role == 'administrator') {
+				crp.util.removeUser(crp.db.objectID(req.body.userid), (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
+			}
+		});
 	});
 
 	callback();

@@ -3,16 +3,14 @@ module.exports = (crp, callback) => {
 	var mongoClient = mongodb.MongoClient;
 
 	mongoClient.connect(process.env.MONGODB_URL, (err, db) => {
-		if (err) return console.error(err);
-
-		db.PREFIX = 'CRP_';
-		db.objectID = mongodb.ObjectId;
-		db.sanitize = require('mongo-sanitize');
+		if (err) return callback(err, crp);
 
 		crp.db = db;
-		crp.util.requireFiles('/globals.js').then(() => {
-			callback(null, crp);
-		}).catch((err) => {
+		crp.db.PREFIX = 'CRP_';
+		crp.db.objectID = mongodb.ObjectId;
+		crp.db.sanitize = require('mongo-sanitize');
+
+		crp.util.requireFiles('/globals.js', (err) => {
 			callback(err, crp);
 		});
 	});

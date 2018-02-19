@@ -19,7 +19,7 @@ module.exports = (crp, callback) => {
 				crp.global.pages.push({
 					slug: '/forums/' + crp.global.forums[i].slug,
 					path: '/forums/forum/index.njk',
-					context: {forum: crp.global.forums[i]}
+					context: {forumid: crp.global.forums[i]._id}
 				});
 			}
 
@@ -35,7 +35,7 @@ module.exports = (crp, callback) => {
 					crp.global.pages.push({
 						slug: '/forums/' + parent.slug + '/' + crp.global.topics[i]._id,
 						path: '/forums/topic/index.njk',
-						context: {topic: crp.global.topics[i]}
+						context: {topicid: crp.global.topics[i]._id}
 					});
 				}
 

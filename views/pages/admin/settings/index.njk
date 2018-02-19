@@ -1,19 +1,20 @@
 {% include "./style.njk" %}
+{% lookup 'site', {}, {}, 'site' %}
 
 <form class="site-settings-form standard-form">
 	<label for="site_name">Site Title</label>
 	<div class="standard-input">
-		<input type="text" name="site_name" class="site_name" value="{{crp.global.site.name}}" />
+		<input type="text" name="site_name" class="site_name" value="{{site.name}}" />
 	</div>
 
 	<label for="site_tagline">Site Tagline</label>
 	<div class="standard-input">
-		<input type="text" name="site_tagline" class="site_tagline" value="{{crp.global.site.tagline}}" />
+		<input type="text" name="site_tagline" class="site_tagline" value="{{site.tagline}}" />
 	</div>
 
 	<label for="mail_template">Email Template</label>
 	<div class="standard-input">
-		<textarea name="mail_template" class="mail_template tinymce">{{crp.global.site.mail_template}}</textarea>
+		<textarea name="mail_template" class="mail_template tinymce">{{site.mail_template}}</textarea>
 		<script>crpTinyMCE()</script>
 	</div>
 

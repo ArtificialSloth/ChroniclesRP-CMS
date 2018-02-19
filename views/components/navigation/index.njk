@@ -12,33 +12,37 @@
 				<li class="menu-item"><a onclick="crpGetPage('/join-us')">Join Us</a></li>
 			</ul>
 		</li>
+
 		<li class="menu-item menu-has-childred">
 			<a onclick="crpGetPage('/resources')">Resources</a>
 			<ul class="sub-menu">
 				<li class="menu-item"><a onclick="crpGetPage('/resources')">Mod Suggestions</a></li>
 				<li class="menu-item"><a onclick="crpGetPage('/events')">Chronicles Events</a></li>
-				{% if crp.util.isUserAdmin(user._id) %}
+				{% if user.role == 'chapter_leader' %}
 					<li class="menu-item"><a onclick="crpGetPage('/global-blacklist')">Global Blacklist</a></li>
 				{% endif %}
 			</ul>
 		</li>
+
 		<li class="menu-item menu-has-childred">
 			<a onclick="crpGetPage('/chapters')">Chapters</a>
 			<ul class="sub-menu">
-			{% for game in crp.global.games %}
-				<li class="menu-item page-has-childred">
-					<a><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
-					{% for chapter in crp.global.chapters %}
-						{% if chapter.game == game._id %}
+				{% query 'games', {}, {name: 1}, 'games' %}
+				{% for game in games %}
+					<li class="menu-item page-has-childred">
+						<a><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
+						{% query 'chapters', {game: game._id}, {name: 1}, 'chapters' %}
+						{% for chapter in chapters %}
 							<ul class="sub-menu">
 								<li class="menu-item"><a onclick="crpGetPage('/{{chapter.slug}}')">{{chapter.name}}</a></li>
 							</ul>
-						{% endif %}
-					{% endfor %}
-				</li>
-			{% endfor %}
+						{% endfor %}
+					</li>
+				{% endfor %}
 			</ul>
 		</li>
+
+		{% lookup 'users', {_id: userid}, {}, 'user' %}
 		{% if user %}
 			<li class="menu-item menu-has-childred">
 				<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
@@ -46,7 +50,7 @@
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}')">Activity</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/account')">Account</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/settings')">Settings</a></li>
-					{% if crp.util.isUserAdmin(user._id) %}
+					{% if user.role == 'administrator' %}
 						<li class="menu-item"><a onclick="crpGetPage('/admin/users')">Admin</a></li>
 					{% endif %}
 				</ul>
@@ -67,7 +71,7 @@
 				<button onclick="crpActivateUser($('.activation_code').val())">Activate</button>
 			</div>
 		</div>
-	{% elseif profile.user.new_email != profile.user.email %}
+	{% elseif profile.new_email != profile.email %}
 		<div class="activate">
 			<span>Validate you new email using the code we sent to {{profile.user.new_email}}.</span>
 

@@ -58,7 +58,7 @@ module.exports = (crp, callback) => {
 			content: data.content,
 			date: data.date || Date.now()
 		};
-		console.log(post.content)
+		
 		if (!post.author || !post.title || !post.content) return;
 
 		post = crp.util.sanitizeObject(post);
