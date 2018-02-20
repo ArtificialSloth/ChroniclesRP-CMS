@@ -1,10 +1,9 @@
 module.exports = (crp, callback) => {
-	crp.db.collection(crp.db.PREFIX + 'users').find({}).toArray((err, result) => {
+	crp.util.getUsers({}, (err, users) => {
 		if (err) return callback(err);
 
-		crp.global.users = result;
-		for (var k in crp.global.users) {
-			crp.util.addProfilePage(crp.global.users[k]);
+		for (var k in users) {
+			crp.util.addProfilePage(users[k]);
 		}
 
 		crp.global.pages.push({

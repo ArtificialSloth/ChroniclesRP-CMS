@@ -1,55 +1,38 @@
 module.exports = (crp, callback) => {
-	crp.util.getPosts = (args) => {
-		if (!args) args = {};
-		args = {
-			filter: args.filter,
-			sortBy: args.sortBy || 'date',
-			sortOrder: args.sortOrder
-		};
-
-		var posts = crp.global.posts;
-		if (args.filter) {
-			posts = crp.util.filterObject(posts, args.filter[0], args.filter[1].toString());
-		}
-
-		if (args.sortBy) {
-			posts = posts.sort((a, b) => {
-				return a[args.sortBy] > b[args.sortBy];
-			});
-		}
-
-		if (args.sortOrder == 'ASC') posts.reverse();
-
-		return posts;
+	crp.util.getPosts = (filter, cb) => {
+		crp.db.collection(crp.db.PREFIX + 'posts').find(filter).toArray(cb);
 	};
 
-	crp.util.getPostData = (postid) => {
-		if (!postid) return;
-		return crp.util.getPosts({filter: ['_id', postid]})[0];
+	crp.util.getPostData = (postid, cb) => {
+		if (typeof postid != 'object') postid = crp.db.objectID(postid);
+		crp.db.collection(crp.db.PREFIX + 'posts').findOne({_id: postid}, cb);
 	};
 
-	crp.util.setPostData = (postid, data) => {
-		var post = crp.util.getPostData(postid);
+	crp.util.setPostData = (postid, data, cb) => {
+		crp.util.getPostData(postid, (err, post) => {
+			if (err) return cb(err);
+			if (!post) return cb('noPost');
 
-		if (post) {
 			var newPost = post;
 
-			newPost.author = data.post_author || post.author;
-			newPost.title = data.post_title || post.title;
-			newPost.slug = data.post_slug || post.slug;
-			newPost.img = data.post_img || '';
-			newPost.content = data.post_content || post.content;
+			newPost.author = data.author || post.author;
+			newPost.title = data.title || post.title;
+			newPost.slug = data.slug || post.slug;
+			newPost.img = data.img || '';
+			newPost.content = data.content || post.content;
 
 			postid = crp.db.sanitize(postid);
 			newPost = crp.util.sanitizeObject(newPost);
 
-			crp.db.collection(crp.db.PREFIX + 'posts').replaceOne({_id: crp.db.objectID(postid)}, newPost);
+			crp.db.collection(crp.db.PREFIX + 'posts').replaceOne({_id: post._id}, newPost, (err, result) => {
+				if (err) return cb(err);
 
-			return crp.global.posts[crp.global.posts.indexOf(post)] = newPost;
-		}
+				cb(null, newPost);
+			});
+		});
 	};
 
-	crp.util.addPost = (data) => {
+	crp.util.addPost = (data, cb) => {
 		var post = {
 			author: data.author,
 			title: data.title,
@@ -58,28 +41,24 @@ module.exports = (crp, callback) => {
 			content: data.content,
 			date: data.date || Date.now()
 		};
-		
+
 		if (!post.author || !post.title || !post.content) return;
 
 		post = crp.util.sanitizeObject(post);
 
-		crp.db.collection(crp.db.PREFIX + 'posts').insertOne(post);
-		crp.global.posts.push(post);
+		crp.db.collection(crp.db.PREFIX + 'posts').insertOne(post, (err, result) => {
+			if (err) return cb(err);
 
-		return post;
+			cb(null, post);
+		});
 	};
 
-	crp.util.removePost = (postid) => {
-		var post = crp.util.getPostData(postid);
+	crp.util.removePost = (postid, cb) => {
+		crp.util.getPostData(postid, (err, post) => {
+			if (err) return cb(err);
 
-		if (post) {
-			postid = crp.db.sanitize(postid);
-
-			crp.db.collection(crp.db.PREFIX + 'posts').deleteOne({_id: post._id});
-			crp.global.posts.splice(crp.global.posts.indexOf(post), 1);
-
-			return true;
-		}
+			crp.db.collection(crp.db.PREFIX + 'posts').deleteOne({_id: post._id}, cb);
+		});
 	};
 
 	callback();

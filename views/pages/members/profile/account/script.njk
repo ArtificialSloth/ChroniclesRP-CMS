@@ -4,7 +4,7 @@
 		tinymce.triggerSave();
 
 		var formData = new FormData(e.target);
-		crpAjaxUpload('/api/admin/edit-user', formData, (response) => {
+		crpAjaxUpload('/api/admin/edit-user', formData, (res) => {
 			$('.user-account-form .user_dob').parent().removeClass('error');
 			$('.user-account-form .user_timezone').parent().removeClass('error');
 			$('.user-account-form .user_gender').parent().removeClass('error');
@@ -12,28 +12,29 @@
 			$('.user-account-form .profile_pic').parent().removeClass('error');
 			$('.user-account-form .cover_pic').parent().removeClass('error');
 
-			if (typeof response != 'object') {
-				if (response == 'dobInvalid') {
+			if (typeof res != 'object') {
+				if (res == 'dobInvalid') {
 					$('.user-account-form .user_dob').parent().addClass('error');
 					$('.user-account-form .user_dob + .input-error').html('Invalid date!');
-				} else if (response == 'tzInvalid') {
+				} else if (res == 'tzInvalid') {
 					$('.user-account-form .user_timezone').parent().addClass('error');
 					$('.user-account-form .user_timezone + .input-error').html('Timezone invalid!');
-				} else if (response == 'genderInvalid') {
+				} else if (res == 'genderInvalid') {
 					$('.user-account-form .user_gender').parent().addClass('error');
 					$('.user-account-form .user_gender + .input-error').html('Gender invalid!');
-				} else if (response == 'profileTooLarge') {
+				} else if (res == 'profileTooLarge') {
 					$('.user-account-form .profile_pic').parent().addClass('error');
 					$('.user-account-form .profile_pic + .input-error').html('File size must me < 2 MB');
-				} else if (response == 'coverTooLarge') {
+				} else if (res == 'coverTooLarge') {
 					$('.user-account-form .cover_pic').parent().addClass('error');
 					$('.user-account-form .cover_pic + .input-error').html('File size must me < 2 MB');
 				} else {
+					console.error(res);
 					$('.user-account-form .display_name').parent().addClass('error');
 					$('.user-account-form .display_name + .input-error').html('Something went wrong :(');
 				}
 			} else {
-				crpGetPage('/members/' + response.nicename + '/account');
+				crpGetPage('/members/' + res.nicename + '/account');
 			}
 		});
 	});

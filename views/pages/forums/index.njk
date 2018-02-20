@@ -4,7 +4,7 @@
 
 	{% query 'categories', {}, {order: 1}, 'categories' %}
 	{% for category in categories %}
-		{% if not category.role or category.role == user.role %}
+		{% if not category.role or category.role == user.role or user.role == 'administrator' %}
 			<li class="category">
 				<ul>
 					<li>{{category.name}}</li>

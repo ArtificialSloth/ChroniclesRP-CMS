@@ -4,15 +4,17 @@
 		tinymce.triggerSave();
 
 		var formData = $(e.target).serialize();
-		crpAjax('/api/admin/edit-post', formData, (response) => {
-			if (response) {
-				$('.' + response._id + ' .title').html(response.title);
-				$('.' + response._id + ' .slug').html(response.slug);
+		crpAjax('/api/admin/edit-post', formData, (res) => {
+			if (typeof res == 'object') {
+				$('.' + res._id + ' .title').html(res.title);
+				$('.' + res._id + ' .slug').html(res.slug);
 				$(e.target).find('.post-saved').addClass('active');
 
 				setTimeout(() => {
 					$(e.target).find('.post-saved').removeClass('active');
 				}, 5000);
+			} else {
+				console.error(res);
 			}
 		});
 	});

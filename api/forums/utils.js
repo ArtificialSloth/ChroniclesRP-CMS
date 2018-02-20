@@ -1,71 +1,32 @@
 module.exports = (crp, callback) => {
-	crp.util.getForums = (filter) => {
-		var forums = crp.global.forums;
-
-		if (filter) {
-			forums = crp.util.filterObject(forums, filter[0], filter[1]);
-		}
-
-		return forums.sort((a, b) => {
-			return a.order - b.order;
-		});
+	crp.util.getForums = (filter, cb) => {
+		crp.db.collection(crp.db.PREFIX + 'forums').find(filter).toArray(cb);
 	};
 
-	crp.util.getTopics = (filter) => {
-		var topics = crp.global.topics;
-
-		if (filter) {
-			topics = crp.util.filterObject(topics, filter[0], filter[1]);
-		}
-
-		return topics.sort((a, b) => {
-			return b.date - a.date;
-		});
+	crp.util.getTopics = (filter, cb) => {
+		crp.db.collection(crp.db.PREFIX + 'topics').find(filter).toArray(cb);
 	};
 
-	crp.util.getReplies = (filter) => {
-		var replies = crp.global.replies;
-
-		if (filter) {
-			replies = crp.util.filterObject(replies, filter[0], filter[1]);
-		}
-
-		return replies.sort((a, b) => {
-			return a.date - b.date;
-		});
+	crp.util.getReplies = (filter, cb) => {
+		crp.db.collection(crp.db.PREFIX + 'replies').find(filter).toArray(cb);
 	};
 
-	crp.util.getForumData = (forumid) => {
-		if (!forumid) return false;
-
-		return crp.util.getForums(['_id', forumid.toString()])[0];
+	crp.util.getForumData = (forumid, cb) => {
+		if (typeof forumid != 'object') forumid = crp.db.objectID(forumid);
+		crp.db.collection(crp.db.PREFIX + 'forums').findOne({_id: forumid}, cb);
 	};
 
-	crp.util.getTopicData = (topicid) => {
-		if (!topicid) return false;
-
-		return crp.util.getTopics(['_id', topicid.toString()])[0];
+	crp.util.getTopicData = (topicid, cb) => {
+		if (typeof topicid != 'object') topicid = crp.db.objectID(topicid);
+		crp.db.collection(crp.db.PREFIX + 'topics').findOne({_id: topicid}, cb);
 	};
 
-	crp.util.getReplyData = (replyid) => {
-		if (!replyid) return false;
-
-		return crp.util.getReplies(['_id', replyid.toString()])[0];
+	crp.util.getReplyData = (replyid, cb) => {
+		if (typeof replyid != 'object') replyid = crp.db.objectID(replyid);
+		crp.db.collection(crp.db.PREFIX + 'replies').findOne({_id: replyid}, cb);
 	};
 
-	crp.util.getForumsByCategory = (category) => {
-		return crp.util.getForums(['category', category]);
-	};
-
-	crp.util.getTopicsByForum = (forumid) => {
-		return crp.util.getTopics(['parent', forumid.toString()]);
-	};
-
-	crp.util.getRepliesByTopic = (topicid) => {
-		return crp.util.getReplies(['parent', topicid.toString()]);
-	};
-
-	crp.util.addTopic = (data) => {
+	crp.util.addTopic = (data, cb) => {
 		var topic = {
 			author: data.author,
 			title: data.title,
@@ -77,27 +38,37 @@ module.exports = (crp, callback) => {
 			dislikes: 0
 		};
 
-		var user = crp.util.getUserData(topic.author);
-		if (!user || user.role == 'pending') return 'generic';
+		crp.util.getUserData(topic.author, (err, user) => {
+			if (err) return cb(err);
+			if (!user || user.role == 'pending') return cb(null, 'generic');
 
-		if (!topic.title || topic.title.length < 4) return 'titleShort';
-		if (topic.title.length > 80) return 'titleLong';
-		if (!topic.content || topic.content.length < 4) return 'bodyLength';
+			if (!topic.title || topic.title.length < 4) return 'titleShort';
+			if (topic.title.length > 80) return 'titleLong';
+			if (!topic.content || topic.content.length < 4) return 'bodyLength';
 
-		var parent = crp.util.getForumData(topic.parent);
-		if (!parent) return 'generic';
+			crp.util.getForumData(topic.parent, (err, forum) => {
+				if (err) return cb(err);
+				if (!parent) return 'generic';
 
-		topic = crp.util.sanitizeObject(topic);
+				topic = crp.util.sanitizeObject(topic);
 
-		var newTopic = crp.db.collection(crp.db.PREFIX + 'topics').insertOne(topic);
-		crp.global.topics.push(topic);
-		crp.global.pages.push({
-			slug: '/forums/' + parent.slug + '/' + newTopic.insertedId.toString(),
-			path: '/forums/topic/index.njk',
-			context: {topic: topic}
+				crp.db.collection(crp.db.PREFIX + 'topics').insertOne(topic, (err, result) => {
+					if (err) return cb(err);	
+
+					crp.global.pages.push({
+						slug: '/forums/' + forum.slug + '/' + result.insertedId.toString(),
+						path: '/forums/topic/index.njk',
+						context: {topic: topic}
+					});
+
+					cb(err, topic);
+				});
+
+			});
+
+
+
 		});
-
-		return topic;
 	};
 
 	crp.util.addReply = (data) => {

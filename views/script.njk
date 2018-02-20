@@ -7,7 +7,7 @@
 			data: data,
 			success: successCallback,
 			error: (jqXHR, status, error) => {
-				console.log(status + ': ' + error);
+				console.error(status + ': ' + error);
 			}
 		});
 	}
@@ -22,15 +22,15 @@
 			contentType: false,
 			success: successCallback,
 			error: (jqXHR, status, error) => {
-				console.log(status + ': ' + error);
+				console.error(status + ': ' + error);
 			}
 		});
 	}
 
 	function crpGetPage(page) {
 		$('.content-blackout').addClass('active');
-		crpAjax('/api/get-page', {page: page}, (response) => {
-			$('.content').html(response);
+		crpAjax('/api/get-page', {page: page}, (res) => {
+			$('.content').html(res);
 			$('.content-blackout').removeClass('active');
 
 			window.history.pushState({page: page}, page + ' - The Chronicles RP', page);
@@ -38,8 +38,8 @@
 	}
 
 	function crpGetSubPage(page, container, newUrl) {
-		crpAjax('/api/get-subpage', {page: page}, (response) => {
-			$(container).html(response);
+		crpAjax('/api/get-subpage', {page: page}, (res) => {
+			$(container).html(res);
 			if (newUrl) window.history.pushState({page: page}, page + ' - The Chronicles RP', page);
 		});
 	}
@@ -58,12 +58,11 @@
 	}
 
 	function crpActivateUser(code) {
-		crpAjax('/api/activate', {code: code}, (response) => {
-			console.log(response);
-			if (response._id) {
+		crpAjax('/api/activate', {code: code}, (res) => {
+			if (typeof res == 'object') {
 				location.reload();
 			} else {
-
+				console.error(res)
 			}
 		});
 	}

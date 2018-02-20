@@ -26,8 +26,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.auth.passport.deserializeUser((id, done) => {
-		id = crp.db.sanitize(id);
-		crp.db.collection(crp.db.PREFIX + 'users').findOne({_id: crp.db.objectID(id)}, (err, user) => {
+		crp.util.getUserData(id, (err, user) => {
 			if (err) return done(err);
 			if (!user) return done(null, false);
 
@@ -40,16 +39,16 @@ module.exports = (crp, callback) => {
 			passwordField: 'user_pass'
 		},
 		(username, password, done) => {
-			var user = crp.util.findObjectInArray(crp.global.users, 'login', username);
-			if (!user) return done(null, false, {message: 'Incorrect username.'});
+			crp.util.getUsers({login: username}, (err, users) => {
+				if (err) return done(err);
+				if (!users[0]) return done(null, false, {message: 'Incorrect username.'});
 
-			crp.auth.bcrypt.compare(password, user.pass, (err, isValid) => {
-				if (err) return done(err, false);
-				if (!isValid) {
-					return done(null, false, {message: 'Incorrect password.'});
-				}
+				crp.auth.bcrypt.compare(password, users[0].pass, (err, isValid) => {
+					if (err) return done(err, false);
+					if (!isValid) return done(null, false, {message: 'Incorrect password.'});
 
-				return done(null, user);
+					return done(null, users[0]);
+				});
 			});
 		}
 	));

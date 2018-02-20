@@ -94,12 +94,12 @@ module.exports = (crp, callback) => {
 				cb(null, {path: path, context: context});
 			});
 		} else {
-			crp.db.collection(crp.db.PREFIX + 'posts').findOne({slug: path}, (err, result) => {
+			crp.util.getPosts({slug: path}, (err, posts) => {
 				if (err) return cb(err);
 
-				if (result) {
+				if (posts[0]) {
 					path = '/posts/index.njk';
-					context.postid = post._id;
+					context.postid = posts[0]._id;
 				} else {
 					path = '/404/index.njk';
 				}

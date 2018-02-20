@@ -1,6 +1,6 @@
 <div class="post">
 	{% include "./style.njk" %}
-	{% lookup 'posts', {}, {}, 'post' %}
+	{% lookup 'posts', {_id: postid}, {}, 'post' %}
 
 	<div class="post-header">
 		{% if post.img %}<img src="{{post.img}}" class="post-image" />{% endif %}

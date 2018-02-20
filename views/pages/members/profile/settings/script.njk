@@ -3,32 +3,38 @@
 		e.preventDefault();
 
 		var formData = new FormData(e.target);
-		crpAjaxUpload('/api/admin/edit-user', formData, (response) => {
+		crpAjaxUpload('/api/admin/edit-user', formData, (res) => {
 			$('.user-settings-form .user_email').parent().removeClass('error');
 			$('.user-settings-form .old_pass').parent().removeClass('error');
 			$('.user-settings-form .new_pass').parent().removeClass('error');
 			$('.user-settings-form .confirm_new_pass').parent().removeClass('error');
 
-			if (response == 'emailInvalid') {
-				$('.user-settings-form .user_email').parent().addClass('error');
-				$('.user-settings-form .user_email + .input-error').html('Email address invalid!');
-			} else if (response == 'passMismatch') {
-				$('.user-settings-form .old_pass').parent().addClass('error');
-				$('.user-settings-form .old_pass + .input-error').html('Wrong password!');
-			} else if (response == 'passLength') {
-				$('.user-settings-form .new_pass').parent().addClass('error');
-				$('.user-settings-form .new_pass + .input-error').html('New password must be at least 6 characters!');
-			} else if (response == 'newPassMismatch') {
-				$('.user-settings-form .confirm_new_pass').parent().addClass('error');
-				$('.user-settings-form .confirm_new_pass + .input-error').html('Passwords don\'t match!');
-			} else if (response == 'hashingError') {
-				$('.user-settings-form .new_pass').parent().addClass('error');
-				$('.user-settings-form .new_pass + .input-error').html('Something went wrong!');
+			if (typeof res != 'object') {
+				if (res == 'emailInvalid') {
+					$('.user-settings-form .user_email').parent().addClass('error');
+					$('.user-settings-form .user_email + .input-error').html('Email address invalid!');
+				} else if (res == 'passMismatch') {
+					$('.user-settings-form .old_pass').parent().addClass('error');
+					$('.user-settings-form .old_pass + .input-error').html('Wrong password!');
+				} else if (res == 'passLength') {
+					$('.user-settings-form .new_pass').parent().addClass('error');
+					$('.user-settings-form .new_pass + .input-error').html('New password must be at least 6 characters!');
+				} else if (res == 'newPassMismatch') {
+					$('.user-settings-form .confirm_new_pass').parent().addClass('error');
+					$('.user-settings-form .confirm_new_pass + .input-error').html('Passwords don\'t match!');
+				} else if (res == 'hashingError') {
+					$('.user-settings-form .new_pass').parent().addClass('error');
+					$('.user-settings-form .new_pass + .input-error').html('Could not hash new password!');
+				} else {
+					console.error(res);
+					$('.user-settings-form .user_email').parent().addClass('error');
+					$('.user-settings-form .user_email + .input-error').html('Something went wrong!');
+				}
 			} else {
 				if ($('.user-settings-form .new_pass').val()) {
 					location.assign('/logout');
 				} else {
-					crpGetPage('/members/' + response.nicename + '/settings');
+					location.reload();
 				}
 			}
 		});
