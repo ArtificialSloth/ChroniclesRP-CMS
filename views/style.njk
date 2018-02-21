@@ -1,6 +1,6 @@
 <style>
 	* {
-		color:#EDEDED;
+		color:{{css.colors.font}};
 		background:transparent;
 		border:0;
 		box-sizing:border-box;
@@ -17,20 +17,20 @@
 	}
 
 	body {
-		background-color:#1d1d1d;
+		background-color:{{css.colors.bodyBg}};
 		font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
 		margin:0;
 		min-width:50em; /* 800/16 */
 	}
 
 	body a {
-		color:#3bc492;
+		color:{{css.colors.link}};
 		text-decoration:none;
 		transition:all 0.2s ease-in-out;
 	}
 
 	body a:hover {
-		color:#3bc492;
+		color:{{css.colors.link}};
 		cursor:pointer;
 		text-decoration:underline;
 	}
@@ -45,7 +45,7 @@
 		background-color:#bbbbbb;
 		border:0.0625em solid #dadada; /* 1/16 */
 		border-radius:0;
-		box-shadow: inset 0 0.0625em 0.25em #242424; /* 1/16 */ /* 4/16 */
+		box-shadow: inset 0 0.0625em 0.25em {{css.colors.primary}}; /* 1/16 */ /* 4/16 */
 		height:1.875em; /* 30/16 */
 		padding:0.3125em; /* 5/16 */
 	}
@@ -56,10 +56,10 @@
 	body input[type=button],
 	body input[type=submit],
 	body input[type=reset] {
-		background-color:#0C9060;
-		border-color:#0C9060;
+		background-color:{{css.colors.secondary}};
+		border-color:{{css.colors.secondary}};
 		border-radius:0.1875em; /* 3/16 */
-		color:#E0E0E0;
+		color:{{css.colors.font}};
 		cursor:pointer;
 		height:1em; /* 16/16 */
 		line-height:0;
@@ -73,7 +73,7 @@
 	body input[type=button]:hover,
 	body input[type=submit]:hover,
 	body input[type=reset]:hover {
-		background-color:#EDEDED;
+		background-color:{{css.colors.font}};
 		color:#555;
 	}
 
@@ -91,7 +91,7 @@
 	}
 
 	#header-image {
-		background-image:url(/img/bg.jpg);
+		background-image:url({{css.img.bg}});
 	    background-position:top center;
 		background-repeat:no-repeat;
 	    background-size:cover;
@@ -112,12 +112,12 @@
 		background:linear-gradient(to bottom, rgba(29,29,29,0.2) 0%,rgba(29,29,29,1) 100%);
 		content: "";
 		display: block;
-		filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#331d1d1d', endColorstr='#1d1d1d',GradientType=0 );
+		filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#1d1d1d', endColorstr='#1d1d1d',GradientType=0 );
 		height:100vh;
 	}
 
 	.content {
-		background-color:#141414;
+		background-color:{{css.colors.bg}};
 		font-family:Droid Serif;
 		margin:0 auto;
 		min-height:12.5em; /* 200/16 */
@@ -182,7 +182,7 @@
 	}
 
 	.standard-form label {
-		background-color:#242424;
+		background-color:{{css.colors.primary}};
 		font-weight:bold;
 		padding:1.25em; /* 20/16 */
 	}
@@ -192,7 +192,7 @@
 	}
 
 	.standard-form .standard-input {
-		background-color:#323232;
+		background-color:{{css.colors.header}};
 		padding:0.9375em 1.25em; /* 15/16 */ /* 20/16 */
 	}
 
@@ -224,7 +224,7 @@
 	}
 
 	.new-post legend {
-		background-color:#242424;
+		background-color:{{css.colors.primary}};
 		display:block;
 		padding:0.3125em; /* 5/16 */
 	}

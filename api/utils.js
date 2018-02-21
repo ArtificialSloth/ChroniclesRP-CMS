@@ -71,7 +71,21 @@ module.exports = (crp, callback) => {
 	crp.util.processPage = (path, req, cb) => {
 		var context = {
 			crp: crp,
-			userid: req.user
+			userid: req.user,
+			css: {
+				colors: {
+					font: '#EDEDED',
+					link: '#3bc492',
+					bg: '#141414',
+					bodyBg: '#1D1D1D',
+					header: '#323232',
+					primary: '#242424',
+					secondary: '#0c9060'
+				},
+				img: {
+					bg: '/img/bg.jpg'
+				}
+			}
 		};
 		var page = crp.util.findObjectInArray(crp.pages, 'slug', path);
 
@@ -110,13 +124,11 @@ module.exports = (crp, callback) => {
 		}
 	};
 
-	crp.util.replaceFile = (oldFile, newFile, newPath) => {
+	crp.util.replaceFile = (oldFile, newFile, newPath, cb) => {
 		crp.fs.unlink(oldFile, (err) => {
 			if (err) return console.error(err);
-		});
 
-		crp.fs.rename(newFile, newPath, (err) => {
-			if (err) return console.error(err);
+			crp.fs.rename(newFile, newPath, console.error);
 		});
 	};
 

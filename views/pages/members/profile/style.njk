@@ -11,7 +11,7 @@
 	.profile .standard-form label,
 	.profile .standard-form .standard-input {
 		flex-basis:50%;
-		border-right:0.0625em solid #141414; /* 1/16 */
+		border-right:0.0625em solid {{css.colors.bg}}; /* 1/16 */
 	}
 
 	.profile .standard-form label.fill,
@@ -24,7 +24,7 @@
 	}
 
 	.profile-header {
-		border:0.3125em solid #242424; /* 5/16 */
+		border:0.3125em solid {{css.colors.primary}}; /* 5/16 */
 		border-radius:0.3125em; /* 5/16 */
 		height:19.375em; /* 310/16 */
 		font-family:'Montserrat', 'Helvetica Neue', 'Helvetica', sans-serif;
@@ -56,7 +56,7 @@
 	}
 
 	.profile-header .header-meta .profile-details .profile-name {
-		color:#E0E0E0;
+		color:{{css.colors.font}};
 		cursor:pointer;
 		font-size:2.1875em; /* 35/16 */
 		font-weight:bold;
@@ -76,7 +76,7 @@
 	}
 
 	.profile-content .top-bar {
-		background-color:#242424;
+		background-color:{{css.colors.primary}};
 		flex-basis:100%;
 		height:2.375em; /* 38/16 */
 	}
@@ -90,8 +90,8 @@
 	}
 
 	.profile-content .nav a {
-		background-color:#242424;
-		color:#E0E0E0;
+		background-color:{{css.colors.primary}};
+		color:{{css.colors.font}};
 		cursor:pointer;
 		display:block;
 		font-family:'Montserrat', 'Helvetica Neue', 'Helvetica', sans-serif;
@@ -101,6 +101,6 @@
 	}
 
 	.profile-content .nav a:hover {
-		background-color:#323232;
+		background-color:{{css.colors.font}};
 	}
 </style>

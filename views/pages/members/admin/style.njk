@@ -1,18 +1,18 @@
 <style>
 	.users-menu .filter {
-		background-color:#242424;
+		background-color:{{css.colors.primary}};
 		border:none;
 		border-radius:0;
 		margin-left:0.0625em; /* 1/16 */
 	}
 
 	.users-menu .filter.active {
-		background-color:#323232;
+		background-color:{{css.colors.header}};
 	}
 
 	.users-menu .filter:hover {
-		color:#E0E0E0;
-		background-color:#323232;
+		color:{{css.colors.font}};
+		background-color:{{css.colors.header}};
 	}
 
 	.users-content .table {
@@ -29,7 +29,7 @@
 	}
 
 	.users-content .table .table-row {
-		background-color:#242424;
+		background-color:{{css.colors.primary}};
 		cursor:pointer;
 		display:flex;
 		justify-content:space-evenly;
@@ -37,12 +37,12 @@
 	}
 
 	.users-content .table .table-row.table-header {
-		background-color:#323232;
+		background-color:{{css.colors.header}};
 		cursor:auto;
 	}
 
 	.users-content .table .table-row:hover:not(.table-header) {
-		background-color:#323232;
+		background-color:{{css.colors.header}};
 	}
 
 	.users-content .table .table-row .table-header-data {
@@ -61,7 +61,7 @@
 	}
 
 	.users-content .table form {
-		background-color:#242424;
+		background-color:{{css.colors.primary}};
 		height:0;
 		overflow:hidden;
 		transition:all 0.2s ease-in-out;
@@ -126,7 +126,7 @@
 	}
 
 	.add-user legend {
-		background-color:#242424;
+		background-color:{{css.colors.primary}};
 	    padding:0.3125em; /* 5/16 */
 	}
 
