@@ -10,7 +10,7 @@ module.exports = (crp, callback) => {
 		crp.db.objectID = mongodb.ObjectId;
 		crp.db.sanitize = require('mongo-sanitize');
 
-		crp.util.requireFiles('/globals.js', (err) => {
+		crp.util.requireFiles('/pages.js', (err) => {
 			callback(err, crp);
 		});
 	});

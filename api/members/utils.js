@@ -256,7 +256,7 @@ module.exports = (crp, callback) => {
 			{page: '/settings'}
 		];
 
-		crp.global.pages.push({
+		crp.pages.push({
 			slug: '/members/' + user.nicename,
 			path: '/members/profile/index.njk',
 			subPage: '/members/profile/activity/index.njk',
@@ -266,7 +266,7 @@ module.exports = (crp, callback) => {
 		});
 
 		for (var i in profilePages) {
-			crp.global.pages.push({
+			crp.pages.push({
 				slug: '/members/' + user.nicename + profilePages[i].page,
 				path: '/members/profile/index.njk',
 				subPage: '/members/profile' + profilePages[i].page + '/index.njk',
@@ -287,12 +287,12 @@ module.exports = (crp, callback) => {
 			'/settings'
 		];
 
-		var index = crp.global.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename));
-		if (index > -1) crp.global.pages.splice(index, 1);
+		var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename));
+		if (index > -1) crp.pages.splice(index, 1);
 
 		for (var i in profilePages) {
-			index = crp.global.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename + profilePages[i]));
-			if (index > -1) crp.global.pages.splice(index, 1);
+			index = crp.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename + profilePages[i]));
+			if (index > -1) crp.pages.splice(index, 1);
 		}
 	};
 

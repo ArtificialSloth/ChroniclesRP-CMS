@@ -1,5 +1,5 @@
 module.exports = (crp, callback) => {
-	crp.global.pages.push({
+	crp.pages.push({
 		slug: '/forums',
 		path: '/forums/index.njk'
 	});
@@ -8,7 +8,7 @@ module.exports = (crp, callback) => {
 		if (err) return callback(err);
 
 		for (var i in forums) {
-			crp.global.pages.push({
+			crp.pages.push({
 				slug: '/forums/' + forums[i].slug,
 				path: '/forums/forum/index.njk',
 				context: {forumid: forums[i]._id}
@@ -22,7 +22,7 @@ module.exports = (crp, callback) => {
 				crp.util.getForumData(topic.parent, (err, forum) => {
 					if (err) return cb(err);
 
-					crp.global.pages.push({
+					crp.pages.push({
 						slug: '/forums/' + forum.slug + '/' + topic._id,
 						path: '/forums/topic/index.njk',
 						context: {topicid: topic._id}

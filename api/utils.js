@@ -73,7 +73,7 @@ module.exports = (crp, callback) => {
 			crp: crp,
 			userid: req.user
 		};
-		var page = crp.util.findObjectInArray(crp.global.pages, 'slug', path);
+		var page = crp.util.findObjectInArray(crp.pages, 'slug', path);
 
 		if (page) {
 			crp.util.getUserData(req.user, (err, user) => {
