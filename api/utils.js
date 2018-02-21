@@ -42,7 +42,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.dateToStr = (date) => {
-		return crp.moment(date).utcOffset('-05:00').format('LLL');
+		return crp.moment(date).utcOffset('-04:00').format('LLL');
 	};
 
 	crp.util.wait = (time, cb) => {

@@ -9,14 +9,13 @@
 				<ul>
 					<li>{{category.name}}</li>
 					<li>Topics</li>
-					<li>Replies</li>
 					<li>Most Recent</li>
 				</ul>
 			</li>
 
 			{% query 'forums', {category: category._id}, {order: 1}, 'forums' %}
 			{% for forum in forums %}
-				{% lookup 'topics', {parent: forum._id}, {date: -1}, 'topic' %}
+				{% query 'topics', {parent: forum._id}, {date: -1}, 'topics' %}
 
 				<li class="forum">
 					<ul>
@@ -25,11 +24,10 @@
 							<div class="forum-desc">{{forum.desc}}</div>
 						</li>
 						<li>{{topics.length}}</li>
-						<li>0</li>
 						<li>
-							{% if topic %}
-								{% lookup 'users', {_id: topic.author}, {}, 'author' %}
-								<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a> by <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+							{% if topics[0] %}
+								{% lookup 'users', {_id: topics[0].author}, {}, 'author' %}
+								<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topics[0]._id}}')">{{topics[0].title}}</a> by <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
 							{% else %}
 								No Topics
 							{% endif %}
