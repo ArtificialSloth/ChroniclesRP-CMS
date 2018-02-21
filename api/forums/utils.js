@@ -42,36 +42,33 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user || user.role == 'pending') return cb(null, 'generic');
 
-			if (!topic.title || topic.title.length < 4) return 'titleShort';
-			if (topic.title.length > 80) return 'titleLong';
-			if (!topic.content || topic.content.length < 4) return 'bodyLength';
+			if (!topic.title || topic.title.length < 4) return cb(null, 'titleShort');
+			if (topic.title.length > 80) return cb(null, 'titleLong');
+			if (!topic.content || topic.content.length < 4) return cb(null, 'bodyLength');
 
 			crp.util.getForumData(topic.parent, (err, forum) => {
 				if (err) return cb(err);
-				if (!parent) return 'generic';
+				if (!forum) return cb(null, 'generic');
+
+				topic.parent = forum._id;
 
 				topic = crp.util.sanitizeObject(topic);
-
 				crp.db.collection(crp.db.PREFIX + 'topics').insertOne(topic, (err, result) => {
-					if (err) return cb(err);	
+					if (err) return cb(err);
 
 					crp.global.pages.push({
 						slug: '/forums/' + forum.slug + '/' + result.insertedId.toString(),
 						path: '/forums/topic/index.njk',
-						context: {topic: topic}
+						context: {topicid: result.insertedId}
 					});
 
-					cb(err, topic);
+					cb(null, topic);
 				});
-
 			});
-
-
-
 		});
 	};
 
-	crp.util.addReply = (data) => {
+	crp.util.addReply = (data, cb) => {
 		var reply = {
 			author: data.author,
 			content: data.content,
@@ -79,31 +76,35 @@ module.exports = (crp, callback) => {
 			parent: data.parent
 		};
 
-		var user = crp.util.getUserData(reply.author);
-		if (!user || user.role == 'pending') return 'generic';
+		crp.util.getUserData(reply.author, (err, user) => {
+			if (err) return cb(err);
+			if (!user || user.role == 'pending') return cb(null, 'generic');;
 
-		if (!reply.content || reply.content.length < 4) return 'bodyLength';
+			if (!reply.content || reply.content.length < 4) return cb(null, 'bodyLength');
 
-		var parent = crp.util.getTopicData(reply.parent);
-		if (!parent) return 'generic';
+			crp.util.getTopicData(reply.parent, (err, topic) => {
+				if (err) return cb(err);
+				if (!topic) return cb(null, 'generic');
 
-		reply = crp.util.sanitizeObject(reply);
+				reply.parent = topic._id;
 
-		crp.db.collection(crp.db.PREFIX + 'replies').insertOne(reply);
-		crp.global.replies.push(reply);
+				reply = crp.util.sanitizeObject(reply);
+				crp.db.collection(crp.db.PREFIX + 'replies').insertOne(reply, (err, result) => {
+					if (err) return cb(err);
 
-		return reply;
+					cb(null, reply)
+				});
+			});
+		});
 	};
 
-	crp.util.removeReply = (replyid) => {
-		var reply = crp.util.getReplyData(replyid);
+	crp.util.removeReply = (replyid, cb) => {
+		crp.util.getReplyData(replyid, (err, reply) => {
+			if (err) return cb(err);
+			if (!reply) return cb(null, 'noReply');
 
-		if (reply) {
-			crp.db.collection(crp.db.PREFIX + 'replies').deleteOne({_id: reply._id});
-			crp.global.replies.splice(crp.global.replies.indexOf(reply), 1);
-
-			return true;
-		}
+			crp.db.collection(crp.db.PREFIX + 'replies').deleteOne({_id: reply._id}, cb);
+		});
 	};
 
 	callback();

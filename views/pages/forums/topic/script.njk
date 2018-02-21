@@ -1,9 +1,11 @@
 <script>
 	function removeReply(replyid) {
 		if (window.confirm('Are you sure?')) {
-			crpAjax('/api/remove-reply', {replyid: replyid}, (response) => {
-				if (response) {
-					location.reload();
+			crpAjax('/api/remove-reply', {replyid: replyid}, (res) => {
+				if (typeof res == 'object') {
+					crpGetPage(window.location.pathname);
+				} else {
+					console.error(res);
 				}
 			});
 		}
@@ -16,14 +18,18 @@
 		if ($('.new-post .reply').val().length < 4) return $('.new-post .reply-error').html('Reply must be at least 4 characters');
 
 		var formData = $(e.target).serialize();
-		crpAjax('/api/new-reply', formData, (response) => {
-			if (response == 'bodyLength') {
-				return $('.new-post .reply-error').html('Reply must be at least 4 characters');
-			} else if (response == 'generic') {
-				return $('.new-post .reply-error').html('Something went wrong :(');
+		crpAjax('/api/new-reply', formData, (res) => {
+			if (typeof res != 'object') {
+				if (res == 'bodyLength') {
+					return $('.new-post .reply-error').html('Reply must be at least 4 characters');
+				} else {
+					console.error(res);
+					return $('.new-post .reply-error').html('Something went wrong :(');
+				}
 			} else {
-				location.reload();
+				crpGetPage(window.location.pathname);
 			}
+
 		});
 	});
 </script>

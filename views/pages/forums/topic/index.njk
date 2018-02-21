@@ -2,6 +2,7 @@
 	{% include "./style.njk" %}
 	{% lookup 'topics', {_id: topicid}, {}, 'topic' %}
 	{% lookup 'users', {_id: topic.author}, {}, 'author' %}
+	{% lookup 'users', {_id: userid}, {}, 'user' %}
 
 	<li class="header">
 		<ul>
@@ -12,8 +13,6 @@
 
 	<li class="sub-header">
 		<ul>
-			{% lookup 'users', {_id: userid}, {}, 'user' %}
-
 			<li>{{crp.util.dateToStr(topic.date)}}</li>
 			<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a>Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 		</ul>

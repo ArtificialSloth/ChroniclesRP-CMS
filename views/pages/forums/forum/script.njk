@@ -8,17 +8,20 @@
 		if ($('.new-post .topic_body').val().length < 4) return $('.new-post .topic-error').html('Topic body must be at least 4 characters');
 
 		var formData = $(e.target).serialize();
-		crpAjax('/api/new-topic', formData, (response) => {
-			if (response == 'titleShort') {
-				return $('.new-post .topic-error').html('Title must be at least 4 characters!');
-			} else if (response == 'titleLong') {
-				return $('.new-post .topic-error').html('Title cannot be more than 80 characters!');
-			} else if (response == 'bodyLength') {
-				return $('.new-post .topic-error').html('Topic body must be at least 4 characters');
-			} else if (response == 'generic') {
-				return $('.new-post .topic-error').html('Something went wrong :(');
+		crpAjax('/api/new-topic', formData, (res) => {
+			if (typeof res != 'object') {
+				if (res == 'titleShort') {
+					return $('.new-post .topic-error').html('Title must be at least 4 characters!');
+				} else if (res == 'titleLong') {
+					return $('.new-post .topic-error').html('Title cannot be more than 80 characters!');
+				} else if (res == 'bodyLength') {
+					return $('.new-post .topic-error').html('Topic body must be at least 4 characters');
+				} else {
+					console.error(res);
+					return $('.new-post .topic-error').html('Something went wrong :(');
+				}
 			} else {
-				location.reload();
+				crpGetPage(window.location.pathname);
 			}
 		});
 	});

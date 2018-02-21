@@ -14,6 +14,7 @@
 
 		{% for topic in topics %}
 			{% lookup 'users', {_id: topic.author}, {}, 'author' %}
+			{% query 'replies', {parent: topic._id}, {date: -1}, 'replies' %}
 			<li class="topic">
 				<ul>
 					<li>
@@ -22,7 +23,7 @@
 							Started By: <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
 						</div>
 					</li>
-					<li>0</li>
+					<li>{{replies.length}}</li>
 					<li>No Replies</li>
 				</ul>
 			</li>

@@ -34,7 +34,7 @@
 					$('.user-account-form .display_name + .input-error').html('Something went wrong :(');
 				}
 			} else {
-				crpGetPage('/members/' + res.nicename + '/account');
+				crpGetPage(window.location.pathname);
 			}
 		});
 	});

@@ -34,7 +34,7 @@
 				if ($('.user-settings-form .new_pass').val()) {
 					location.assign('/logout');
 				} else {
-					location.reload();
+					crpGetPage(window.location.pathname);
 				}
 			}
 		});

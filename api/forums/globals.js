@@ -18,19 +18,19 @@ module.exports = (crp, callback) => {
 		crp.util.getTopics({}, (err, topics) => {
 			if (err) return callback(err);
 
-			for (var i in topics) {
-				crp.util.getForumData(topics[i].parent, (err, forum) => {
-					if (err) return callback(err);
+			crp.async.each(topics, (topic, cb) => {
+				crp.util.getForumData(topic.parent, (err, forum) => {
+					if (err) return cb(err);
 
 					crp.global.pages.push({
-						slug: '/forums/' + forum.slug + '/' + topics[i]._id,
+						slug: '/forums/' + forum.slug + '/' + topic._id,
 						path: '/forums/topic/index.njk',
-						context: {topicid: topics[i]._id}
+						context: {topicid: topic._id}
 					});
-				});
-			}
 
-			callback();
+					cb()
+				});
+			}, callback);
 		});
 	});
 };
