@@ -17,7 +17,7 @@ module.exports = (crp, callback) => {
 		};
 
 		this.run = (context, collection, filter, sort, key, cb) => {
-			crp.db.collection(crp.db.PREFIX + collection).find(filter).sort(sort).toArray((err, result) => {
+			crp.db.find(collection, filter, sort, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});
@@ -35,7 +35,7 @@ module.exports = (crp, callback) => {
 		};
 
 		this.run = (context, collection, filter, sort, key, cb) => {
-			crp.db.collection(crp.db.PREFIX + collection).findOne(filter, (err, result) => {
+			crp.db.findOne(collection, filter, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});

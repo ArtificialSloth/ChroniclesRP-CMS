@@ -1,16 +1,14 @@
 module.exports = (crp, callback) => {
 	crp.util = {};
 
-	crp.util.filterObject = (object, key, filter) => {
+	crp.util.filterObject = (object, filter) => {
 		var result = [];
 
 		for (var k in object) {
-			if (object[k][key] == filter) {
-				result.push(object[k]);
-			}
+			if (object[k] == filter[k]) result.push(true);
 		}
 
-		return result;
+		return result.length == Object.keys(filter).length;
 	};
 
 	crp.util.findObjectInArray = (array, key, val) => {
@@ -132,20 +130,21 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.editSite = (site, cb) => {
-		crp.db.collection(crp.db.PREFIX + 'site').findOne({}, (err, result) => {
+	crp.util.editSite = (data, cb) => {
+		crp.db.findOne('site', {}, (err, site) => {
 			if (err) return cb(err);
 
 			var newSite = {
-				name: site.name || result.name,
-				tagline: site.tagline || result.tagline,
-				mail_template: site.mail_template || result.mail_template
+				name: data.name || site.name,
+				tagline: data.tagline || site.tagline,
+				mail_template: data.mail_template || site.mail_template
 			};
 
 			newSite = crp.util.sanitizeObject(newSite);
-			crp.db.collection(crp.db.PREFIX + 'site').replaceOne({}, newSite);
+			crp.db.replaceOne('site', {}, newSite, (err, result) => {
+				cb(err, site)
+			});
 
-			cb(null, result)
 		});
 	};
 

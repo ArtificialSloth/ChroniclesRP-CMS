@@ -1,29 +1,29 @@
 module.exports = (crp, callback) => {
 	crp.util.getForums = (filter, cb) => {
-		crp.db.collection(crp.db.PREFIX + 'forums').find(filter).toArray(cb);
+		crp.db.find('forums', filter, {}, cb);
 	};
 
 	crp.util.getTopics = (filter, cb) => {
-		crp.db.collection(crp.db.PREFIX + 'topics').find(filter).toArray(cb);
+		crp.db.find('topics', filter, {}, cb);
 	};
 
 	crp.util.getReplies = (filter, cb) => {
-		crp.db.collection(crp.db.PREFIX + 'replies').find(filter).toArray(cb);
+		crp.db.find('replies', filter, {}, cb);
 	};
 
 	crp.util.getForumData = (forumid, cb) => {
 		if (typeof forumid != 'object') forumid = crp.db.objectID(forumid);
-		crp.db.collection(crp.db.PREFIX + 'forums').findOne({_id: forumid}, cb);
+		crp.db.findOne('forums', {_id: forumid}, cb);
 	};
 
 	crp.util.getTopicData = (topicid, cb) => {
 		if (typeof topicid != 'object') topicid = crp.db.objectID(topicid);
-		crp.db.collection(crp.db.PREFIX + 'topics').findOne({_id: topicid}, cb);
+		crp.db.findOne('topics', {_id: topicid}, cb);
 	};
 
 	crp.util.getReplyData = (replyid, cb) => {
 		if (typeof replyid != 'object') replyid = crp.db.objectID(replyid);
-		crp.db.collection(crp.db.PREFIX + 'replies').findOne({_id: replyid}, cb);
+		crp.db.findOne('replies', {_id: replyid}, cb);
 	};
 
 	crp.util.addTopic = (data, cb) => {
@@ -53,7 +53,7 @@ module.exports = (crp, callback) => {
 				topic.parent = forum._id;
 
 				topic = crp.util.sanitizeObject(topic);
-				crp.db.collection(crp.db.PREFIX + 'topics').insertOne(topic, (err, result) => {
+				crp.db.insertOne('topics', topic, (err, result) => {
 					if (err) return cb(err);
 
 					crp.global.pages.push({
@@ -89,10 +89,8 @@ module.exports = (crp, callback) => {
 				reply.parent = topic._id;
 
 				reply = crp.util.sanitizeObject(reply);
-				crp.db.collection(crp.db.PREFIX + 'replies').insertOne(reply, (err, result) => {
-					if (err) return cb(err);
-
-					cb(null, reply)
+				crp.db.insertOne('replies', reply, (err, result) => {
+					cb(err, reply)
 				});
 			});
 		});
@@ -103,7 +101,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!reply) return cb(null, 'noReply');
 
-			crp.db.collection(crp.db.PREFIX + 'replies').deleteOne({_id: reply._id}, cb);
+			crp.db.deleteOne('replies', {_id: reply._id}, cb);
 		});
 	};
 

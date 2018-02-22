@@ -1,11 +1,11 @@
 module.exports = (crp, callback) => {
 	crp.util.getPosts = (filter, cb) => {
-		crp.db.collection(crp.db.PREFIX + 'posts').find(filter).toArray(cb);
+		crp.db.find('posts', filter, {}, cb);
 	};
 
 	crp.util.getPostData = (postid, cb) => {
 		if (typeof postid != 'object') postid = crp.db.objectID(postid);
-		crp.db.collection(crp.db.PREFIX + 'posts').findOne({_id: postid}, cb);
+		crp.db.findOne('posts', {_id: postid}, cb);
 	};
 
 	crp.util.setPostData = (postid, data, cb) => {
@@ -24,10 +24,8 @@ module.exports = (crp, callback) => {
 			postid = crp.db.sanitize(postid);
 			newPost = crp.util.sanitizeObject(newPost);
 
-			crp.db.collection(crp.db.PREFIX + 'posts').replaceOne({_id: post._id}, newPost, (err, result) => {
-				if (err) return cb(err);
-
-				cb(null, newPost);
+			crp.db.replaceOne('posts', {_id: post._id}, newPost, (err, result) => {
+				cb(err, newPost);
 			});
 		});
 	};
@@ -46,10 +44,8 @@ module.exports = (crp, callback) => {
 
 		post = crp.util.sanitizeObject(post);
 
-		crp.db.collection(crp.db.PREFIX + 'posts').insertOne(post, (err, result) => {
-			if (err) return cb(err);
-
-			cb(null, post);
+		crp.db.insertOne('posts', post, (err, result) => {
+			cb(err, post);
 		});
 	};
 
@@ -57,7 +53,7 @@ module.exports = (crp, callback) => {
 		crp.util.getPostData(postid, (err, post) => {
 			if (err) return cb(err);
 
-			crp.db.collection(crp.db.PREFIX + 'posts').deleteOne({_id: post._id}, cb);
+			crp.db.deleteOne('posts', {_id: post._id}, cb);
 		});
 	};
 

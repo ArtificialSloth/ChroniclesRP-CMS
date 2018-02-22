@@ -23,12 +23,12 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.getUsers = (filter, cb) => {
-		crp.db.collection(crp.db.PREFIX + 'users').find(filter).toArray(cb);
+		crp.db.find('users', filter, {}, cb);
 	};
 
 	crp.util.getUserData = (userid, cb) => {
 		if (typeof userid != 'object') userid = crp.db.objectID(userid);
-		crp.db.collection(crp.db.PREFIX + 'users').findOne({_id: userid}, cb);
+		crp.db.findOne('users', {_id: userid}, cb);
 	};
 
 	crp.util.newUserObject = (user) => {
@@ -144,10 +144,8 @@ module.exports = (crp, callback) => {
 							newUser = crp.util.newUserObject(newUser);
 							newUser = crp.util.sanitizeObject(newUser);
 
-							crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: user._id}, newUser, (err, result) => {
-								if (err) return cb(err);
-
-								cb(null, newUser);
+							crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
+								cb(err, newUser);
 							});
 						});
 					});
@@ -155,10 +153,8 @@ module.exports = (crp, callback) => {
 					newUser = crp.util.newUserObject(newUser);
 					newUser = crp.util.sanitizeObject(newUser);
 
-					crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: user._id}, newUser, (err, result) => {
-						if (err) return cb(err);
-
-						cb(null, newUser);
+					crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
+						cb(err, newUser);
 					});
 				}
 			});
@@ -179,10 +175,8 @@ module.exports = (crp, callback) => {
 			newUser = crp.util.newUserObject(newUser);
 			newUser = crp.util.sanitizeObject(newUser);
 
-			crp.db.collection(crp.db.PREFIX + 'users').replaceOne({_id: user._id}, newUser, (err, result) => {
-				if (err) return cb(err);
-
-				cb(null, newUser);
+			crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
+				cb(err, newUser);
 			});
 
 		});
@@ -217,17 +211,20 @@ module.exports = (crp, callback) => {
 					user = crp.util.newUserObject(user);
 					user = crp.util.sanitizeObject(user);
 
-					crp.db.collection(crp.db.PREFIX + 'users').insertOne(user);
-					crp.util.addProfilePage(user);
+					crp.db.insertOne('users', user, (err, result) => {
+						if (err) return cb(err);
 
-					cb(null, user);
+						crp.util.addProfilePage(user);
+						cb(null, user);
+					});
+
 				});
 			} else {
 				user.pass = user.pass.replace('$2y$', '$2a$');
 				user = crp.util.newUserObject(user);
 				user = crp.util.sanitizeObject(user);
 
-				crp.db.collection(crp.db.PREFIX + 'users').insertOne(user, (err, result) => {
+				crp.db.insertOne('users', user, (err, result) => {
 					if (err) return cb(err);
 
 					crp.util.addProfilePage(user);
@@ -242,7 +239,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb();
 
-			crp.db.collection(crp.db.PREFIX + 'users').deleteOne({_id: user._id}, cb);
+			crp.db.deleteOne('users', {_id: user._id}, cb);
 		});
 	};
 
