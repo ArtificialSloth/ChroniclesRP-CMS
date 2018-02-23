@@ -1,14 +1,16 @@
 module.exports = (crp, callback) => {
 	crp.util = {};
 
-	crp.util.filterObject = (object, filter) => {
+	crp.util.filterObjectArray = (array, filter) => {
 		var result = [];
 
-		for (var k in object) {
-			if (object[k] == filter[k]) result.push(true);
+		for (var i in array) {
+			for (var k in array[i]) {
+				if (filter[k] && filter[k] == array[i][k]) result.push(array[i]);
+			}
 		}
 
-		return result.length == Object.keys(filter).length;
+		return result;
 	};
 
 	crp.util.findObjectInArray = (array, key, val) => {

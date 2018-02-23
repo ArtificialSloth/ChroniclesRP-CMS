@@ -1,10 +1,10 @@
 {% include "./style.njk" %}
 {% query 'users', {}, {login: 1}, 'users' %}
 
-{% set administrators = crp.util.filterObject(users, 'role', 'administrator') %}
-{% set chapterLeaders = crp.util.filterObject(users, 'role', 'chapter_leader') %}
-{% set members = crp.util.filterObject(users, 'role', 'member') %}
-{% set pendings = crp.util.filterObject(users, 'role', 'pending') %}
+{% set administrators = crp.util.filterObjectArray(users, {role: 'administrator'}) %}
+{% set chapterLeaders = crp.util.filterObjectArray(users, {role: 'chapter_leader'}) %}
+{% set members = crp.util.filterObjectArray(users, {role: 'member'}) %}
+{% set pendings = crp.util.filterObjectArray(users, {role: 'pending'}) %}
 
 <div class="users-menu">
 	<button class="filter all active" onclick="usersToggleRoleFilter(this, 'all')">All ({{users.length}})</button>
