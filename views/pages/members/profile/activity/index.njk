@@ -1,1 +1,58 @@
-Activity
+<ul class="activity">
+	{% include "./style.njk" %}
+
+	{% lookup 'users', {_id: profileid}, {}, 'profile' %}
+	{% lookup 'users', {_id: userid}, {}, 'user' %}
+	{% query 'topics', {author: profile._id}, {}, 'topics' %}
+	{% query 'replies', {author: profile._id}, {}, 'replies' %}
+	{% set activities = crp.util.sortObjectArray(topics.concat(replies), 'date', -1) %}
+
+	{% for activity in activities %}
+		{% if activity.title %}
+			{% lookup 'forums', {_id: activity.parent}, {}, 'parent' %}
+			<li>
+				<ul>
+					<li><img class="profile-pic" src="{{profile.img.profile or '/img/members/profile.png'}}" /></li>
+					<li>
+						<a onclick="crpGetPage('/members/{{profile.nicename}}')">{{profile.display_name}}</a>
+						started topic
+						<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">{{activity.title}}</a>
+						in
+						<a onclick="crpGetPage('/forums/{{parent.slug}}')">{{parent.name}}</a>
+						{{crp.moment(activity.date).fromNow()}}
+
+						<blockquote>
+							{{activity.content | safe | truncate}}
+							{% if activity.content.length > 255 %}
+								<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
+							{% endif %}
+						</blockquote>
+					</li>
+				</ul>
+			</li>
+			{% else %}
+				{% lookup 'topics', {_id: activity.parent}, {}, 'parent' %}
+				{% lookup 'forums', {_id: parent.parent}, {}, 'forum' %}
+				<li>
+					<ul>
+						<li><img class="profile-pic" src="{{profile.img.profile or '/img/members/profile.png'}}" /></li>
+						<li>
+							<a onclick="crpGetPage('/members/{{profile.nicename}}')">{{profile.display_name}}</a>
+							replied to
+							<a onclick="crpGetPage('/forums/{{forum.slug}}/{{parent._id}}')">{{parent.title}}</a>
+							in
+							<a onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
+							{{crp.moment(activity.date).fromNow()}}
+
+							<blockquote>
+								{{activity.content | safe | truncate}}
+								{% if activity.content.length > 255 %}
+									<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
+								{% endif %}
+							</blockquote>
+						</li>
+					</ul>
+				</li>
+		{% endif %}
+	{% endfor %}
+</ul>

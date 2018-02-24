@@ -16,7 +16,7 @@ module.exports = (crp, callback) => {
 			crp.db.mongodb.collection(crp.db.prefix + collection).find(filter).sort(sort).toArray(cb);
 		};
 
-		crp.db.findOne = (collection, filter, cb) => {			
+		crp.db.findOne = (collection, filter, cb) => {
 			crp.db.mongodb.collection(crp.db.prefix + collection).findOne(filter, cb);
 		};
 

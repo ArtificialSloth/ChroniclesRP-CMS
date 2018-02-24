@@ -35,7 +35,7 @@
 						{% query 'chapters', {game: game._id}, {name: 1}, 'chapters' %}
 						{% for chapter in chapters %}
 							<ul class="sub-menu">
-								<li class="menu-item"><a onclick="crpGetPage('/{{chapter.slug}}')">{{chapter.name}}</a></li>
+								<li class="menu-item"><a onclick="crpGetPage('/chapters/{{chapter.slug}}')">{{chapter.name}}</a></li>
 							</ul>
 						{% endfor %}
 					</li>

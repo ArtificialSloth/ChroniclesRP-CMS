@@ -3,6 +3,7 @@ module.exports = (crp, callback) => {
 
 	crp.util.filterObjectArray = (array, filter) => {
 		var result = [];
+		if (Object.keys(filter).length == 0) return array;
 
 		for (var i in array) {
 			for (var k in array[i]) {
@@ -14,11 +15,20 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.findObjectInArray = (array, key, val) => {
-		for (var i = 0; i < array.length; i++) {
+		for (var i in array) {
 			if (array[i][key] == val) {
 				return array[i];
 			}
 		}
+	};
+
+	crp.util.sortObjectArray = (array, key, order) => {
+		var result = array.sort((a, b) => {
+			return a[key] - b[key];
+		});
+
+		if (order == -1) result = result.reverse();
+		return result;
 	};
 
 	crp.util.sanitizeObject = (object) => {
@@ -41,8 +51,8 @@ module.exports = (crp, callback) => {
 		return str;
 	};
 
-	crp.util.dateToStr = (date) => {
-		return crp.moment(date).utcOffset('-04:00').format('LLL');
+	crp.util.dateToStr = (date, tz) => {
+		return crp.moment(date).tz(tz || 'America/New_York').format('LLL');
 	};
 
 	crp.util.wait = (time, cb) => {

@@ -13,7 +13,7 @@
 
 	<li class="sub-header">
 		<ul>
-			<li>{{crp.util.dateToStr(topic.date)}}</li>
+			<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
 			<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a>Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 		</ul>
 	</li>
@@ -35,7 +35,7 @@
 
 		<li class="sub-header reply">
 			<ul>
-				<li>{{crp.util.dateToStr(reply.date)}}</li>
+				<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>
 				<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 			</ul>
 		</li>

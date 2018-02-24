@@ -28,6 +28,8 @@
 						{% if replies[0] %}
 							{% lookup 'users', {_id: replies[0].author}, {}, 'author' %}
 							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+							<br />
+							{{crp.moment(replies[0].date).fromNow()}}
 						{% else %}
 							No Replies
 						{% endif %}

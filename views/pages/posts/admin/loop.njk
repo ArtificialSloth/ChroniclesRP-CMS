@@ -1,7 +1,7 @@
 <div class="table-row {{post._id}}" onclick="$(this).next().toggleClass('active')">
 	<div class="table-data title">{{post.title}}</div>
 	<div class="table-data slug">{{post.slug}}</div>
-	<div class="table-data date">{{crp.util.dateToStr(post.date)}}</div>
+	<div class="table-data date">{{crp.util.dateToStr(post.date, user.timezone)}}</div>
 </div>
 <form class="post-settings-form">
 	<label for="post_title">Title: </label>
