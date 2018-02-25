@@ -1,21 +1,29 @@
 module.exports = (crp, callback) => {
-	crp.util.msgTemplate = (subject, msg) => {
-		var keys = [
-			['SITENAME', crp.global.site.name],
-			['SUBJECT', subject],
-			['MESSAGE', msg]
-		];
+	crp.util.msgTemplate = (subject, msg, cb) => {
+		crp.db.findOne('site', {}, (err, site) => {
+			if (err) return cb(err);
 
-		return crp.util.parseString(crp.global.site.mail_template, keys);
+			var keys = [
+				['SITENAME', site.name],
+				['SUBJECT', subject],
+				['MESSAGE', msg]
+			];
+
+			return cb(null, crp.util.parseString(site.mail_template, keys));
+		});
 	};
 
 	crp.util.mail = (to, subject, msg) => {
-		crp.mail.send({
-			to: to,
-			from: 'no_reply@chroniclesrp.com',
-			subject: subject,
-			text: msg,
-			html: crp.util.msgTemplate(subject, msg)
+		crp.util.msgTemplate(subject, msg, (err, result) => {
+			if (err) return;
+
+			crp.mail.send({
+				to: to,
+				from: 'no_reply@chroniclesrp.com',
+				subject: subject,
+				text: msg,
+				html: result
+			});
 		});
 	};
 

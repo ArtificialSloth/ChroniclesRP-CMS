@@ -56,13 +56,31 @@ module.exports = (crp, callback) => {
 				crp.db.insertOne('topics', topic, (err, result) => {
 					if (err) return cb(err);
 
-					crp.global.pages.push({
+					crp.pages.push({
 						slug: '/forums/' + forum.slug + '/' + result.insertedId.toString(),
 						path: '/forums/topic/index.njk',
 						context: {topicid: result.insertedId}
 					});
 
 					cb(null, topic);
+				});
+			});
+		});
+	};
+
+	crp.util.removeTopic = (topicid, cb) => {
+		crp.util.getTopicData(topicid, (err, topic) => {
+			if (err) return cb(err);
+			if (!topic) return cb(null, 'noTopic');
+
+			crp.db.deleteMany('replies', {parent: topic._id}, (err, result) => {
+				if (err) return cb(err);
+
+				crp.db.deleteOne('topics', {_id: topic._id}, (err, result) => {
+					if (err) return cb(err);
+
+					crp.pages.splice(crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'context', {topicid: topic._id})), 1);
+					return cb(null, result);
 				});
 			});
 		});

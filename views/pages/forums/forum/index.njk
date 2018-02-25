@@ -41,7 +41,6 @@
 
 	{% lookup 'users', {_id: userid}, {}, 'user' %}
 	{% if user and user.role != 'pending' %}
-		<script>crpTinyMCE()</script>
 		<fieldset class="new-post">
 			<legend>Create New Topic in {{forum.name}}</legend>
 			<form>
@@ -49,6 +48,7 @@
 				<input type="text" name="topic_title" class="topic_title" maxlength="80" />
 
 				<textarea name="topic_body" class="topic_body tinymce"></textarea>
+				<script>crpTinyMCE()</script>
 
 				{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
 					<label for="topic_type">Topic Type:</label>

@@ -45,16 +45,19 @@
 	}
 
 	function crpTinyMCE() {
-		tinymce.init({
-			selector: '.tinymce',
-			plugins: 'textcolor colorpicker help link paste code hr table',
-			forced_root_blocks: false,
-			menubar: false,
-			toolbar: [
-				'undo | redo | paste | formatselect | fontselect | fontsizeselect | forecolor',
-				'bold | italic | underline | strikethrough | hr | blockquote | table | alignleft | aligncenter | alignright | alignjustify | bullist | numlist | outdent | indent | superscript | subscript | link | removeformat | code | help'
-			]
-		});
+		tinymce.remove();
+		setTimeout(() => {
+			tinymce.init({
+				selector: '.tinymce',
+				plugins: 'textcolor colorpicker help link paste code hr table',
+				forced_root_blocks: false,
+				menubar: false,
+				toolbar: [
+					'undo | redo | paste | formatselect | fontselect | fontsizeselect | forecolor',
+					'bold | italic | underline | strikethrough | hr | blockquote | table | alignleft | aligncenter | alignright | alignjustify | bullist | numlist | outdent | indent | superscript | subscript | link | removeformat | code | help'
+				]
+			});
+		}, 0);
 	}
 
 	function crpActivateUser(code) {

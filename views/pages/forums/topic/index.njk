@@ -14,7 +14,7 @@
 	<li class="sub-header">
 		<ul>
 			<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
-			<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a>Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+			<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 		</ul>
 	</li>
 
@@ -29,7 +29,7 @@
 		</ul>
 	</li>
 
-	{% query 'replies', {parent: topic._id}, {date: -1}, 'replies' %}
+	{% query 'replies', {parent: topic._id}, {date: 1}, 'replies' %}
 	{% for reply in replies %}
 		{% lookup 'users', {_id: reply.author}, {}, 'author' %}
 

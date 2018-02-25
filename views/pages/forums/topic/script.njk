@@ -1,4 +1,16 @@
 <script>
+	function removeTopic(topicid) {
+		if (window.confirm('Are you sure?')) {
+			crpAjax('/api/remove-topic', {topicid: topicid}, (res) => {
+				if (typeof res == 'object') {
+					crpGetPage('/forums');
+				} else {
+					console.error(res);
+				}
+			});
+		}
+	}
+
 	function removeReply(replyid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/remove-reply', {replyid: replyid}, (res) => {

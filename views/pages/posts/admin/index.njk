@@ -1,7 +1,6 @@
 {% include "./style.njk" %}
 {% lookup 'users', {_id: userid}, {}, 'user' %}
 
-<script>crpTinyMCE()</script>
 <div class="posts-content">
 	<div class="table">
 		<div class="table-row table-header">
@@ -29,6 +28,7 @@
 		<input type="text" name="post_img" class="post_img" />
 		<br />
 		<textarea name="post_content" class="post_content tinymce"></textarea>
+		<script>crpTinyMCE()</script>
 
 		<input type="submit" value="Post" />
 	</form>

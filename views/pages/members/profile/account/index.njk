@@ -2,7 +2,6 @@
 {% lookup 'users', {_id: userid}, {}, 'user' %}
 
 {% if profile._id.equals(user._id) %}
-	<script>crpTinyMCE()</script>
 	<form class="user-account-form standard-form">
 		<label for="display_name">Display Name</label>
 		<div class="standard-input">
@@ -64,6 +63,7 @@
 		<label for="user_about" class="fill">About Me</label>
 		<div class="standard-input fill">
 			<textarea name="user_about" class="user_about tinymce">{{user.about}}</textarea>
+			<script>crpTinyMCE()</script>
 			<span class="input-error"></span>
 		</div>
 

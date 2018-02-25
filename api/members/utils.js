@@ -284,11 +284,11 @@ module.exports = (crp, callback) => {
 			'/settings'
 		];
 
-		var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename));
+		var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/members/' + user.nicename));
 		if (index > -1) crp.pages.splice(index, 1);
 
 		for (var i in profilePages) {
-			index = crp.pages.indexOf(crp.util.findObjectInArray(crp.global.pages, 'slug', '/members/' + user.nicename + profilePages[i]));
+			index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/members/' + user.nicename + profilePages[i]));
 			if (index > -1) crp.pages.splice(index, 1);
 		}
 	};

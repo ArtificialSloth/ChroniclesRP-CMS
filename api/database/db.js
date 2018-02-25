@@ -32,6 +32,10 @@ module.exports = (crp, callback) => {
 			crp.db.mongodb.collection(crp.db.prefix + collection).deleteOne(filter, cb);
 		};
 
+		crp.db.deleteMany = (collection, filter, cb) => {
+			crp.db.mongodb.collection(crp.db.prefix + collection).deleteMany(filter, cb);
+		};
+
 		crp.util.requireFiles('/pages.js', (err) => {
 			callback(err, crp);
 		});
