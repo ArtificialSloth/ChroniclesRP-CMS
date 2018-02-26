@@ -1,0 +1,198 @@
+{% include "./style.njk" %}
+{% lookup 'users', {_id: userid}, {}, 'user' %}
+{% query 'users', {}, {display_name: 1}, 'users' %}
+{% query 'forums', {}, {order: 1}, 'forums' %}
+{% query 'topics', {}, {date: -1}, 'topics' %}
+{% query 'replies', {}, {date: -1}, 'replies' %}
+
+<ul class="forums-menu">
+	{% if topics.length > 0 %}
+		<li class="filter topics active" onclick="forumsToggleFilter(this, 'topics')">Topics ({{topics.length}})</li>
+	{% endif %}
+
+	{% if replies.length > 0 %}
+		<li class="filter replies" onclick="forumsToggleFilter(this, 'replies')">Replies ({{replies.length}})</li>
+	{% endif %}
+</ul>
+
+<div class="forums-content">
+	<div class="filter topics active">
+		<ul class="header">
+			<li>Title</li>
+			<li>Author</li>
+			<li>Date</li>
+		</ul>
+
+		{% for topic in topics %}
+			<ul onclick="$(this).next().toggleClass('active')">
+				<li>{{topic.title}}</li>
+				<li>{{crp.util.findObjectInArray(users, '_id', topic.author.toString()).display_name}}</li>
+				<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
+			</ul>
+
+			<form class="topic-settings-form">
+				<label for="topic_title">Title:</label>
+				<input type="text" name="topic_title" class="topic_title" value="{{topic.title}}" />
+
+				<br />
+
+				<label for="topic_parent">Forum:</label>
+				<select name="topic_parent" class="topic_parent">
+					{% for forum in forums %}
+						<option value="{{forum._id}}" {% if forum._id.equals(topic.parent) %}selected{% endif %}>{{forum.name}}</option>
+					{% endfor %}
+				</select>
+
+				<br />
+
+				<label for="topic_author">Author:</label>
+				<select name="topic_author" class="topic_author">
+					{% for u in users %}
+						<option value="{{u._id}}" {% if u._id.equals(topic.author) %}selected{% endif %}>{{u.display_name}}</option>
+					{% endfor %}
+				</select>
+
+				<br />
+
+				<label for="topic_likes">Likes:</label>
+				<input type="number" name="topic_likes" class="topic_likes" value="{{topic.likes}}" />
+
+				<br />
+
+				<label for="topic_dislikes">Dislikes:</label>
+				<input type="number" name="topic_dislikes" class="topic_dislikes" value="{{topic.dislikes}}" />
+
+				<br />
+
+				<label for="topic_body">Content:</label>
+				<textarea name="topic_body" class="topic_body tinymce">{{topic.content}}</textarea>
+
+				<input type="hidden" name="topic_id" class="topic_id" value="{{topic._id}}" />
+
+				<div class="submit">
+					<input type="submit" value="Save" />
+				</div>
+			</form>
+		{% endfor %}
+
+		<fieldset class="new-post">
+			<legend>Add a New Topic</legend>
+			<form class="add-topic new-forum-post">
+				<label for="topic_title">Title:</label>
+				<input type="text" name="topic_title" class="topic_title" />
+
+				<br />
+
+				<label for="topic_parent">Forum:</label>
+				<select name="topic_parent" class="topic_parent">
+					{% for forum in forums %}
+						<option value="{{forum._id}}">{{forum.name}}</option>
+					{% endfor %}
+				</select>
+
+				<br />
+
+				<label for="topic_author">Author:</label>
+				<select name="topic_author" class="topic_author">
+					{% for u in users %}
+						<option value="{{u._id}}" {% if u._id.equals(user._id) %}selected{% endif %}>{{u.display_name}}</option>
+					{% endfor %}
+				</select>
+
+				<br />
+
+				<label for="topic_date">Post Date:</label>
+				<input type="text" name="topic_date" class="topic_date" />
+
+				<br />
+
+				<label for="topic_likes">Likes:</label>
+				<input type="number" name="topic_likes" class="topic_likes" value="0" />
+
+				<br />
+
+				<label for="topic_dislikes">Dislikes:</label>
+				<input type="number" name="topic_dislikes" class="topic_dislikes" value="0" />
+
+				<br />
+
+				<label for="topic_body">Content:</label>
+				<textarea name="topic_body" class="topic_body tinymce"></textarea>
+
+				<input type="submit" value="Add Topic" />
+			</form>
+		</fieldset>
+	</div>
+
+	<div class="filter replies">
+		<ul class="header">
+			<li>Author</li>
+			<li>Topic</li>
+			<li>Date</li>
+		</ul>
+
+		{% for reply in replies %}
+			<ul onclick="$(this).next().toggleClass('active')">
+				<li>{{crp.util.findObjectInArray(users, '_id', reply.author.toString()).display_name}}</li>
+				<li>{{crp.util.findObjectInArray(topics, '_id', reply.parent.toString()).title}}</li>
+				<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>
+			</ul>
+
+			<form class="reply-settings-form">
+				<label for="reply_author">Author:</label>
+				<select name="reply_author" class="reply_author">
+					{% for u in users %}
+						<option value="{{u._id}}" {% if u._id.equals(reply.author) %}selected{% endif %}>{{u.display_name}}</option>
+					{% endfor %}
+				</select>
+
+				<br />
+
+				<label for="reply_body">Content:</label>
+				<textarea name="reply_body" class="reply_body tinymce">{{reply.content}}</textarea>
+
+				<input type="hidden" name="reply_id" class="reply_id" value="{{reply._id}}" />
+
+				<div class="submit">
+					<input type="submit" value="Save" />
+				</div>
+			</form>
+		{% endfor %}
+
+		<fieldset class="new-post">
+			<legend>Add a New Reply</legend>
+			<form class="add-reply new-forum-post">
+				<label for="reply_parent">Topic:</label>
+				<select name="reply_parent" class="reply_parent">
+					{% for topic in topics %}
+						<option value="{{topic._id}}">{{topic.title}}</option>
+					{% endfor %}
+				</select>
+
+				<br />
+
+				<label for="reply_author">Author:</label>
+				<select name="reply_author" class="reply_author">
+					{% for u in users %}
+						<option value="{{u._id}}" {% if u._id.equals(user._id) %}selected{% endif %}>{{u.display_name}}</option>
+					{% endfor %}
+				</select>
+
+				<br />
+
+				<label for="reply_date">Post Date:</label>
+				<input type="text" name="reply_date" class="reply_date" />
+
+				<br />
+
+				<label for="reply_body">Content:</label>
+				<textarea name="reply_body" class="reply_body tinymce"></textarea>
+				<script>crpTinyMCE()</script>
+
+				<input type="submit" value="Add Reply" />
+			</form>
+		</fieldset>
+	</div>
+</div>
+
+{% include "./script.njk" %}

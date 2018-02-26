@@ -5,6 +5,7 @@ module.exports = (crp, callback) => {
 				var postData = {
 					author: user._id,
 					title: req.body.post_title,
+					type: req.body.post_type,
 					slug: req.body.post_slug,
 					img: req.body.post_img,
 					content: req.body.post_content
@@ -24,6 +25,7 @@ module.exports = (crp, callback) => {
 			if (user.role == 'administrator') {
 				var postData = {
 					title: req.body.post_title,
+					type: req.body.post_type,
 					slug: req.body.post_slug,
 					img: req.body.post_img,
 					content: req.body.post_content

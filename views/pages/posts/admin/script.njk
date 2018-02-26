@@ -19,12 +19,6 @@
 		});
 	});
 
-	function postsRemove(postid) {
-		crpAjax('/api/admin/remove-post', {postid: postid}, (response) => {
-			if (response) crpGetSubPage('/admin/posts', '.admin-content', true);
-		});
-	}
-
 	$('.add-post form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
@@ -34,4 +28,18 @@
 			if (response) crpGetSubPage('/admin/posts', '.admin-content', true);
 		});
 	});
+
+	function postsRemove(postid) {
+		crpAjax('/api/admin/remove-post', {postid: postid}, (response) => {
+			if (response) crpGetSubPage('/admin/posts', '.admin-content', true);
+		});
+	}
+
+	function postsToggleTypeFilter(tab, type) {
+		$('.posts-menu .active').removeClass('active');
+		$(tab).addClass('active');
+
+		$('.posts-content .table .active').removeClass('active');
+		$('.posts-content .table .' + type).addClass('active');
+	}
 </script>

@@ -1,0 +1,57 @@
+<script>
+	$('.topic-settings-form').submit((e) => {
+		e.preventDefault();
+		tinymce.triggerSave();
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/admin/edit-topic', formData, (res) => {
+			if (typeof res != 'object') return console.error(res);
+
+			crpGetSubPage('/admin/forums', '.admin-content', true);
+		});
+	});
+
+	$('.add-topic').submit((e) => {
+		e.preventDefault();
+		tinymce.triggerSave();
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/admin/new-topic', formData, (res) => {
+			if (typeof res != 'object') return console.error(res);
+
+			crpGetSubPage('/admin/forums', '.admin-content', true);
+		});
+	});
+
+	$('.reply-settings-form').submit((e) => {
+		e.preventDefault();
+		tinymce.triggerSave();
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/admin/edit-reply', formData, (res) => {
+			if (typeof res != 'object') return console.error(res);
+
+			crpGetSubPage('/admin/forums', '.admin-content', true);
+		});
+	});
+
+	$('.add-reply').submit((e) => {
+		e.preventDefault();
+		tinymce.triggerSave();
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/admin/new-reply', formData, (res) => {
+			if (typeof res != 'object') return console.error(res);
+
+			crpGetSubPage('/admin/forums', '.admin-content', true);
+		});
+	});
+
+	function forumsToggleFilter(tab, filter) {
+		$('.forums-menu .active').removeClass('active');
+		$(tab).addClass('active');
+
+		$('.forums-content .filter.active').removeClass('active');
+		$('.forums-content .filter.' + filter).addClass('active');
+	}
+</script>

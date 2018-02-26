@@ -4,6 +4,13 @@ module.exports = (crp, callback) => {
 		path: '/forums/index.njk'
 	});
 
+	crp.pages.push({
+		slug: '/admin/forums',
+		path: '/admin/index.njk',
+		role: 'administrator',
+		subPage: '/forums/admin/index.njk'
+	});
+
 	crp.util.getForums({}, (err, forums) => {
 		if (err) return callback(err);
 

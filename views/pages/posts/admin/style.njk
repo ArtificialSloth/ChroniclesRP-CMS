@@ -1,7 +1,31 @@
 <style>
+	.posts-menu .filter {
+		background-color:{{css.colors.primary}};
+		border:none;
+		border-radius:0;
+		margin-left:0.0625em; /* 1/16 */
+	}
+
+	.posts-menu .filter.active {
+		background-color:{{css.colors.header}};
+	}
+
+	.posts-menu .filter:hover {
+		color:{{css.colors.font}};
+		background-color:{{css.colors.header}};
+	}
+
 	.posts-content .table {
 		margin-left:0.0625em; /* 1/16 */
 		width:100%;
+	}
+
+	.posts-content .table .filter {
+		display:none;
+	}
+
+	.posts-content .table .filter.active {
+		display:block;
 	}
 
 	.posts-content .table .table-row {
@@ -112,6 +136,7 @@
 	}
 
 	.add-post form input,
+	.add-post form select,
 	.add-post form textarea {
 		margin-bottom:0.9375em; /* 15/16 */
 	}

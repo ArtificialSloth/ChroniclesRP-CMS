@@ -13,13 +13,14 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!post) return cb('noPost');
 
-			var newPost = post;
-
-			newPost.author = data.author || post.author;
-			newPost.title = data.title || post.title;
-			newPost.slug = data.slug || post.slug;
-			newPost.img = data.img || '';
-			newPost.content = data.content || post.content;
+			var newPost = {
+				author: data.author || post.author,
+				title: data.title || post.title,
+				type: data.type || post.type,
+				slug: data.slug || post.slug,
+				img: data.img || '',
+				content: data.content || post.content
+			};
 
 			postid = crp.db.sanitize(postid);
 			newPost = crp.util.sanitizeObject(newPost);
@@ -34,13 +35,14 @@ module.exports = (crp, callback) => {
 		var post = {
 			author: data.author,
 			title: data.title,
-			slug: data.slug || 'posts/' + data.title.replace(' ', '-').toLowerCase(),
+			type: data.type || 'page',
+			slug: data.slug || '/posts/' + data.title.replace(' ', '-').toLowerCase(),
 			img: data.img || '',
 			content: data.content,
 			date: data.date || Date.now()
 		};
 
-		if (!post.author || !post.title || !post.content) return;
+		if (!post.author || !post.title || !post.content) return cb('missingInfo');
 
 		post = crp.util.sanitizeObject(post);
 
