@@ -26,6 +26,7 @@
 	body a {
 		color:{{css.colors.link}};
 		text-decoration:none;
+		-webkit-transition:all 0.2s ease-in-out;
 		transition:all 0.2s ease-in-out;
 	}
 
@@ -69,6 +70,7 @@
 		height:1em; /* 16/16 */
 		line-height:0;
 		padding:1em 1.25em; /* 16/16 */ /* 20/16 */
+		-webkit-transition:all 0.2s ease-in-out;
 		transition:all 0.2s ease-in-out;
 	}
 
@@ -109,11 +111,7 @@
 
 	#header-image:after {
 		background:#1d1d1d;
-		background:-moz-linear-gradient(top, rgba(29,29,29,0.2) 0%, rgba(29,29,29,1) 100%);
-		background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(29,29,29,0.2)), color-stop(100%,rgba(29,29,29,1)));
-		background:-webkit-linear-gradient(top, rgba(29,29,29,0.2) 0%,rgba(29,29,29,1) 100%);
-		background:-o-linear-gradient(top, rgba(29,29,29,0.2) 0%,rgba(29,29,29,1) 100%);
-		background:-ms-linear-gradient(top, rgba(29,29,29,0.2) 0%,rgba(29,29,29,1) 100%);
+		background:-webkit-gradient(linear, left top, left bottom, from(rgba(29,29,29,0.2)),to(rgba(29,29,29,1)));
 		background:linear-gradient(to bottom, rgba(29,29,29,0.2) 0%,rgba(29,29,29,1) 100%);
 		content: "";
 		display: block;
@@ -137,6 +135,7 @@
 		position:fixed;
 		opacity:0;
 		top:0;
+		-webkit-transition:all 0.2s ease-in-out;
 		transition:all 0.2s ease-in-out;
 		visibility:hidden;
 		width:100%;
@@ -253,5 +252,12 @@
 
 	.tinymce {
 		height:12.5em; /* 200/16 */
+	}
+
+	.noselect {
+		-webkit-user-select:none;
+		-moz-user-select:none;
+		-ms-user-select:none;
+		user-select:none;
 	}
 </style>

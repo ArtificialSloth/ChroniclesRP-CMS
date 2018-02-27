@@ -5,7 +5,7 @@
 {% query 'topics', {}, {date: -1}, 'topics' %}
 {% query 'replies', {}, {date: -1}, 'replies' %}
 
-<ul class="forums-menu">
+<ul class="forums-menu noselect">
 	{% if topics.length > 0 %}
 		<li class="filter topics active" onclick="forumsToggleFilter(this, 'topics')">Topics ({{topics.length}})</li>
 	{% endif %}
@@ -24,7 +24,7 @@
 		</ul>
 
 		{% for topic in topics %}
-			<ul onclick="$(this).next().toggleClass('active')">
+			<ul class="noselect" onclick="$(this).next().toggleClass('active')">
 				<li>{{topic.title}}</li>
 				<li>{{crp.util.findObjectInArray(users, '_id', topic.author.toString()).display_name}}</li>
 				<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
@@ -132,7 +132,7 @@
 		</ul>
 
 		{% for reply in replies %}
-			<ul onclick="$(this).next().toggleClass('active')">
+			<ul class="noselect" onclick="$(this).next().toggleClass('active')">
 				<li>{{crp.util.findObjectInArray(users, '_id', reply.author.toString()).display_name}}</li>
 				<li>{{crp.util.findObjectInArray(topics, '_id', reply.parent.toString()).title}}</li>
 				<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>

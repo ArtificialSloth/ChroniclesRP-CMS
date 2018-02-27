@@ -1,0 +1,11 @@
+<div class="sidebar">
+	{% include "./style.njk" %}
+	{% lookup 'users', {_id: userid}, {}, 'user' %}
+
+	<div class="login-widget">
+		<h3></h3>
+		<img src="{{user.img.profile}}" />
+		<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
+		<a href="/logout">Logout</a>
+	</div>
+</div>
