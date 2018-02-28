@@ -1,6 +1,6 @@
 <div id="navigation">
 	{% include "./style.njk" %}
-	{% lookup 'users', {_id: userid}, {}, 'user' %}
+	{% lookup 'users', {_id: userid}, 'user' %}
 
 	<ul class="main-menu noselect">
 		<li class="menu-item"><a onclick="crpGetPage('/')">Home</a></li>
@@ -28,11 +28,11 @@
 		<li class="menu-item menu-has-childred">
 			<a onclick="crpGetPage('/chapters')">Chapters</a>
 			<ul class="sub-menu">
-				{% query 'games', {}, {name: 1}, 'games' %}
+				{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
 				{% for game in games %}
 					<li class="menu-item page-has-childred">
 						<a><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
-						{% query 'chapters', {game: game._id}, {name: 1}, 'chapters' %}
+						{% query 'chapters', {game: game._id}, {sort: [['name', 1]]}, 'chapters' %}
 						{% for chapter in chapters %}
 							<ul class="sub-menu">
 								<li class="menu-item"><a onclick="crpGetPage('/chapters/{{chapter.slug}}')">{{chapter.name}}</a></li>

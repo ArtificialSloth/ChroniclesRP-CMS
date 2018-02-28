@@ -1,6 +1,6 @@
 <div class="profile">
 	{% include "./style.njk" %}
-	{% lookup 'users', {_id: profileid}, {}, 'profile' %}
+	{% lookup 'users', {_id: profileid}, 'profile' %}
 
 	<div class="profile-header">
 		<div class="header-cover-image" style="background-image:url('{{profile.img.cover or '/img/members/cover.png'}}')"></div>
@@ -25,7 +25,7 @@
 			<a onclick="crpGetSubPage('/members/{{profile.nicename}}/info', '.profile-content .containor', true)">Info</a>
 			<a onclick="crpGetSubPage('/members/{{profile.nicename}}/friends', '.profile-content .containor', true)">Friends</a>
 			<a onclick="crpGetSubPage('/members/{{profile.nicename}}/chapters', '.profile-content .containor', true)">Chapters</a>
-			{% lookup 'users', {_id: userid}, {}, 'user' %}
+			{% lookup 'users', {_id: userid}, 'user' %}
 			{% if profile._id.equals(user._id) %}
 				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/messages', '.profile-content .containor', true)">Messages</a>
 				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/account', '.profile-content .containor', true)">Account</a>

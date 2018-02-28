@@ -1,6 +1,6 @@
 {% include "./style.njk" %}
-{% lookup 'users', {_id: userid}, {}, 'user' %}
-{% query 'posts', {}, {title: 1}, 'posts' %}
+{% lookup 'users', {_id: userid}, 'user' %}
+{% query 'posts', {}, {sort: [['title', 1]]}, 'posts' %}
 
 {% set pages = crp.util.filterObjectArray(posts, {type: 'page'}) %}
 {% set news = crp.util.filterObjectArray(posts, {type: 'news'}) %}

@@ -1,40 +1,44 @@
-<ul class="forums">
-	{% include "./style.njk" %}
-	{% lookup 'users', {_id: userid}, {}, 'user' %}
+<div class="index">
+	<ul class="forums">
+		{% include "./style.njk" %}
+		{% lookup 'users', {_id: userid}, 'user' %}
 
-	{% query 'categories', {}, {order: 1}, 'categories' %}
-	{% for category in categories %}
-		{% if not category.role or category.role == user.role or user.role == 'administrator' %}
-			<li class="category">
-				<ul>
-					<li>{{category.name}}</li>
-					<li>Topics</li>
-					<li>Most Recent</li>
-				</ul>
-			</li>
-
-			{% query 'forums', {category: category._id}, {order: 1}, 'forums' %}
-			{% for forum in forums %}
-				{% query 'topics', {parent: forum._id}, {date: -1}, 'topics' %}
-
-				<li class="forum">
+		{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
+		{% for category in categories %}
+			{% if not category.role or category.role == user.role or user.role == 'administrator' %}
+				<li class="category">
 					<ul>
-						<li>
-							<a class="forum-name" onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
-							<div class="forum-desc">{{forum.desc}}</div>
-						</li>
-						<li>{{topics.length}}</li>
-						<li>
-							{% if topics[0] %}
-								{% lookup 'users', {_id: topics[0].author}, {}, 'author' %}
-								<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topics[0]._id}}')">{{topics[0].title}}</a> by <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-							{% else %}
-								No Topics
-							{% endif %}
-						</li>
+						<li>{{category.name}}</li>
+						<li>Topics</li>
+						<li>Most Recent</li>
 					</ul>
 				</li>
-			{% endfor %}
-		{% endif %}
-	{% endfor %}
-</ul>
+
+				{% query 'forums', {category: category._id}, {sort: [['order', 1]]}, 'forums' %}
+				{% for forum in forums %}
+					{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
+
+					<li class="forum">
+						<ul>
+							<li>
+								<a class="forum-name" onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
+								<div class="forum-desc">{{forum.desc}}</div>
+							</li>
+							<li>{{topics.length}}</li>
+							<li>
+								{% if topics[0] %}
+									{% lookup 'users', {_id: topics[0].author}, 'author' %}
+									<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topics[0]._id}}')">{{topics[0].title}}</a> by <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+								{% else %}
+									No Topics
+								{% endif %}
+							</li>
+						</ul>
+					</li>
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	</ul>
+
+	{% include "components/sidebar/index.njk" %}
+</div>

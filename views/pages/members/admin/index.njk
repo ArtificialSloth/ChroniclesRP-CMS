@@ -1,5 +1,5 @@
 {% include "./style.njk" %}
-{% query 'users', {}, {login: 1}, 'users' %}
+{% query 'users', {}, {sort: [['login', 1]]}, 'users' %}
 
 {% set administrators = crp.util.filterObjectArray(users, {role: 'administrator'}) %}
 {% set chapterLeaders = crp.util.filterObjectArray(users, {role: 'chapter_leader'}) %}

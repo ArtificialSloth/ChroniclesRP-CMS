@@ -1,23 +1,66 @@
 <style>
 	.sidebar {
 		width:25%;
+		padding-left:1.406em; /* 22.5/16 */
+	}
+
+	.sidebar div {
+		margin-bottom:1.875em; /* 30/16 */
 	}
 
 	.sidebar div h3 {
-		border-bottom:2px solid {{css.colors.primary}};
+		border-bottom:0.1em solid {{css.colors.primary}}; /* 2/20 */
 		font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
-		font-size:20px;
-		line-height:18px;
-		margin-bottom:5px;
-		padding-bottom:15px;
+		font-size:1.25em; /* 20/16 */
+		line-height:0.9em; /* 18/20 */
+		margin-bottom:0.25em; /* 5/20 */
+		padding-bottom:0.75em; /* 15/20 */
 	}
 
-	.sidebar div img {
-		height:40px;
-		width:40px;
+	.sidebar div.login-widget ul {
+		display:flex;
 	}
 
-	.sidebar div.login-widget a {
+	.sidebar div.login-widget ul li {
+		list-style-type:none;
+	}
+
+	.sidebar div.login-widget ul li:first-child {
+		padding-right:10px;
+	}
+
+	.sidebar div.login-widget ul li a {
 		display:block;
+		font-size:1.125em; /* 18/16 */
+	}
+
+	.sidebar div.login-widget ul li a:first-child {
+		font-weight:bold;
+	}
+
+	.sidebar div.login-widget ul li img {
+		height:2.5em; /* 40/16 */
+		width:2.5em; /* 40/16 */
+	}
+
+	.sidebar div.login-widget .login-form {
+		background-color:transparent;
+		position:static;
+		transform:translate(0, 0);
+		width:auto;
+	}
+
+	.sidebar div.login-widget .login-form input[type=text],
+	.sidebar div.login-widget .login-form input[type=password] {
+		width:100%;
+	}
+
+	.sidebar .recent-posts-widget ul {
+		font-size:1.125em; /* 18/16 */
+		margin-left:1.1111111111111112em; /* 20/18 */
+	}
+
+	.sidebar .recent-posts-widget ul li {
+		margin:0.5em 0;
 	}
 </style>

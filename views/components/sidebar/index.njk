@@ -1,11 +1,51 @@
 <div class="sidebar">
 	{% include "./style.njk" %}
-	{% lookup 'users', {_id: userid}, {}, 'user' %}
+	{% lookup 'users', {_id: userid}, 'user' %}
 
 	<div class="login-widget">
 		<h3></h3>
-		<img src="{{user.img.profile}}" />
-		<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
-		<a href="/logout">Logout</a>
+
+		{% if user %}
+			<ul>
+				<li><img src="{{user.img.profile}}" /></li>
+				<li>
+					<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
+					<a href="/logout">Logout</a>
+				</li>
+			</ul>
+		{% else %}
+			<form class="login-form">
+				<label for="user_login">Username</label>
+				<input type="text" name="user_login" class="user_login" value="" placeholder="Username" />
+
+				<label for="user_pass">Password</label>
+				<input type="password" name="user_pass" class="user_pass" value="" placeholder="Password" />
+
+				<input type="checkbox" name="remember_me" class="remember_me" /> <input type="button" onclick="$('.remember_me').prop('checked', !$('.remember_me').prop('checked'))" value="Remember me" />
+				<input type="submit" value="Login">
+			</form>
+
+			{% include "components/login/script.njk" %}
+		{% endif %}
+	</div>
+
+	<div class="recent-posts-widget">
+		{% query 'topics', {}, {sort: [['date', -1]], limit: 5}, 'topics' %}
+
+		<h3>Recent Posts</h3>
+		<ul>
+			{% for topic in topics %}
+				{% lookup 'users', {_id: topic.author}, 'author' %}
+				{% lookup 'forums', {_id: topic.parent}, 'parent' %}
+
+				<li>
+					<a onclick="crpGetPage('/forums/{{parent.slug}}/{{topic._id}}')">{{topic.title}}</a>
+					by
+					<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+					<br />
+					{{crp.moment(topic.date).fromNow()}}
+				</li>
+			{% endfor %}
+		</ul>
 	</div>
 </div>

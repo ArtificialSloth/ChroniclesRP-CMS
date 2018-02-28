@@ -16,8 +16,8 @@ module.exports = (crp, callback) => {
 			return new nodes.CallExtensionAsync(this, 'run', args);
 		};
 
-		this.run = (context, collection, filter, sort, key, cb) => {
-			crp.db.find(collection, filter, sort, (err, result) => {
+		this.run = (context, collection, filter, options, key, cb) => {
+			crp.db.find(collection, filter, options, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});
@@ -34,7 +34,7 @@ module.exports = (crp, callback) => {
 			return new nodes.CallExtensionAsync(this, 'run', args);
 		};
 
-		this.run = (context, collection, filter, sort, key, cb) => {
+		this.run = (context, collection, filter, key, cb) => {
 			crp.db.findOne(collection, filter, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);

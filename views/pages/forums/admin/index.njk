@@ -1,9 +1,9 @@
 {% include "./style.njk" %}
-{% lookup 'users', {_id: userid}, {}, 'user' %}
-{% query 'users', {}, {display_name: 1}, 'users' %}
-{% query 'forums', {}, {order: 1}, 'forums' %}
-{% query 'topics', {}, {date: -1}, 'topics' %}
-{% query 'replies', {}, {date: -1}, 'replies' %}
+{% lookup 'users', {_id: userid}, 'user' %}
+{% query 'users', {}, {sort: [['display_name', 1]]}, 'users' %}
+{% query 'forums', {}, {sort: [['order', 1]]}, 'forums' %}
+{% query 'topics', {}, {sort: [['date', -1]]}, 'topics' %}
+{% query 'replies', {}, {sort: [['date', -1]]}, 'replies' %}
 
 <ul class="forums-menu noselect">
 	{% if topics.length > 0 %}

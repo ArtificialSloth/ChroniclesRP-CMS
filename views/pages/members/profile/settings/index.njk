@@ -1,5 +1,5 @@
-{% lookup 'users', {_id: profileid}, {}, 'profile' %}
-{% lookup 'users', {_id: userid}, {}, 'user' %}
+{% lookup 'users', {_id: profileid}, 'profile' %}
+{% lookup 'users', {_id: userid}, 'user' %}
 
 {% if profile._id.equals(user._id) %}
 	<form class="user-settings-form standard-form">

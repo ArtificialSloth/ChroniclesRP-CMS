@@ -1,8 +1,8 @@
 <ul class="topic">
 	{% include "./style.njk" %}
-	{% lookup 'topics', {_id: topicid}, {}, 'topic' %}
-	{% lookup 'users', {_id: topic.author}, {}, 'author' %}
-	{% lookup 'users', {_id: userid}, {}, 'user' %}
+	{% lookup 'topics', {_id: topicid}, 'topic' %}
+	{% lookup 'users', {_id: topic.author}, 'author' %}
+	{% lookup 'users', {_id: userid}, 'user' %}
 
 	<li class="header">
 		<ul>
@@ -29,9 +29,9 @@
 		</ul>
 	</li>
 
-	{% query 'replies', {parent: topic._id}, {date: 1}, 'replies' %}
+	{% query 'replies', {parent: topic._id}, {sort: [['date', 1]]}, 'replies' %}
 	{% for reply in replies %}
-		{% lookup 'users', {_id: reply.author}, {}, 'author' %}
+		{% lookup 'users', {_id: reply.author}, 'author' %}
 
 		<li class="sub-header reply">
 			<ul>

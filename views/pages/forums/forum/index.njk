@@ -1,7 +1,7 @@
 <ul class="forum">
 	{% include "./style.njk" %}
-	{% lookup 'forums', {_id: forumid}, {}, 'forum' %}
-	{% query 'topics', {parent: forum._id}, {date: -1}, 'topics' %}
+	{% lookup 'forums', {_id: forumid}, 'forum' %}
+	{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
 
 	{% if topics.length != 0 %}
 		<li class="header">
@@ -13,8 +13,8 @@
 		</li>
 
 		{% for topic in topics %}
-			{% lookup 'users', {_id: topic.author}, {}, 'author' %}
-			{% query 'replies', {parent: topic._id}, {date: -1}, 'replies' %}
+			{% lookup 'users', {_id: topic.author}, 'author' %}
+			{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
 			<li class="topic">
 				<ul>
 					<li>
@@ -26,7 +26,7 @@
 					<li>{{replies.length}}</li>
 					<li>
 						{% if replies[0] %}
-							{% lookup 'users', {_id: replies[0].author}, {}, 'author' %}
+							{% lookup 'users', {_id: replies[0].author}, 'author' %}
 							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
 							<br />
 							{{crp.moment(replies[0].date).fromNow()}}
@@ -39,7 +39,7 @@
 		{% endfor %}
 	{% endif %}
 
-	{% lookup 'users', {_id: userid}, {}, 'user' %}
+	{% lookup 'users', {_id: userid}, 'user' %}
 	{% if user and user.role != 'pending' %}
 		<fieldset class="new-post">
 			<legend>Create New Topic in {{forum.name}}</legend>

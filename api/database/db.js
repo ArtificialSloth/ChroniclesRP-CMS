@@ -12,8 +12,8 @@ module.exports = (crp, callback) => {
 			sanitize: require('mongo-sanitize')
 		};
 
-		crp.db.find = (collection, filter, sort, cb) => {
-			crp.db.mongodb.collection(crp.db.prefix + collection).find(filter).sort(sort).toArray(cb);
+		crp.db.find = (collection, filter, options, cb) => {
+			crp.db.mongodb.collection(crp.db.prefix + collection).find(filter, options).toArray(cb);
 		};
 
 		crp.db.findOne = (collection, filter, cb) => {

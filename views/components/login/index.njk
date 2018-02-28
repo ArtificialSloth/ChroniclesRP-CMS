@@ -2,16 +2,16 @@
 	{% include "./style.njk" %}
 
 	<div class="login-background" onclick="$('#login').toggleClass('active')"></div>
-	<form id="login-form">
+	<form class="login-form">
 		<label for="user_login">Username</label>
-		<input type="text" name="user_login" id="user_login" value="" placeholder="Username" />
+		<input type="text" name="user_login" class="user_login" placeholder="Username" />
 
 		<label for="user_pass">Password</label>
-		<input type="password" name="user_pass" id="user_pass" value="" placeholder="Password" />
+		<input type="password" name="user_pass" class="user_pass" placeholder="Password" />
 
 		<div class="error-message">Incorrect username or password!</div>
 
-		<input type="checkbox" name="remember_me" id="remember_me" /> <input type="button" onclick="$('#remember_me').prop('checked', !$('#remember_me').prop('checked'))" value="Remember me" />
+		<input type="checkbox" name="remember_me" class="remember_me" /> <input type="button" onclick="$('.remember_me').prop('checked', !$('.remember_me').prop('checked'))" value="Remember me" />
 		<input type="submit" value="Login">
 	</form>
 
