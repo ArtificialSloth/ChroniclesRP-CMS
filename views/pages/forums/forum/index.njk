@@ -1,69 +1,81 @@
-<ul class="forum">
-	{% include "./style.njk" %}
-	{% lookup 'forums', {_id: forumid}, 'forum' %}
-	{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
+<div class="page">
+	<ul class="forum">
+		{% include "./style.njk" %}
 
-	{% if topics.length != 0 %}
-		<li class="header">
-			<ul>
-				<li>Topic</li>
-				<li>Replies</li>
-				<li>Most Recent</li>
-			</ul>
-		</li>
+		{% lookup 'users', {_id: userid}, 'user' %}
+		{% lookup 'forums', {_id: forumid}, 'forum' %}
+		{% lookup 'categories', {_id: forum.category}, 'category' %}
+		{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
 
-		{% for topic in topics %}
-			{% lookup 'users', {_id: topic.author}, 'author' %}
-			{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
-			<li class="topic">
-				<ul>
-					<li>
-						<a class="topic-name" onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a>
-						<div class="topic-author">
-							Started By: <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-						</div>
+		{% if not category.role or category.role == user.role or user.role == 'administrator' %}
+			{% if topics.length != 0 %}
+				<li class="header">
+					<ul>
+						<li>Topic</li>
+						<li>Replies</li>
+						<li>Most Recent</li>
+					</ul>
+				</li>
+
+				{% for topic in topics %}
+					{% lookup 'users', {_id: topic.author}, 'author' %}
+					{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
+					<li class="topic">
+						<ul>
+							<li>
+								<a class="topic-name" onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a>
+								<div class="topic-author">
+									Started By: <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+								</div>
+							</li>
+							<li>{{replies.length}}</li>
+							<li>
+								{% if replies[0] %}
+									{% lookup 'users', {_id: replies[0].author}, 'author' %}
+									<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+									<br />
+									{{crp.moment(replies[0].date).fromNow()}}
+								{% else %}
+									No Replies
+								{% endif %}
+							</li>
+						</ul>
 					</li>
-					<li>{{replies.length}}</li>
-					<li>
-						{% if replies[0] %}
-							{% lookup 'users', {_id: replies[0].author}, 'author' %}
-							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-							<br />
-							{{crp.moment(replies[0].date).fromNow()}}
-						{% else %}
-							No Replies
+				{% endfor %}
+			{% else %}
+				This forum has no topics.
+			{% endif %}
+
+			{% if user and user.role != 'pending' %}
+				<fieldset class="new-post">
+					<legend>Create New Topic in {{forum.name}}</legend>
+					<form>
+						<label for="topic_title">Topic Title (Max: 80)</label>
+						<input type="text" name="topic_title" class="topic_title" maxlength="80" />
+
+						<textarea name="topic_body" class="topic_body tinymce"></textarea>
+						<script>crpTinyMCE()</script>
+
+						{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+							<label for="topic_type">Topic Type:</label>
+							<select name="topic_type" class="topic_type">
+								<option value="normal" selected>Normal</option>
+								<option value="sticky">Sticky</option>
+							</select>
 						{% endif %}
-					</li>
-				</ul>
-			</li>
-		{% endfor %}
-	{% endif %}
 
-	{% lookup 'users', {_id: userid}, 'user' %}
-	{% if user and user.role != 'pending' %}
-		<fieldset class="new-post">
-			<legend>Create New Topic in {{forum.name}}</legend>
-			<form>
-				<label for="topic_title">Topic Title (Max: 80)</label>
-				<input type="text" name="topic_title" class="topic_title" maxlength="80" />
+						<input type="hidden" name="topic_parent" class="topic_parent" value="{{forum._id}}" />
+						<input type="submit" value="Post" />
+						<span class="topic-error"></span>
+					</form>
+				</fieldset>
+			{% endif %}
 
-				<textarea name="topic_body" class="topic_body tinymce"></textarea>
-				<script>crpTinyMCE()</script>
+			{% include "./script.njk" %}
+		{% else %}
+			You're not allowed to view this forum.
+		{% endif %}
+	</ul>
 
-				{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
-					<label for="topic_type">Topic Type:</label>
-					<select name="topic_type" class="topic_type">
-						<option value="normal" selected>Normal</option>
-						<option value="sticky">Sticky</option>
-					</select>
-				{% endif %}
-
-				<input type="hidden" name="topic_parent" class="topic_parent" value="{{forum._id}}" />
-				<input type="submit" value="Post" />
-				<span class="topic-error"></span>
-			</form>
-		</fieldset>
-	{% endif %}
-
-	{% include "./script.njk" %}
-</ul>
+	{% include "components/sidebar/index.njk" %}
+</div>

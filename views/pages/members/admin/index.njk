@@ -6,80 +6,79 @@
 {% set members = crp.util.filterObjectArray(users, {role: 'member'}) %}
 {% set pendings = crp.util.filterObjectArray(users, {role: 'pending'}) %}
 
-<div class="users-menu">
-	<button class="filter all active" onclick="usersToggleRoleFilter(this, 'all')">All ({{users.length}})</button>
+<ul class="users-menu">
+	<li class="filter all active" onclick="usersToggleRoleFilter(this, 'all')">All ({{users.length}})</li>
 
 	{% if administrators.length > 0 %}
-		<button class="filter administrator" onclick="usersToggleRoleFilter(this, 'administrator')">Administrators ({{administrators.length}})</button>
+		<li class="filter administrator" onclick="usersToggleRoleFilter(this, 'administrator')">Administrators ({{administrators.length}})</li>
 	{% endif %}
 
 	{% if chapterLeaders.length > 0 %}
-		<button class="filter chapter-leader" onclick="usersToggleRoleFilter(this, 'chapter-leader')">Chapter Leaders ({{chapterLeaders.length}})</button>
+		<li class="filter chapter-leader" onclick="usersToggleRoleFilter(this, 'chapter-leader')">Chapter Leaders ({{chapterLeaders.length}})</li>
 	{% endif %}
 
 	{% if members.length > 0 %}
-		<button class="filter member" onclick="usersToggleRoleFilter(this, 'member')">Members ({{members.length}})</button>
+		<li class="filter member" onclick="usersToggleRoleFilter(this, 'member')">Members ({{members.length}})</li>
 	{% endif %}
 
 	{% if pendings.length > 0 %}
-		<button class="filter pending" onclick="usersToggleRoleFilter(this, 'pending')">Pending ({{pendings.length}})</button>
+		<li class="filter pending" onclick="usersToggleRoleFilter(this, 'pending')">Pending ({{pendings.length}})</li>
 	{% endif %}
-</div>
+</ul>
 
 <div class="users-content">
-	<div class="table">
-		<div class="table-row table-header">
-			<div class="table-header-data">Username</div>
-			<div class="table-header-data">Email</div>
-			<div class="table-header-data">Role</div>
-		</div>
-		<div class="filter all active">
-			{% for user in users %}
-				{% include "./loop.njk" %}
-			{% endfor %}
-		</div>
-		<div class="filter administrator">
-			{% for user in administrators %}
-				{% include "./loop.njk" %}
-			{% endfor %}
-		</div>
-		<div class="filter chapter-leader">
-			{% for user in chapterLeaders %}
-				{% include "./loop.njk" %}
-			{% endfor %}
-		</div>
-		<div class="filter member">
-			{% for user in members %}
-				{% include "./loop.njk" %}
-			{% endfor %}
-		</div>
-		<div class="filter pending">
-			{% for user in pendings %}
-				{% include "./loop.njk" %}
-			{% endfor %}
-		</div>
+	<ul class="header">
+		<li>Username</li>
+		<li>Email</li>
+		<li>Role</li>
+	</ul>
+
+	<div class="filter all active">
+		{% for user in users %}
+			{% include "./loop.njk" %}
+		{% endfor %}
 	</div>
+	<div class="filter administrator">
+		{% for user in administrators %}
+			{% include "./loop.njk" %}
+		{% endfor %}
+	</div>
+	<div class="filter chapter-leader">
+		{% for user in chapterLeaders %}
+			{% include "./loop.njk" %}
+		{% endfor %}
+	</div>
+	<div class="filter member">
+		{% for user in members %}
+			{% include "./loop.njk" %}
+		{% endfor %}
+	</div>
+	<div class="filter pending">
+		{% for user in pendings %}
+			{% include "./loop.njk" %}
+		{% endfor %}
+	</div>
+
+	<fieldset class="new-post">
+		<legend>Add a New User</legend>
+		<form class="add-user">
+			<label for="user_login">Username: </label>
+			<input type="text" name="user_login" class="user_login" autocomplete="off" />
+			<br />
+			<label for="user_email">Email: </label>
+			<input type="text" name="user_email" class="user_email" autocomplete="off" />
+			<br />
+			<label for="user_pass">Password: </label>
+			<input type="password" name="user_pass" class="user_pass" autocomplete="off" />
+			<input type="checkbox" name="encrypted" class="encrypted" autocomplete="off" />
+			<label for="encrypted">Encrypted</label>
+			<br />
+			<label for="register_date">Registration Date: </label>
+			<input type="text" name="register_date" class="register_date" autocomplete="off" />
+
+			<input type="submit" value="Add User" />
+		</form>
+	</fieldset>
 </div>
-
-<fieldset class="add-user">
-	<legend>Add a New User</legend>
-	<form>
-		<label for="user_login">Username: </label>
-		<input type="text" name="user_login" class="user_login" autocomplete="off" />
-		<br />
-		<label for="user_email">Email: </label>
-		<input type="text" name="user_email" class="user_email" autocomplete="off" />
-		<br />
-		<label for="user_pass">Password: </label>
-		<input type="password" name="user_pass" class="user_pass" autocomplete="off" />
-		<input type="checkbox" name="encrypted" class="encrypted" autocomplete="off" />
-		<label for="encrypted">Encrypted</label>
-		<br />
-		<label for="register_date">Registration Date: </label>
-		<input type="text" name="register_date" class="register_date" autocomplete="off" />
-
-		<input type="submit" value="Add User" />
-	</form>
-</fieldset>
 
 {% include "./script.njk" %}

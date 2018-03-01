@@ -31,22 +31,24 @@
 	});
 
 	function usersRemove(userid) {
-		crpAjax('/api/admin/remove-user', {userid: userid}, (res) => {
-			if (typeof res != 'object') return console.error(res);
+		if (window.confirm('Are you Sure?')) {
+			crpAjax('/api/admin/remove-user', {userid: userid}, (res) => {
+				if (typeof res != 'object') return console.error(res);
 
-			crpGetSubPage('/admin/users', '.admin-content', true);
-		});
+				crpGetSubPage('/admin/users', '.admin-content', true);
+			});
+		}
 	}
 
 	function usersToggleRoleFilter(tab, role) {
 		$('.users-menu .active').removeClass('active');
 		$(tab).addClass('active');
 
-		$('.users-content .table .active').removeClass('active');
-		$('.users-content .table .' + role).addClass('active');
+		$('.users-content .filter.active').removeClass('active');
+		$('.users-content .filter.' + role).addClass('active');
 	}
 
-	$('.add-user form').submit((e) => {
+	$('.add-user').submit((e) => {
 		e.preventDefault();
 
 		var formData = $(e.target).serialize();

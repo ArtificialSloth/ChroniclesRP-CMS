@@ -182,14 +182,19 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addUser = (data, cb) => {
+	crp.util.addUser = (data, admin, cb) => {
 		var user = {
 			login: data.login,
 			pass: data.pass,
 			email: data.email,
-			register_date: data.register_date,
-			activation_code: crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase()
+			register_date: data.register_date
 		};
+
+		if (admin) {
+			user.role = data.role;
+		} else {
+			user.activation_code = crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase();
+		}
 
 		crp.util.getUsers({login: user.login}, (err, result) => {
 			if (err) return cb(err);

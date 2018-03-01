@@ -14,6 +14,7 @@ module.exports = (crp, callback) => {
 			if (!post) return cb('noPost');
 
 			var newPost = {
+				_id: post._id,
 				author: data.author || post.author,
 				title: data.title || post.title,
 				type: data.type || post.type,

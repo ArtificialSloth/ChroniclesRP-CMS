@@ -1,8 +1,8 @@
-<div class="table-row {{user._id}} {% if user.locked %}locked{% endif %}" onclick="$(this).next().toggleClass('active')">
-	<div class="table-data login">{{user.login}}</div>
-	<div class="table-data email">{{user.email}}</div>
-	<div class="table-data role">{{user.role}}</div>
-</div>
+<ul class="{{user._id}} {% if user.locked %}locked{% endif %}" onclick="$(this).next().toggleClass('active')">
+	<li class="login">{{user.login}}</li>
+	<li class="email">{{user.email}}</li>
+	<li class="role">{{user.role}}</li>
+</ul>
 
 <form class="user-settings-form">
 	<label for="user_login">Username: </label>
@@ -25,6 +25,7 @@
 
 	<label for="user_role">Role: </label>
 	<select name="user_role" class="user_role">
+		<option value="pending" {% if user.role == "pending" %}selected{% endif %}>Pending</option>
 		<option value="member" {% if user.role == "member" %}selected{% endif %}>Member</option>
 		<option value="chapter_leader" {% if user.role == "chapter_leader" %}selected{% endif %}>Chapter Leader</option>
 		<option value="administrator" {% if user.role == "administrator" %}selected{% endif %}>Administrator</option>
@@ -34,10 +35,12 @@
 
 	<input type="hidden" name="user_id" class="user_id" value="{{user._id}}" />
 
-	<input type="submit" value="Save" />
-	<span class="user-saved">Saved!</span>
-
-	<div class="user-actions">
+	<div class="actions">
 		<a onclick="usersRemove('{{user._id}}')">delete</a>
+	</div>
+
+	<div class="submit">
+		<span class="user-saved">Saved!</span>
+		<input type="submit" value="Save" />
 	</div>
 </form>

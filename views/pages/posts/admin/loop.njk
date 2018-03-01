@@ -1,8 +1,8 @@
-<div class="table-row {{post._id}}" onclick="$(this).next().toggleClass('active')">
-	<div class="table-data title">{{post.title}}</div>
-	<div class="table-data slug">{{post.slug}}</div>
-	<div class="table-data date">{{crp.util.dateToStr(post.date, user.timezone)}}</div>
-</div>
+<ul class="{{post._id}} noselect" onclick="$(this).next().toggleClass('active')">
+	<li class="title">{{post.title}}</li>
+	<li class="slug">{{post.slug}}</li>
+	<li class="date">{{crp.util.dateToStr(post.date, user.timezone)}}</li>
+</ul>
 
 <form class="post-settings-form">
 	<label for="post_title">Title: </label>
@@ -35,10 +35,12 @@
 
 	<input type="hidden" name="postid" class="postid" value="{{post._id}}" />
 
-	<input type="submit" value="Save" />
-	<span class="post-saved">Saved!</span>
-
-	<div class="post-actions">
+	<div class="actions">
 		<a onclick="postsRemove('{{post._id}}')">delete</a>
+	</div>
+
+	<div class="submit">
+		<span class="post-saved">Saved!</span>
+		<input type="submit" value="Save" />
 	</div>
 </form>

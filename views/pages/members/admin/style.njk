@@ -1,145 +1,100 @@
 <style>
-	.users-menu .filter {
-		background-color:{{css.colors.primary}};
-		border:none;
-		border-radius:0;
-		margin-left:0.0625em; /* 1/16 */
-	}
-
-	.users-menu .filter.active {
-		background-color:{{css.colors.header}};
-	}
-
-	.users-menu .filter:hover {
-		color:{{css.colors.font}};
-		background-color:{{css.colors.header}};
-	}
-
-	.users-content .table {
-		margin-left:0.0625em; /* 1/16 */
-		width:100%;
-	}
-
-	.users-content .table .filter {
-		display:none;
-	}
-
-	.users-content .table .filter.active {
-		display:block;
-	}
-
-	.users-content .table .table-row {
-		background-color:{{css.colors.primary}};
-		cursor:pointer;
+	.users-menu {
 		display:flex;
-		justify-content:space-evenly;
-		margin-bottom:0.0625em; /* 1/16 */
 	}
 
-	.users-content .table .table-row.table-header {
-		background-color:{{css.colors.header}};
-		cursor:auto;
-	}
-
-	.users-content .table .table-row:hover:not(.table-header) {
-		background-color:{{css.colors.header}};
-	}
-
-	.users-content .table .table-row .table-header-data {
-		flex:1;
-		padding:0.625em; /* 10/16 */
-		text-align:left;
-	}
-
-	.users-content .table .table-row .table-data {
-		flex:1;
-		padding:0.625em; /* 10/16 */
-	}
-
-	.users-content .table .table-row.locked .table-data {
-		color:#999;
-	}
-
-	.users-content .table form {
+	.users-menu li {
 		background-color:{{css.colors.primary}};
-		height:0;
-		overflow:hidden;
+		font-family: Montserrat, Helvetica Neue, Helvetica, sans-serif;
+		list-style-type:none;
+		padding:0.375em 1.25em; /* 6/16 */ /* 20/16 */
+		margin-left:0.0625em; /* 1/16 */
 		transition:all 0.2s ease-in-out;
-		visibility:hidden;
 	}
 
-	.users-content .table form.active {
-		height:15em; /* 240/16 */
-		margin-bottom:0.0625em; /* 1/16 */
-		margin-top:-0.0625em; /* 1/16 */
-		padding:0.625em; /* 10/16 */
-		visibility:initial;
+	.users-menu li.active {
+		background-color:{{css.colors.header}};
 	}
 
-	.users-content .table form label {
-		display:inline-block;
-		width:15%;
+	.users-menu li:hover {
+		background-color:{{css.colors.header}};
+		cursor:pointer;
 	}
 
-	.users-content .table form select,
-	.users-content .table form input {
-		margin-bottom:0.9375em; /* 15/16 */
+	.users-content {
+		margin-left:0.0625em; /* 1/16 */
 	}
 
-	.users-content .table form input[type=submit] {
-		float:right;
-	}
-
-	.users-content .table form .user-saved {
-		color:#55ff55;
+	.users-content .filter {
 		display:none;
-		float:right;
-		padding:0.3125em 0.625em; /* 5/16 */ /* 10/16 */
 	}
 
-	.users-content .table form .user-saved.active {
+	.users-content .filter.active {
 		display:initial;
 	}
 
-	.users-content .table form .user-actions {
-		display:block;
-		margin-top:1em; /* 16/16 */
+	.users-content ul {
+		display:flex;
+		justify-content:space-evenly;
 	}
 
-	.users-content .table form .user-actions a:nth-child(2) {
-		border-left:0.0625em solid #999; /* 1/16 */
-		padding-left:0.25em; /* 4/16 */
+	.users-content ul li {
+		background-color:{{css.colors.primary}};
+		flex:1;
+		list-style-type:none;
+		margin-top:0.0625em; /* 1/16 */
+		padding:0.625em; /* 10/16 */
 	}
 
-	.users-content .table form .user-actions a {
+	.users-content ul.header li {
+		background-color:{{css.colors.header}};
+		margin-top:0;
+	}
+
+	.users-content ul:not(.header):hover li {
+		background-color:{{css.colors.header}};
 		cursor:pointer;
 	}
 
-	.users-content .table form .user-actions a:hover {
-		text-decoration:underline;
-	}
-
-	.add-user {
-		border:0.0625em solid #585858; /* 1/16 */
-		margin:0.9375em 1.875em 1.875em 1.875em; /* 15/16 */ /* 30/16 */ /* 30/16 */ /* 30/16 */
-		padding:1.5625em; /* 25/16 */
-	}
-
-	.add-user legend {
+	.users-content form:not(.add-user) {
 		background-color:{{css.colors.primary}};
-	    padding:0.3125em; /* 5/16 */
+		display:none;
 	}
 
-	.add-user form label {
+	.users-content form:not(.add-user).active {
+		padding:0.625em; /* 10/16 */
+		display:block;
+	}
+
+	.users-content form input,
+	.users-content form select {
 		display:inline-block;
-		width:15%;
+		margin-bottom:0.5em; /* 8/16 */
+		width:auto;
 	}
 
-	.add-user form input {
-		margin-bottom:0.9375em; /* 15/16 */
+	.users-content form .submit {
+		display:flex;
+		justify-content:flex-end;
+		margin-top:0.5em; /* 8/16 */
 	}
 
-	.add-user form input[type=submit] {
-		float:right;
+	.users-content form .submit span {
+		color:#55ff55;
+		display:none;
+		padding:0.375em 0.625em; /* 6/16 */ /* 10/16 */
+	}
+
+	.users-content form .submit span.active {
+		display:initial;
+	}
+
+	.users-content form .actions {
+		float:left;
+		margin-top:0.9375em; /* 15/16 */
+	}
+
+	.new-post {
+		margin:1.875em; /* 30/16 */
 	}
 </style>

@@ -45,7 +45,7 @@ module.exports = (crp, callback) => {
 				email: req.body.user_email
 			};
 
-			crp.util.addUser(userData, (err, result) => {
+			crp.util.addUser(userData, false, (err, result) => {
 				if (err) return res.send(err);
 				if (!result._id) return res.send(result);
 
@@ -149,7 +149,7 @@ module.exports = (crp, callback) => {
 					role: 'member'
 				};
 
-				crp.util.addUser(userData, (err, result) => {
+				crp.util.addUser(userData, true, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);

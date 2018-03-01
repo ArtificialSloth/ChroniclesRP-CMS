@@ -1,147 +1,100 @@
 <style>
-	.posts-menu .filter {
-		background-color:{{css.colors.primary}};
-		border:none;
-		border-radius:0;
-		margin-left:0.0625em; /* 1/16 */
-	}
-
-	.posts-menu .filter.active {
-		background-color:{{css.colors.header}};
-	}
-
-	.posts-menu .filter:hover {
-		color:{{css.colors.font}};
-		background-color:{{css.colors.header}};
-	}
-
-	.posts-content .table {
-		margin-left:0.0625em; /* 1/16 */
-		width:100%;
-	}
-
-	.posts-content .table .filter {
-		display:none;
-	}
-
-	.posts-content .table .filter.active {
-		display:block;
-	}
-
-	.posts-content .table .table-row {
-		background-color:{{css.colors.primary}};
-		cursor:pointer;
+	.posts-menu {
 		display:flex;
-		justify-content:space-evenly;
-		margin-bottom:0.0625em; /* 1/16 */
 	}
 
-	.posts-content .table .table-row.table-header {
-		background-color:{{css.colors.header}};
-		cursor:auto;
-	}
-
-	.posts-content .table .table-row:hover:not(.table-header) {
-		background-color:{{css.colors.header}};
-	}
-
-	.posts-content .table .table-row .table-header-data {
-		flex:1;
-		padding:0.625em; /* 10/16 */
-		text-align:left;
-	}
-
-	.posts-content .table .table-row .table-data {
-		flex:1;
-		padding:0.625em; /* 10/16 */
-	}
-
-	.posts-content .table .table-row.locked .table-data {
-		color:#999;
-	}
-
-	.posts-content .table form {
+	.posts-menu li {
 		background-color:{{css.colors.primary}};
-		height:0;
-		overflow:hidden;
+		font-family: Montserrat, Helvetica Neue, Helvetica, sans-serif;
+		list-style-type:none;
+		padding:0.375em 1.25em; /* 6/16 */ /* 20/16 */
+		margin-left:0.0625em; /* 1/16 */
 		transition:all 0.2s ease-in-out;
-		visibility:hidden;
 	}
 
-	.posts-content .table form.active {
-		height:32.5em; /* 520/16 */
-		margin-bottom:0.0625em; /* 1/16 */
-		margin-top:-0.0625em; /* 1/16 */
-		padding:0.625em; /* 10/16 */
-		visibility:initial;
+	.posts-menu li.active {
+		background-color:{{css.colors.header}};
 	}
 
-	.posts-content .table form label {
-		display:inline-block;
-		width:15%;
+	.posts-menu li:hover {
+		background-color:{{css.colors.header}};
+		cursor:pointer;
 	}
 
-	.posts-content .table form select,
-	.posts-content .table form input {
-		margin-bottom:0.9375em; /* 15/16 */
+	.posts-content {
+		margin-left:0.0625em; /* 1/16 */
 	}
 
-	.posts-content .table form input[type=submit] {
-		float:right;
-	}
-
-	.posts-content .table form .post-saved {
-		color:#55ff55;
+	.posts-content .filter {
 		display:none;
-		float:right;
-		padding:0.3125em 0.625em; /* 5/16 */ /* 10/16 */
 	}
 
-	.posts-content .table form .post-saved.active {
+	.posts-content .filter.active {
 		display:initial;
 	}
 
-	.posts-content .table form .post-actions {
-		display:block;
-		margin-top:1em; /* 16/16 */
+	.posts-content ul {
+		display:flex;
+		justify-content:space-evenly;
 	}
 
-	.posts-content .table form .post-actions a:nth-child(2) {
-		border-left:0.0625em solid #999; /* 1/16 */
-		padding-left:0.25em; /* 4/16 */
+	.posts-content ul li {
+		background-color:{{css.colors.primary}};
+		flex:1;
+		list-style-type:none;
+		margin-top:0.0625em; /* 1/16 */
+		padding:0.625em; /* 10/16 */
 	}
 
-	.posts-content .table form .post-actions a {
+	.posts-content ul.header li {
+		background-color:{{css.colors.header}};
+		margin-top:0;
+	}
+
+	.posts-content ul:not(.header):hover li {
+		background-color:{{css.colors.header}};
 		cursor:pointer;
 	}
 
-	.posts-content .table form .post-actions a:hover {
-		text-decoration:underline;
-	}
-
-	.add-post {
-		border:0.0625em solid #585858; /* 1/16 */
-		margin:0.9375em 1.875em 1.875em 1.875em; /* 15/16 */ /* 30/16 */ /* 30/16 */ /* 30/16 */
-		padding:1.5625em; /* 25/16 */
-	}
-
-	.add-post legend {
+	.posts-content form:not(.add-post) {
 		background-color:{{css.colors.primary}};
-		padding:0.3125em; /* 5/16 */
+		display:none;
 	}
 
-	.add-post form label {
+	.posts-content form:not(.add-post).active {
+		padding:0.625em; /* 10/16 */
+		display:block;
+	}
+
+	.posts-content form input,
+	.posts-content form select {
 		display:inline-block;
-		width:15%;
+		margin-bottom:0.5em; /* 8/16 */
+		width:auto;
 	}
 
-	.add-post form input,
-	.add-post form select,
-	.add-post form textarea {
-		margin-bottom:0.9375em; /* 15/16 */
+	.posts-content form .submit {
+		display:flex;
+		justify-content:flex-end;
+		margin-top:0.5em; /* 8/16 */
 	}
 
-	.add-post form input[type=submit] {
-		float:right;
+	.posts-content form .submit span {
+		color:#55ff55;
+		display:none;
+		padding:0.375em 0.625em; /* 6/16 */ /* 10/16 */
+	}
+
+	.posts-content form .submit span.active {
+		display:initial;
+	}
+
+	.posts-content form .actions {
+		float:left;
+		margin-top:0.9375em; /* 15/16 */
+	}
+
+	.new-post {
+		margin:1.875em; /* 30/16 */
 	}
 </style>

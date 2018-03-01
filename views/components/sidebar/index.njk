@@ -30,21 +30,28 @@
 	</div>
 
 	<div class="recent-posts-widget">
-		{% query 'topics', {}, {sort: [['date', -1]], limit: 5}, 'topics' %}
+		{% query 'topics', {}, {sort: [['date', -1]]}, 'topics' %}
 
 		<h3>Recent Posts</h3>
 		<ul>
+			{% set i = 0 %}
 			{% for topic in topics %}
-				{% lookup 'users', {_id: topic.author}, 'author' %}
-				{% lookup 'forums', {_id: topic.parent}, 'parent' %}
+				{% if i < 5 %}
+					{% lookup 'users', {_id: topic.author}, 'author' %}
+					{% lookup 'forums', {_id: topic.parent}, 'forum' %}
+					{% lookup 'categories', {_id: forum.category}, 'category' %}
 
-				<li>
-					<a onclick="crpGetPage('/forums/{{parent.slug}}/{{topic._id}}')">{{topic.title}}</a>
-					by
-					<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-					<br />
-					{{crp.moment(topic.date).fromNow()}}
-				</li>
+					{% if not category.role or category.role == user.role or user.role == 'administrator' %}
+						<li>
+							<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a>
+							by
+							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+							<br />
+							{{crp.moment(topic.date).fromNow()}}
+						</li>
+						{% set i = i + 1 %}
+					{% endif %}
+				{% endif %}
 			{% endfor %}
 		</ul>
 	</div>

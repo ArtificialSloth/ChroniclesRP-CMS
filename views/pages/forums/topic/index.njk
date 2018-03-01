@@ -1,70 +1,81 @@
-<ul class="topic">
-	{% include "./style.njk" %}
-	{% lookup 'topics', {_id: topicid}, 'topic' %}
-	{% lookup 'users', {_id: topic.author}, 'author' %}
-	{% lookup 'users', {_id: userid}, 'user' %}
+<div class="page">
+	<ul class="topic">
+		{% include "./style.njk" %}
 
-	<li class="header">
-		<ul>
-			<li>Author</li>
-			<li>{{topic.title}}</li>
-		</ul>
-	</li>
+		{% lookup 'topics', {_id: topicid}, 'topic' %}
+		{% lookup 'forums', {_id: topic.parent}, 'forum' %}
+		{% lookup 'categories', {_id: forum.category}, 'category' %}
+		{% lookup 'users', {_id: topic.author}, 'author' %}
+		{% lookup 'users', {_id: userid}, 'user' %}
 
-	<li class="sub-header">
-		<ul>
-			<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
-			<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
-		</ul>
-	</li>
-
-	<li class="body">
-		<ul>
-			<li>
-				<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
-				<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-				<div class="role">{{author.role.replace('_', ' ')}}</div>
+		{% if not category.role or category.role == user.role or user.role == 'administrator' %}
+			<li class="header">
+				<ul>
+					<li>Author</li>
+					<li>{{topic.title}}</li>
+				</ul>
 			</li>
-			<li>{{topic.content | safe}}</li>
-		</ul>
-	</li>
 
-	{% query 'replies', {parent: topic._id}, {sort: [['date', 1]]}, 'replies' %}
-	{% for reply in replies %}
-		{% lookup 'users', {_id: reply.author}, 'author' %}
+			<li class="sub-header">
+				<ul>
+					<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
+					<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+				</ul>
+			</li>
 
-		<li class="sub-header reply">
-			<ul>
-				<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>
-				<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
-			</ul>
-		</li>
-		<li class="reply body">
-			<ul>
-				<li>
+			<li class="body">
+				<ul>
+					<li>
+						<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
+						<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+						<div class="role">{{author.role.replace('_', ' ')}}</div>
+					</li>
+					<li>{{topic.content | safe}}</li>
+				</ul>
+			</li>
 
-					<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
-					<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-					<div class="role">{{author.role.replace('_', ' ')}}</div>
+			{% query 'replies', {parent: topic._id}, {sort: [['date', 1]]}, 'replies' %}
+			{% for reply in replies %}
+				{% lookup 'users', {_id: reply.author}, 'author' %}
+
+				<li class="sub-header reply">
+					<ul>
+						<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>
+						<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+					</ul>
 				</li>
-				<li>{{reply.content | safe}}</li>
-			</ul>
-		</li>
-	{% endfor %}
+				<li class="reply body">
+					<ul>
+						<li>
 
-	{% if user and user.role != 'pending' %}
-		<script>crpTinyMCE()</script>
-		<fieldset class="new-post">
-			<legend>Reply to: {{topic.title}}</legend>
-			<form>
-				<textarea name="reply" class="reply tinymce"></textarea>
+							<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
+							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+							<div class="role">{{author.role.replace('_', ' ')}}</div>
+						</li>
+						<li>{{reply.content | safe}}</li>
+					</ul>
+				</li>
+			{% endfor %}
 
-				<input type="hidden" name="parent" class="parent" value="{{topic._id}}" />
-				<input type="submit" value="Post" />
-				<span class="reply-error"></span>
-			</form>
-		</fieldset>
-	{% endif %}
+			{% if user and user.role != 'pending' %}
+				<script>crpTinyMCE()</script>
+				<fieldset class="new-post">
+					<legend>Reply to: {{topic.title}}</legend>
+					<form>
+						<textarea name="reply" class="reply tinymce"></textarea>
 
-	{% include "./script.njk" %}
-</ul>
+						<input type="hidden" name="parent" class="parent" value="{{topic._id}}" />
+						<input type="submit" value="Post" />
+						<span class="reply-error"></span>
+					</form>
+				</fieldset>
+			{% endif %}
+
+			{% include "./script.njk" %}
+		{% else %}
+			You're not allowed to view this topic.
+		{% endif %}
+	</ul>
+
+	{% include "components/sidebar/index.njk" %}
+</div>
