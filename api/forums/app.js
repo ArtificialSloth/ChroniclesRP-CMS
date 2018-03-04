@@ -132,7 +132,9 @@ module.exports = (crp, callback) => {
 				author: crp.db.objectID(req.body.reply_author),
 				content: req.body.reply_body,
 				date: Date.parse(req.body.reply_date),
-				parent: req.body.reply_parent
+				parent: req.body.reply_parent,
+				likes: parseInt(req.body.reply_likes),
+				dislikes: parseInt(req.body.reply_dislikes)
 			};
 
 			crp.util.addReply(replyData, (err, result) => {
@@ -154,7 +156,9 @@ module.exports = (crp, callback) => {
 
 				var replyData = {
 					author: crp.db.objectID(req.body.reply_author),
-					content: req.body.reply_body
+					content: req.body.reply_body,
+					likes: parseInt(req.body.reply_likes),
+					dislikes: parseInt(req.body.reply_dislikes)
 				};
 
 				crp.util.setReplyData(reply._id, replyData, (err, result) => {

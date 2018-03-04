@@ -133,6 +133,9 @@ module.exports = (crp, callback) => {
 				newReply.content = data.content;
 			}
 
+			if (data.likes !== undefined && data.likes != newReply.likes) newReply.likes = data.likes;
+			if (data.dislikes !== undefined && data.dislikes != newReply.dislikes) newReply.dislikes = data.dislikes;
+
 			newReply = crp.util.sanitizeObject(newReply);
 			crp.db.replaceOne('replies', {_id: reply._id}, newReply, (err, result) => {
 				cb(err, newReply);
@@ -145,7 +148,9 @@ module.exports = (crp, callback) => {
 			author: data.author,
 			content: data.content,
 			date: data.date || Date.now(),
-			parent: data.parent
+			parent: data.parent,
+			likes: data.likes || 0,
+			dislikes: data.dislikes || 0
 		};
 
 		crp.util.getUserData(reply.author, (err, user) => {
