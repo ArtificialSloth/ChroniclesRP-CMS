@@ -63,7 +63,7 @@
 	</ul>
 
 	{% if user.role == "pending" %}
-		<div class="activate">
+		<div class="warning">
 			<span>You're not done! You need to use the code we sent to you're email address to activate you're account and complete the registration process.</span>
 
 			<div>
@@ -72,12 +72,12 @@
 			</div>
 		</div>
 	{% elseif user.new_email and user.new_email != user.email %}
-		<div class="activate">
+		<div class="warning">
 			<span>Validate you new email using the code we sent to {{user.new_email}}.</span>
 
 			<div>
 				<input type="text" name="activation_code" class="activation_code" maxlength="6" placeholder="ACTIVATION CODE" />
-				<button onclick="crpActivateUser($('.activation_code').val())">Activate</button>
+				<button onclick="crpActivateUser($('.activation_code').val())">Validate</button>
 			</div>
 		</div>
 	{% endif %}

@@ -51,7 +51,7 @@
 					</li>
 				{% endfor %}
 			{% else %}
-				This forum has no topics.
+				<div class="warning">This forum has no topics.</div>
 			{% endif %}
 
 			{% if user and user.role != 'pending' %}
@@ -81,7 +81,7 @@
 
 			{% include "./script.njk" %}
 		{% else %}
-			You're not allowed to view this forum.
+			<div class="warning">You're not allowed to view this forum.</div>
 		{% endif %}
 	</ul>
 
