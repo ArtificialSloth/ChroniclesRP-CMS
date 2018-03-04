@@ -3,6 +3,12 @@
 		{% include "./style.njk" %}
 		{% lookup 'users', {_id: userid}, 'user' %}
 
+		<p class="breadcrumbs">
+			<a onclick="crpGetPage('/')">Home</a>
+			<span>›</span>
+			<span>Index</span>
+		</p>
+
 		{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
 		{% for category in categories %}
 			{% if not category.role or category.role == user.role or user.role == 'administrator' %}

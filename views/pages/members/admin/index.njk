@@ -6,7 +6,7 @@
 {% set members = crp.util.filterObjectArray(users, {role: 'member'}) %}
 {% set pendings = crp.util.filterObjectArray(users, {role: 'pending'}) %}
 
-<ul class="users-menu">
+<ul class="users-menu noselect">
 	<li class="filter all active" onclick="usersToggleRoleFilter(this, 'all')">All ({{users.length}})</li>
 
 	{% if administrators.length > 0 %}

@@ -7,6 +7,14 @@
 		{% lookup 'categories', {_id: forum.category}, 'category' %}
 		{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
 
+		<p class="breadcrumbs">
+			<a onclick="crpGetPage('/')">Home</a>
+			<span>›</span>
+			<a onclick="crpGetPage('/forums')">Index</a>
+			<span>›</span>
+			<span>{{forum.name}}</span>
+		</p>
+
 		{% if not category.role or category.role == user.role or user.role == 'administrator' %}
 			{% if topics.length != 0 %}
 				<li class="header">

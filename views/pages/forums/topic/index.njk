@@ -8,6 +8,16 @@
 		{% lookup 'users', {_id: topic.author}, 'author' %}
 		{% lookup 'users', {_id: userid}, 'user' %}
 
+		<p class="breadcrumbs">
+			<a onclick="crpGetPage('/')">Home</a>
+			<span>›</span>
+			<a onclick="crpGetPage('/forums')">Index</a>
+			<span>›</span>
+			<a onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
+			<span>›</span>
+			<span>{{topic.title}}</span>
+		</p>
+
 		{% if not category.role or category.role == user.role or user.role == 'administrator' %}
 			<li class="header">
 				<ul>

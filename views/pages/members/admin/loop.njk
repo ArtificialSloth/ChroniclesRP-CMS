@@ -1,4 +1,4 @@
-<ul class="{{user._id}} {% if user.locked %}locked{% endif %}" onclick="$(this).next().toggleClass('active')">
+<ul class="{{user._id}} {% if user.locked %}locked{% endif %} noselect" onclick="$(this).next().toggleClass('active')">
 	<li class="login">{{user.login}}</li>
 	<li class="email">{{user.email}}</li>
 	<li class="role">{{user.role}}</li>
