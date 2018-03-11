@@ -1,0 +1,76 @@
+<style>
+	.chapters {
+		width:75%;
+	}
+
+	.chapters li {
+		list-style-type:none;
+	}
+
+	.chapters .header {
+		display:flex;
+	}
+
+	.chapters .header li {
+		background-color:{{css.colors.primary}};
+		font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
+		list-style-type:none;
+		padding:0.375em 1.25em; /* 6/16 */ /* 20/16 */
+		margin-right:0.0625em; /* 1/16 */
+		transition:all 0.2s ease-in-out;
+	}
+
+	.chapters .header li:hover,
+	.chapters .header li.active {
+		background-color:{{css.colors.header}};
+		cursor:pointer;
+	}
+
+	.chapters .sub-header {
+		background-color:{{css.colors.header}};
+		display:flex;
+		height:2.375em;
+	}
+
+	.chapters .sub-header li {
+		border-right:1px solid {{css.colors.bg}};
+		padding:10px;
+		transition:all 0.2s ease-in-out;
+	}
+
+	.chapters .sub-header li:hover {
+		background-color:{{css.colors.primary}};
+		cursor:pointer;
+	}
+
+	.chapters .all .chapter {
+		border-bottom:1px solid #EAEAEA;
+		padding:15px 0;
+	}
+
+	.chapters .all .chapter ul {
+		display:flex;
+		flex-wrap:wrap;
+		justify-content:left;
+	}
+
+	.chapters .all .chapter ul li:first-child {
+		margin-right:10px;
+	}
+
+	.chapters .all .chapter ul li:last-child {
+		flex-basis:100%;
+		margin-top:10px;
+	}
+
+	.chapters .all .chapter ul li img {
+		height:50px;
+		width:50px;
+	}
+
+	.chapters .all .chapter ul li p {
+		color:#767676;
+		font-size:12px;
+		margin-top:10px;
+	}
+</style>

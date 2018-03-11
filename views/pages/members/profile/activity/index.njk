@@ -21,12 +21,12 @@
 						<a onclick="crpGetPage('/forums/{{parent.slug}}')">{{parent.name}}</a>
 						{{crp.moment(activity.date).fromNow()}}
 
-						<blockquote>
+						<div>
 							{{activity.content | safe | truncate}}
 							{% if activity.content.length > 255 %}
 								<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
 							{% endif %}
-						</blockquote>
+						</div>
 					</li>
 				</ul>
 			</li>
@@ -44,12 +44,12 @@
 							<a onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
 							{{crp.moment(activity.date).fromNow()}}
 
-							<blockquote>
+							<div>
 								{{activity.content | safe | truncate}}
 								{% if activity.content.length > 255 %}
 									<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
 								{% endif %}
-							</blockquote>
+							</div>
 						</li>
 					</ul>
 				</li>

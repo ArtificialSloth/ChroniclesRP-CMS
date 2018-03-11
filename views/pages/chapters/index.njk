@@ -1,0 +1,40 @@
+<div class="page">
+	{% include "./style.njk" %}
+	{% lookup 'users', {_id: userid}, 'user' %}
+	{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+	{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
+
+	<div class="chapters">
+		<ul class="header noselect">
+			<li class="active">All Chapters</li>
+
+			{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+				<li>Create a Chapter</li>
+			{% endif %}
+		</ul>
+
+		<ul class="sub-header noselect">
+			{% for game in games %}
+				<li onclick="crpGetPage('/chapters/{{game.slug}}')">{{game.name}}</li>
+			{% endfor %}
+		</ul>
+
+		<ul class="all active">
+			{% for chapter in chapters %}
+				{% set game = crp.util.findObjectInArray(games, '_id', chapter.game.toString()) %}
+				<li class="chapter">
+					<ul>
+						<li><img src="{{chapter.img.icon or '/img/chapters/icon.png'}}" /></li>
+						<li>
+							<a onclick="crpGetPage('/chapters/{{chapter.slug}}')">{{chapter.name}}</a>
+							<p>{{chapter.desc}}</p>
+						</li>
+						<li>Game: <a onclick="crpGetPage('/chapter/{{game.slug}}')">{{game.name}}</a></li>
+					</ul>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+	{% include "components/sidebar/index.njk" %}
+</div>
