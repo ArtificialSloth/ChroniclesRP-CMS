@@ -1,0 +1,62 @@
+{% include "./style.njk" %}
+{% lookup 'users', {_id: userid}, 'user' %}
+
+<ul class="header noselect">
+	<li onclick="crpGetSubPage('/chapters', '.chapters', true)">All Chapters</li>
+
+	{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+		<li class="active" onclick="crpGetSubPage('/chapters/create', '.chapters', true)">Create a Chapter</li>
+	{% endif %}
+</ul>
+
+<form class="add-chapter multistep">
+	<div class="header">type</div>
+
+	<ul class="steps">
+		<li class="step types active">
+			<div class="radio">
+				<div class="option">
+					<input type="radio" name="type" value="hosted" />
+					<label for="type" onclick="labelClick(this)">
+						<h1>Hosted Website</h1>
+						<span>Your Chapter's website will be set up and hosted on our servers giving you the freedom to design and build your site just as you would with any common web host. Except ours is completely free!</span>
+					</label>
+				</div>
+
+				<div class="option disabled">
+					<input type="radio" name="type" value="group" disabled />
+					<label for="type" onclick="labelClick(this)">
+						<h1>Chapter Group</h1>
+						<span>Your Chapter will be set up as a group on the main Chronicles site allowing you to add users to your Chapter and giving your Chapter its own private members only forum.</span>
+					</label>
+				</div>
+
+				<div class="option disabled">
+					<input type="radio" name="type" value="page" disabled />
+					<label for="type" onclick="labelClick(this)">
+						<h1>Single Page</h1>
+						<span>Your Chapter will be displayed as a single page on the main Chronicles site.</span>
+					</label>
+				</div>
+
+				<div class="option disabled">
+					<input type="radio" name="type" value="url" disabled />
+					<label for="type" onclick="labelClick(this)">
+						<h1>Outside URL</h1>
+						<span>Already have a website? Choosing this option will make all references to your Chapter point to the URL you provide here.</span>
+					</label>
+				</div>
+			</div>
+		</li>
+
+		{% include "./hosted/index.njk" %}
+	</ul>
+
+	<div class="nav noselect">
+		<span class="previous disabled" onclick="multistepPrev(this)">&#10094;</span>
+		<span class="next disabled" onclick="multistepNext(this)">&#10095;</span>
+		<span class="submit hidden" onclick="$(this).submit()">Create Chapter</span>
+	</div>
+
+	{% include "./script.njk" %}
+</form>

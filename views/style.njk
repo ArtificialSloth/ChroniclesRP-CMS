@@ -157,6 +157,10 @@
 		visibility:initial;
 	}
 
+	.hidden {
+		display:none !important;
+	}
+
 	.standard-form {
 		overflow:hidden;
 	}
@@ -207,6 +211,79 @@
 	.standard-form input[type=submit] {
 		float:right;
 		margin:1.875em 0; /* 30/16 */
+	}
+
+	.multistep {
+		overflow-x:hidden;
+	}
+
+	.multistep .header {
+		background-color:{{css.colors.header}};
+		margin-bottom:1px;
+		padding:8px 20px;
+	}
+
+	.multistep .steps {
+		display:flex;
+		left:0px;
+		position:relative;
+		transition:left 0.5s ease-in-out;
+	}
+
+	.multistep .steps .step {
+		display:none;
+		flex-basis:100%;
+		flex-shrink:0;
+	}
+
+	.multistep .steps .step.active {
+		display:initial;
+	}
+
+	.multistep .nav {
+		background-color:{{css.colors.header}};
+	}
+
+	.multistep .nav .previous,
+	.multistep .nav .next,
+	.multistep .nav .submit {
+		display:inline-block;
+		padding:6px 20px;
+		transition:all 0.2s ease-in-out;
+	}
+
+	.multistep .nav .previous:hover:not(.disabled),
+	.multistep .nav .next:hover:not(.disabled),
+	.multistep .nav .submit:hover {
+		background-color:{{css.colors.primary}};
+		cursor:pointer;
+	}
+
+	.multistep .nav .previous.disabled,
+	.multistep .nav .next.disabled {
+		color:#888;
+	}
+
+	.multistep .nav .previous {
+		border-right:1px solid {{css.colors.bg}};
+	}
+
+	.multistep .nav .next,
+	.multistep .nav .submit {
+		border-left:1px solid {{css.colors.bg}};
+		float:right;
+	}
+
+	.multistep .nav .submit {
+		padding:8px 20px;
+	}
+
+	.radio .option:not(.disabled) label:hover {
+		cursor:pointer;
+	}
+
+	.radio .option.disabled label {
+		color:#888;
 	}
 
 	.new-post {

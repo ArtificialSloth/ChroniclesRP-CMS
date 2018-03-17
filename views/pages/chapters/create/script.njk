@@ -1,0 +1,20 @@
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+	$('.add-chapter .types input').change((e) => {
+		if (e.target.checked) {
+			if (e.target.value == 'hosted') {
+				$('.add-chapter .cms').removeClass('disabled');
+				$('.add-chapter .nav .next').removeClass('disabled');
+				multistepNext($('.add-chapter .nav .next'));
+				$('.add-chapter .header').html('type › hosted');
+			}
+		}
+	});
+
+	$('.add-chapter').submit((e) => {
+		var formData = $(e.target).serialize();
+		crpAjax('/api/add-chapter', formData, (res) => {
+			console.log(res);
+		});
+	});
+</script>

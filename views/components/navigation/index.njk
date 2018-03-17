@@ -40,6 +40,12 @@
 						{% endfor %}
 					</li>
 				{% endfor %}
+
+				{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+					<li class="menu-item">
+						<a onclick="crpGetPage('/chapters/create')">Create a Chapter</a>
+					</li>
+				{% endif %}
 			</ul>
 		</li>
 

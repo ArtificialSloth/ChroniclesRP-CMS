@@ -1,0 +1,64 @@
+{% include "./style.njk" %}
+
+<li class="step hosted cms disabled">
+	<div class="radio noselect">
+		<div class="option">
+			<input type="radio" name="cms" value="wordpress" />
+			<label for="cms" onclick="labelClick(this)">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/WordPress_blue_logo.svg/1200px-WordPress_blue_logo.svg.png" />
+				<h1>Wordpress</h1>
+				<a href="https://wordpress.org/" target="_blank">[More Info]</a>
+			</label>
+		</div>
+
+		<div class="option">
+			<input type="radio" name="cms" value="drupal" />
+			<label for="cms" onclick="labelClick(this)">
+				<img src="http://adilserv.com/wp-content/uploads/2017/03/druplicon_sphism_2015_1.png" />
+				<h1>Drupal</h1>
+				<a href="https://www.drupal.org/" target="_blank">[More Info]</a>
+			</label>
+		</div>
+
+		<div class="option">
+			<input type="radio" name="cms" value="joomla" />
+			<label for="cms" onclick="labelClick(this)">
+				<img src="https://docs.joomla.org/images/0/02/Joomla-flat-logo-en.png" />
+				<h1>Joomla</h1>
+				<a href="https://www.joomla.org/" target="_blank">[More Info]</a>
+			</label>
+		</div>
+
+		<div class="option">
+			<input type="radio" name="cms" value="phpbb" />
+			<label for="cms" onclick="labelClick(this)">
+				<img src="https://www.phpbb.com/assets/images/images/logos/blue/125x125.png" />
+				<h1>phpBB</h1>
+				<a href="https://www.phpbb.com/" target="_blank">[More Info]</a>
+			</label>
+		</div>
+	</div>
+</li>
+
+<li class="step final hosted disabled">
+	<div class="standard-form">
+		<label for="name" required>Chapter Name</label>
+		<div class="standard-input">
+			<input type="text" name="name" value="">
+			<span class="input-error"></span>
+		</div>
+
+		<label for="slug" required>Domain</label>
+		<div class="standard-input">
+			<input type="text" name="slug" value=""> .chroniclesrp.com
+			<span class="input-error"></span>
+		</div>
+
+		<div class="standard-input captcha">
+			<div class="g-recaptcha" data-sitekey="6Lf0MT8UAAAAAJ48jzvBm-QGZpB0Fer8WsGpguMS"></div>
+			<span class="input-error"></span>
+		</div>
+	</div>
+</li>
+
+{% include "./script.njk" %}

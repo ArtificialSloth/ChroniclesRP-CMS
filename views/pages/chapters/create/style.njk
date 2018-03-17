@@ -1,0 +1,60 @@
+<style>
+	.add-chapter .option label h1 {
+		font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
+		font-size:17px;
+	}
+
+	.add-chapter .standard-form {
+		display:flex;
+		flex-wrap:wrap;
+	}
+
+	.add-chapter .standard-form label,
+	.add-chapter .standard-form .standard-input {
+		flex-basis:50%;
+		margin:0 0 1px 0;
+	}
+
+	.add-chapter .standard-form label {
+		border-right:1px solid {{css.colors.bg}};
+	}
+
+	.add-chapter .standard-form .captcha {
+		flex-basis:100%;
+	}
+
+	.add-chapter .types input[type=radio] {
+		display:none;
+	}
+
+	.add-chapter .types .option label {
+		display:block;
+		background-color:{{css.colors.primary}};
+		margin-bottom:1px;
+		padding:15px;
+		transition:all 0.2s ease-in-out;
+	}
+
+	.add-chapter .types .option:not(.disabled) label:hover {
+		background-color:{{css.colors.header}};
+	}
+
+	.add-chapter .types .option label h1 {
+		margin-left:15px;
+	}
+
+	.add-chapter .types .option label span {
+		color:#BCBCBC;
+		display:block;
+		font-size:13px;
+		margin:10px 0 10px 30px;
+	}
+
+	.add-chapter .option.disabled label h1 {
+		color:#888;
+	}
+
+	.add-chapter .types .option.disabled label span {
+		color:#666;
+	}
+</style>
