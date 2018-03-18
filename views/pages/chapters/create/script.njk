@@ -12,9 +12,18 @@
 	});
 
 	$('.add-chapter').submit((e) => {
+		e.preventDefault();
+		$('.add-chapter .error').removeClass('active');
+
 		var formData = $(e.target).serialize();
 		crpAjax('/api/add-chapter', formData, (res) => {
-			console.log(res);
+			if (res._id) {
+				if (res.type == 'group' || res.type == 'page') return crpGetPage('/chapters/' + res.slug);
+
+				window.location = res.slug;
+			} else {
+				$('.add-chapter .error').addClass('active').html(res);
+			}
 		});
 	});
 </script>

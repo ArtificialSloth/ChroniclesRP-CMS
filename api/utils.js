@@ -51,6 +51,10 @@ module.exports = (crp, callback) => {
 		return str;
 	};
 
+	crp.util.urlSafe = (str) => {
+		return str.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+	};
+
 	crp.util.dateToStr = (date, tz) => {
 		return crp.moment(date).tz(tz || 'America/New_York').format('LLL');
 	};

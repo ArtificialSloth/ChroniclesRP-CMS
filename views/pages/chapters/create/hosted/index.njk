@@ -45,18 +45,36 @@
 		<label for="name" required>Chapter Name</label>
 		<div class="standard-input">
 			<input type="text" name="name" value="">
-			<span class="input-error"></span>
 		</div>
 
-		<label for="slug" required>Domain</label>
+		<label for="slug">Domain</label>
 		<div class="standard-input">
 			<input type="text" name="slug" value=""> .chroniclesrp.com
-			<span class="input-error"></span>
+		</div>
+
+		<label for="game" required>Game</label>
+		<div class="standard-input">
+			{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
+
+			<select name="game">
+				{% for game in games %}
+					<option value="{{game._id}}">{{game.name}}</option>
+				{% endfor %}
+			</select>
+		</div>
+
+		<label for="desc">Description</label>
+		<div class="standard-input">
+			<input type="text" name="desc" value="">
+		</div>
+
+		<label for="discord">Discord ID</label>
+		<div class="standard-input">
+			<input type="text" name="discord" value="">
 		</div>
 
 		<div class="standard-input captcha">
 			<div class="g-recaptcha" data-sitekey="6Lf0MT8UAAAAAJ48jzvBm-QGZpB0Fer8WsGpguMS"></div>
-			<span class="input-error"></span>
 		</div>
 	</div>
 </li>

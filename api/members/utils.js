@@ -39,7 +39,7 @@ module.exports = (crp, callback) => {
 			email: user.email,
 			register_date: user.register_date || Date.now(),
 			display_name: user.display_name || user.login,
-			nicename: user.nicename || user.login.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+			nicename: user.nicename || crp.util.urlSafe(user.login),
 			role: user.role || 'pending',
 			locked: user.locked || false,
 			timezone: user.timezone || crp.moment.tz.guess(),
@@ -79,7 +79,7 @@ module.exports = (crp, callback) => {
 					if (users.length > 0) return cb(null, 'loginTaken');
 
 					newUser.login = data.login;
-					newUser.nicename = newUser.login.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+					newUser.nicename = crp.util.urlSafe(newUser.login);
 				}
 
 				if (data.email && data.email != user.email) {

@@ -55,7 +55,8 @@
 	<div class="nav noselect">
 		<span class="previous disabled" onclick="multistepPrev(this)">&#10094;</span>
 		<span class="next disabled" onclick="multistepNext(this)">&#10095;</span>
-		<span class="submit hidden" onclick="$(this).submit()">Create Chapter</span>
+		<span class="submit hidden" onclick="$(this).parents('.add-chapter').submit()">Create Chapter</span>
+		<span class='error'></span>
 	</div>
 
 	{% include "./script.njk" %}
