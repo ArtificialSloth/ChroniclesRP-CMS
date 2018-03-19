@@ -62,7 +62,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.newNginxVHost = (name, slug, cb) => {
-		crp.fs.readFile(crp.ROOT + '/templates/site', 'utf8', (err, data) => {
+		crp.fs.readFile(crp.ROOT + '/deploy/nginx/site', 'utf8', (err, data) => {
 			if (err) return cb(err);
 			var site = crp.util.parseString(data, [
 				['NICENAME', name],
@@ -76,7 +76,7 @@ module.exports = (crp, callback) => {
 					if (err) return cb(err);
 
 					crp.cmd.run('systemctl reload nginx');
-					crp.fs.readFile(crp.ROOT + '/templates/pool.conf', 'utf8', (err, data) => {
+					crp.fs.readFile(crp.ROOT + '/deploy/php-fpm/pool.conf', 'utf8', (err, data) => {
 						if (err) return cb(err);
 						var pool = crp.util.parseString(data, [['NICENAME', name]]);
 
@@ -93,24 +93,10 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.deployWordpress = (chapter, user, cb) => {
-		var nicename = crp.util.urlSafe(chapter.name);
-
-		crp.util.newNginxVHost(nicename, chapter.slug, (err) => {
+		crp.util.newNginxVHost(crp.util.urlSafe(chapter.name), chapter.slug, (err) => {
 			if (err) return cb(err);
 
-			crp.cmd.get('wget http://wordpress.org/latest.tar.gz -O /var/www/' + nicename + '/latest.tar.gz', (err) => {
-				if (err) return cb(err);
-
-				crp.cmd.get('tar xzvf /var/www/' + nicename + '/latest.tar.gz /var/www/' + nicename, (err) => {
-					if (err) return cb(err);
-
-					crp.cmd.get('mv /var/www/' + nicename + '/wordpress/* /var/www/' + nicename, (err) => {
-						if (err) return cb(err);
-
-						crp.cmd.get('rm -R /var/www/' + nicename + '/wordpress', cb);
-					});
-				});
-			});
+			crp.cmd.get(crp.ROOT + '/deploy/wordpress/deploy.sh ' + crp.util.urlSafe(chapter.name), cb);
 		});
 	};
 
