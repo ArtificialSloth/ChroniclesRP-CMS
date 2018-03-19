@@ -7,6 +7,7 @@ async.waterfall([
 			PUBLICDIR: __dirname + '/public',
 			async: async,
 			fs: require('fs'),
+			cmd: require('node-cmd'),
 			nunjucks: require('nunjucks'),
 			moment: require('moment-timezone'),
 			browserRefresh: process.env.BROWSER_REFRESH_URL,
