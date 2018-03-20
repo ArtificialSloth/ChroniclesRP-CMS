@@ -62,41 +62,18 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.newNginxVHost = (name, slug, cb) => {
-		crp.fs.readFile(crp.ROOT + '/deploy/nginx/site', 'utf8', (err, data) => {
+		crp.cmd.get('bash ' + crp.ROOT + '/deploy/nginx/deploy.sh php ' + name + ' ' + slug, (err) => {
 			if (err) return cb(err);
-			var site = crp.util.parseString(data, [
-				['NICENAME', name],
-				['SLUG', slug]
-			]);
 
-			crp.fs.writeFile('/etc/nginx/sites-available/' + name, site, (err) => {
-				if (err) return cb(err);
-
-				crp.fs.symlink('/etc/nginx/sites-available/' + name, '/etc/nginx/sites-enabled/' + name, (err) => {
-					if (err) return cb(err);
-
-					crp.cmd.run('systemctl reload nginx');
-					crp.fs.readFile(crp.ROOT + '/deploy/php-fpm/pool.conf', 'utf8', (err, data) => {
-						if (err) return cb(err);
-						var pool = crp.util.parseString(data, [['NICENAME', name]]);
-
-						crp.fs.writeFile('/etc/php/7.0/fpm/pool.d/' + name + '.conf', pool, (err) => {
-							if (err) return cb(err);
-
-							crp.cmd.run('systemctl reload php7.0-fpm');
-							cb();
-						});
-					});
-				});
-			});
+			crp.cmd.get('bash ' + crp.ROOT + '/deploy/php-fpm/deploy.sh ' + name, cb);
 		});
 	};
 
 	crp.util.deployWordpress = (chapter, user, cb) => {
-		crp.util.newNginxVHost(crp.util.urlSafe(chapter.name), chapter.slug, (err) => {
+		crp.util.newNginxVHost(crp.util.urlSafe(chapter.name), chapter.slug.replace('https://', ''), (err) => {
 			if (err) return cb(err);
 
-			crp.cmd.get(crp.ROOT + '/deploy/wordpress/deploy.sh ' + crp.util.urlSafe(chapter.name), cb);
+			crp.cmd.get('bash ' + crp.ROOT + '/deploy/wordpress/deploy.sh ' + crp.util.urlSafe(chapter.name), cb);
 		});
 	};
 

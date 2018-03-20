@@ -1,3 +1,6 @@
+#!/bin/bash
+
+mkdir /var/www/$1
 cd /var/www/$1
 wget http://wordpress.org/latest.tar.gz
 
