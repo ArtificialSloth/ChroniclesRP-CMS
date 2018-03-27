@@ -2,7 +2,7 @@
 
 groupadd crp
 useradd -m -g crp crp
-echo 'crp ALL=(ALL)	NOPASSWD: /bin/systemctl reload nginx, /bin/systemctl reload php7.0-fpm, /usr/bin/npm, /usr/bin/pm2' >> /etc/sudoers
+echo 'crp ALL=(ALL)	NOPASSWD: /bin/systemctl reload nginx, /bin/systemctl reload php7.0-fpm, /bin/mysql, /usr/bin/npm, /usr/bin/pm2' >> /etc/sudoers
 
 apt-get update && apt-get upgrade -y
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
