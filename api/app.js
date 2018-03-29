@@ -2,6 +2,12 @@ module.exports = (crp, callback) => {
 	crp.express = require('express');
 	crp.express.app = crp.express();
 
+	crp.proxy = require('redbird')({
+		port: 80,
+		xfwd: false
+	});
+
+	crp.nunjucks = require('nunjucks');
 	crp.nunjucks.configure('views', {
 		express: crp.express.app
 	}).addExtension('query', new function() {
