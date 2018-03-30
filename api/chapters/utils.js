@@ -61,20 +61,8 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.newNginxVHost = (name, slug, cb) => {
-		crp.cmd.get('bash ' + crp.ROOT + '/deploy/nginx/deploy.sh php ' + name + ' ' + slug, (err) => {
-			if (err) return cb(err);
-
-			crp.cmd.get('bash ' + crp.ROOT + '/deploy/php-fpm/deploy.sh ' + name, cb);
-		});
-	};
-
 	crp.util.deployWordpress = (chapter, user, cb) => {
-		crp.util.newNginxVHost(crp.util.urlSafe(chapter.name), chapter.slug.replace('https://', ''), (err) => {
-			if (err) return cb(err);
-
-			crp.cmd.get('bash ' + crp.ROOT + '/deploy/wordpress/deploy.sh ' + crp.util.urlSafe(chapter.name), cb);
-		});
+		crp.cmd.get('bash ' + crp.ROOT + '/deploy/wordpress/deploy.sh ' + crp.util.urlSafe(chapter.name), cb);
 	};
 
 	crp.util.deployChapter = (cms, chapter, user, cb) => {
