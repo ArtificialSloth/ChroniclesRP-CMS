@@ -1,6 +1,6 @@
 <?php
-define('DB_NAME', 'NICENAME');
-define('DB_USER', 'NICENAME');
+define('DB_NAME', 'SNAME');
+define('DB_USER', 'SNAME');
 define('DB_PASSWORD', 'PASS');
 define('DB_HOST', 'localhost');
 define('DB_CHARSET', 'utf8');
@@ -8,7 +8,7 @@ define('DB_COLLATE', '');
 
 SALT
 
-$table_prefix  = 'wp_';
+$table_prefix  = 'SNAME_';
 
 define('WP_DEBUG', false);
 define('FS_METHOD', 'direct');

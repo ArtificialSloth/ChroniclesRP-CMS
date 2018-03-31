@@ -4,7 +4,7 @@ module.exports = (crp, callback) => {
 
 	crp.proxy = require('redbird')({
 		port: 80,
-		xfwd: false
+		bunyan: false
 	});
 
 	crp.nunjucks = require('nunjucks');

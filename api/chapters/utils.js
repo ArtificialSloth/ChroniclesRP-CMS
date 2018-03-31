@@ -25,6 +25,8 @@ module.exports = (crp, callback) => {
 				if (!types.includes(chapter.type)) return cb(null, 'noType');
 
 				if (!chapter.name) return cb(null, 'noName');
+
+				if (chapter.slug == 'www') return cb(null, 'badDomain');
 				if (chapter.type == 'hosted') chapter.slug = 'https://' + chapter.slug + '.chroniclesrp.com';
 
 				if (data.user) {
@@ -62,14 +64,19 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.deployWordpress = (chapter, user, cb) => {
-		crp.cmd.get('bash ' + crp.ROOT + '/deploy/wordpress/deploy.sh ' + crp.util.urlSafe(chapter.name), cb);
+		var sname = chapter.slug.match(/(?<=https?:\/\/)?.*(?=\..*\.com)/);
+		if (!sname[0]) return cb('badSlug');
+
+		crp.cmd.get('bash ' + crp.ROOT + '/deploy/wordpress/deploy.sh ' + sname[0], cb);
 	};
 
 	crp.util.deployChapter = (cms, chapter, user, cb) => {
-		if (cms == 'wordpress') {
-			crp.util.deployWordpress(chapter, user, cb);
-		} else {
-			cb();
+		switch (cms) {
+			case 'wordpress':
+				crp.util.deployWordpress(chapter, user, cb);
+				break;
+			default:
+				cb();
 		}
 	};
 
