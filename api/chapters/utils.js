@@ -64,8 +64,8 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.deployWordpress = (chapter, user, cb) => {
-		var sname = chapter.slug.match(/(?<=https?:\/\/)?.*(?=\..*\.com)/);
-		if (!sname[0]) return cb('badSlug');
+		var sname = chapter.slug.match(/(?<=https?:\/\/).*(?=\..*\.com)/);
+		if (!sname) return cb('badSlug');
 
 		crp.cmd.get('bash ' + crp.ROOT + '/deploy/wordpress/deploy.sh ' + sname[0], cb);
 	};
