@@ -24,10 +24,6 @@ process() {
 		DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 		FLUSH PRIVILEGES;
 _EOF_
-
-	npm i
-	npm i -g pm2
-	pm2 ecosystem
 }
 process > /dev/null &
 pid=$!
