@@ -7,7 +7,7 @@ async.waterfall([
 			PUBLICDIR: __dirname + '/public',
 			async: async,
 			fs: require('fs'),
-			cmd: require('node-cmd'),
+			cmd: require('child_process').exec,
 			moment: require('moment-timezone'),
 			browserRefresh: process.env.BROWSER_REFRESH_URL,
 			redis: require('redis').createClient(process.env.REDIS_URL)
@@ -37,9 +37,9 @@ async.waterfall([
 		crp.express.app.listen(process.env.PORT || 3000, () => {
 			if (process.send) process.send('online');
 
-			crp.proxy.register('chroniclesrp.com', '127.0.0.1:' + (process.env.PORT || 3000));
+			crp.proxy.register(process.env.DOMAIN, '127.0.0.1:' + (process.env.PORT || 3000));
 			crp.proxy.register('127.0.0.1', '127.0.0.1:' + (process.env.PORT || 3000));
-			crp.proxy.register('*.chroniclesrp.com', '127.0.0.1:8080');
+			crp.proxy.register('*.' + process.env.DOMAIN, '127.0.0.1:8080');
 			console.log('\nThe Chronicles RP is up and running!');
 		});
 	});

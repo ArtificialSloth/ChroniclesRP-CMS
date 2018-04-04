@@ -63,11 +63,52 @@ module.exports = (crp, callback) => {
 		});
 	};
 
+	crp.util.deployPHP = (sname, cb) => {
+		crp.fs.readFile(crp.ROOT + '/deploy/php-fpm/pool.conf', 'utf8', (err, data) => {
+			if (err) return cb(err);
+
+			var pool = crp.util.parseString(data, [['SNAME', sname]]);
+			crp.fs.writeFile('/etc/php/7.0/fpm/pool.d/' + sname + '.conf', pool, (err) => {
+				if (err) return cb(err);
+
+				crp.cmd('systemctl reload php7.0-fpm', cb);
+			});
+		});
+	};
+
 	crp.util.deployWordpress = (chapter, user, cb) => {
 		var sname = chapter.slug.match(/(?<=https?:\/\/).*(?=\..*\.com)/);
 		if (!sname) return cb('badSlug');
 
-		crp.cmd.get('bash ' + crp.ROOT + '/deploy/wordpress/deploy.sh ' + sname[0], cb);
+		crp.util.deployPHP(sname, (err) => {
+			if (err) return cb(err);
+
+			crp.cmd('wget http://wordpress.org/latest.tar.gz && tar xzvf latest.tar.gz', (err) => {
+				if (err) return cb(err);
+
+				crp.fs.rename('wordpress', '/var/www/' + sname, (err) => {
+					if (err) return cb(err);
+
+					crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
+						if (err) return cb(err);
+
+						crp.auth.crypto.randomBytes(32, (err, buf) => {
+							if (err) return cb(err);
+
+							var config = crp.util.parseString(data, [
+								['SNAME', sname],
+								['PASS', buf.toString('hex')]
+							]);
+							crp.fs.writeFile('/var/www/' + sname + '/wp-config.php', config, (err) => {
+								if (err) return cb(err);
+
+								crp.cmd('systemctl reload php7.0-fpm', cb);
+							});
+						});
+					});
+				});
+			});
+		});
 	};
 
 	crp.util.deployChapter = (cms, chapter, user, cb) => {
