@@ -40,9 +40,8 @@ module.exports = (crp, callback) => {
 					if (err) return cb(err);
 
 					if (chapter.type == 'hosted') {
-						crp.util.deployChapter(data.cms, chapter, data.user, (err, stdout, stderr) => {
+						crp.util.deployChapter(data.cms, chapter, data.user, (err) => {
 							if (err) return cb(err);
-							if (stderr) return cb(stderr);
 
 							cb(null, chapter);
 						});
@@ -85,31 +84,37 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (stderr) return cb(stderr);
 
-			crp.cmd('wget http://wordpress.org/latest.tar.gz && tar xzvf latest.tar.gz', (err, stdout, stderr) => {
-				if (err) return cb(err);
-				if (stderr) return cb(stderr);
+			crp.http.get('http://wordpress.org/latest.tar.gz', (res) => {
+				var file = fs.createWriteStream('/var/www/latest.tar.gz');
 
-				crp.fs.rename('wordpress', '/var/www/' + sname, (err) => {
-					if (err) return cb(err);
-
-					crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
+				res.pipe(file);
+				file.on('finish', () => {
+					crp.targz({src: '/var/www/latest.tar.gz', dest: '/var/www'}, (err) => {
 						if (err) return cb(err);
 
-						crp.auth.crypto.randomBytes(32, (err, buf) => {
+						crp.fs.unlink('/var/www/latest.tar.gz');
+						crp.fs.rename('/var/www/wordpress', '/var/www/' + sname, (err) => {
 							if (err) return cb(err);
 
-							var config = crp.util.parseString(data, [
-								['SNAME', sname],
-								['PASS', buf.toString('hex')]
-							]);
-							crp.fs.writeFile('/var/www/' + sname + '/wp-config.php', config, (err) => {
+							crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
 								if (err) return cb(err);
 
-								crp.cmd('systemctl reload php7.0-fpm', cb);
+								crp.auth.crypto.randomBytes(32, (err, buf) => {
+									if (err) return cb(err);
+
+									var config = crp.util.parseString(data, [
+										['SNAME', sname],
+										['PASS', buf.toString('hex')]
+									]);
+									crp.fs.writeFile('/var/www/' + sname + '/wp-config.php', config, cb);
+								});
 							});
 						});
 					});
 				});
+			}).on('error', (err) => {
+				fs.unlink('/var/www/latest.tar.gz');
+				cb(err);
 			});
 		});
 	};

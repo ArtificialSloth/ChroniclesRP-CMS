@@ -7,6 +7,8 @@ async.waterfall([
 			PUBLICDIR: __dirname + '/public',
 			async: async,
 			fs: require('fs'),
+			http: require('http'),
+			targz: require('targz'),
 			cmd: require('child_process').exec,
 			moment: require('moment-timezone'),
 			browserRefresh: process.env.BROWSER_REFRESH_URL,
