@@ -40,8 +40,9 @@ module.exports = (crp, callback) => {
 					if (err) return cb(err);
 
 					if (chapter.type == 'hosted') {
-						crp.util.deployChapter(data.cms, chapter, data.user, (err) => {
+						crp.util.deployChapter(data.cms, chapter, data.user, (err, stdout, stderr) => {
 							if (err) return cb(err);
+							if (stderr) return cb(stderr);
 
 							cb(null, chapter);
 						});
@@ -80,11 +81,13 @@ module.exports = (crp, callback) => {
 		var sname = chapter.slug.match(/(?<=https?:\/\/).*(?=\..*\.com)/);
 		if (!sname) return cb('badSlug');
 
-		crp.util.deployPHP(sname, (err) => {
+		crp.util.deployPHP(sname, (err, stdout, stderr) => {
 			if (err) return cb(err);
+			if (stderr) return cb(stderr);
 
-			crp.cmd('wget http://wordpress.org/latest.tar.gz && tar xzvf latest.tar.gz', (err) => {
+			crp.cmd('wget http://wordpress.org/latest.tar.gz && tar xzvf latest.tar.gz', (err, stdout, stderr) => {
 				if (err) return cb(err);
+				if (stderr) return cb(stderr);
 
 				crp.fs.rename('wordpress', '/var/www/' + sname, (err) => {
 					if (err) return cb(err);
