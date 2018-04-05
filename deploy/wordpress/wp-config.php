@@ -1,7 +1,7 @@
 <?php
 define('DB_NAME', 'SNAME');
 define('DB_USER', 'SNAME');
-define('DB_PASSWORD', 'PASS');
+define('DB_PASSWORD', 'GENPASS');
 define('DB_HOST', 'localhost');
 define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');

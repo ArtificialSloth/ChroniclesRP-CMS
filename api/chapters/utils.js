@@ -41,9 +41,7 @@ module.exports = (crp, callback) => {
 
 					if (chapter.type == 'hosted') {
 						crp.util.deployChapter(data.cms, chapter, data.user, (err) => {
-							if (err) return cb(err);
-
-							cb(null, chapter);
+							cb(err, chapter);
 						});
 					} else {
 						if (chapter.type == 'group' || chapter.type == 'page') {
@@ -84,37 +82,27 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (stderr) return cb(stderr);
 
-			crp.http.get('http://wordpress.org/latest.tar.gz', (res) => {
-				var file = fs.createWriteStream('/var/www/latest.tar.gz');
+			crp.cmd('wget http://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz && tar xzvf /var/www/latest.tar.gz', (err, stdout, stderr) => {
+				if (err) return cb(err);
 
-				res.pipe(file);
-				file.on('finish', () => {
-					crp.targz({src: '/var/www/latest.tar.gz', dest: '/var/www'}, (err) => {
+				crp.fs.unlink('/var/www/latest.tar.gz');
+				crp.fs.rename('/var/www/wordpress', '/var/www/' + sname, (err) => {
+					if (err) return cb(err);
+
+					crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
 						if (err) return cb(err);
 
-						crp.fs.unlink('/var/www/latest.tar.gz');
-						crp.fs.rename('/var/www/wordpress', '/var/www/' + sname, (err) => {
+						crp.auth.crypto.randomBytes(32, (err, buf) => {
 							if (err) return cb(err);
 
-							crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
-								if (err) return cb(err);
-
-								crp.auth.crypto.randomBytes(32, (err, buf) => {
-									if (err) return cb(err);
-
-									var config = crp.util.parseString(data, [
-										['SNAME', sname],
-										['PASS', buf.toString('hex')]
-									]);
-									crp.fs.writeFile('/var/www/' + sname + '/wp-config.php', config, cb);
-								});
-							});
+							var config = crp.util.parseString(data, [
+								['SNAME', sname],
+								['GENPASS', buf.toString('hex')]
+							]);
+							crp.fs.writeFile('/var/www/' + sname + '/wp-config.php', config, cb);
 						});
 					});
 				});
-			}).on('error', (err) => {
-				fs.unlink('/var/www/latest.tar.gz');
-				cb(err);
 			});
 		});
 	};
