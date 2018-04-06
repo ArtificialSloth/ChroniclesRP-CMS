@@ -80,7 +80,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (stderr) return cb(stderr);
 
-			crp.cmd('wget http://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz && tar xzvf /var/www/latest.tar.gz', (err, stdout, stderr) => {
+			crp.cmd('wget http://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz && tar xzvf /var/www/latest.tar.gz -C /var/www', (err, stdout, stderr) => {
 				if (err) return cb(err);
 
 				crp.fs.unlink('/var/www/latest.tar.gz');
