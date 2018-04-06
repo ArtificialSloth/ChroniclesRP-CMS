@@ -27,7 +27,6 @@ module.exports = (crp, callback) => {
 				if (!chapter.name) return cb(null, 'noName');
 
 				if (chapter.slug == 'www') return cb(null, 'badDomain');
-				if (chapter.type == 'hosted') chapter.slug = 'https://' + chapter.slug + '.chroniclesrp.com';
 
 				if (data.user) {
 					chapter.members = [{
@@ -41,6 +40,8 @@ module.exports = (crp, callback) => {
 
 					if (chapter.type == 'hosted') {
 						crp.util.deployChapter(data.cms, chapter, data.user, (err) => {
+							crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+
 							cb(err, chapter);
 						});
 					} else {
@@ -75,10 +76,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.deployWordpress = (chapter, user, cb) => {
-		var sname = chapter.slug.match(/(?<=https?:\/\/).*(?=\..*\.com)/);
-		if (!sname) return cb('badSlug');
-
-		crp.util.deployPHP(sname, (err, stdout, stderr) => {
+		crp.util.deployPHP(chapter.slug, (err, stdout, stderr) => {
 			if (err) return cb(err);
 			if (stderr) return cb(stderr);
 
@@ -86,20 +84,29 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 
 				crp.fs.unlink('/var/www/latest.tar.gz');
-				crp.fs.rename('/var/www/wordpress', '/var/www/' + sname, (err) => {
+				crp.fs.rename('/var/www/wordpress', '/var/www/' + chapter.slug, (err) => {
 					if (err) return cb(err);
 
 					crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
 						if (err) return cb(err);
 
-						crp.auth.crypto.randomBytes(32, (err, buf) => {
+						crp.auth.crypto.randomBytes(32, (err, buff) => {
 							if (err) return cb(err);
 
+							var pass = buff.toString('hex')
 							var config = crp.util.parseString(data, [
-								['SNAME', sname],
-								['GENPASS', buf.toString('hex')]
+								['SNAME', chapter.slug],
+								['GENPASS', pass]
 							]);
-							crp.fs.writeFile('/var/www/' + sname + '/wp-config.php', config, cb);
+							crp.fs.writeFile('/var/www/' + chapter.slug + '/wp-config.php', config, (err) => {
+								if (err) return cb(err);
+
+								crp.cmd('useradd ' + chapter.slug + ' && chown -R /var/www/' + chapter.slug, (err, stdout, stderr) => {
+									crp.db.mysql.connect((err, con) => {
+										con.query('CREATE DATABASE ' + chapter.slug + '; GRANT ALL PRIVILEGES ON ' + chapter.slug + '.* TO "' + chapter.slug + '"@"localhost" IDENTIFIED BY ' + pass + ';', cb);
+									});
+								});
+							});
 						});
 					});
 				});

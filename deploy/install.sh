@@ -5,10 +5,9 @@ process() {
 
 	apt-get update && apt-get upgrade -y
 	curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-	apt-get install -y pwgen nginx php-fpm php-mysql php-gd mysql-server nodejs
+	apt-get install -y nginx php-fpm php-mysql php-gd mysql-server nodejs
 
 	sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini
-	rm /etc/php/7.0/fpm/pool.d/www.conf
 	systemctl reload php7.0-fpm
 
 	rm -R /var/www/html

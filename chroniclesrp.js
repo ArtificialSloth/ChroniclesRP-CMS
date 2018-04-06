@@ -39,7 +39,6 @@ async.waterfall([
 
 			crp.proxy.register(process.env.DOMAIN, '127.0.0.1:' + (process.env.PORT || 3000));
 			crp.proxy.register('127.0.0.1', '127.0.0.1:' + (process.env.PORT || 3000));
-			crp.proxy.register('*.' + process.env.DOMAIN, '127.0.0.1:8080');
 			console.log('\nThe Chronicles RP is up and running!');
 		});
 	});
