@@ -8,7 +8,6 @@ module.exports = (crp, callback) => {
 		crp.db = {
 			mongodb: db,
 			prefix: 'CRP_',
-			mysql: require('mysql'),
 			objectID: mongodb.ObjectId,
 			sanitize: require('mongo-sanitize')
 		};
@@ -35,17 +34,6 @@ module.exports = (crp, callback) => {
 
 		crp.db.deleteMany = (collection, filter, cb) => {
 			crp.db.mongodb.collection(crp.db.prefix + collection).deleteMany(filter, cb);
-		};
-
-		crp.db.mysql.connect = (cb) => {
-			var con = crp.db.mysql.createConnection({
-				host: process.env.MYSQL_URL ||  'localhost',
-				user: process.env.MYSQL_USER || 'root',
-				password: process.env.MYSQL_PASS || ''
-			});
-			con.connect((err) => {
-				cb(err, con);
-			});
 		};
 
 		crp.pages = [];

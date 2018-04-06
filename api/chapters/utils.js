@@ -101,10 +101,8 @@ module.exports = (crp, callback) => {
 							crp.fs.writeFile('/var/www/' + chapter.slug + '/wp-config.php', config, (err) => {
 								if (err) return cb(err);
 
-								crp.cmd('useradd ' + chapter.slug + ' && chown -R /var/www/' + chapter.slug, (err, stdout, stderr) => {
-									crp.db.mysql.connect((err, con) => {
-										con.query('CREATE DATABASE ' + chapter.slug + '; GRANT ALL PRIVILEGES ON ' + chapter.slug + '.* TO "' + chapter.slug + '"@"localhost" IDENTIFIED BY ' + pass + ';', cb);
-									});
+								crp.cmd(`useradd ${chapter.slug} && chown -R /var/www/${chapter.slug}`, (err, stdout, stderr) => {
+									crp.cmd(`mysql -e "CREATE DATABASE ${chapter.slug}" && mysql -e "GRANT ALL PRIVILEGES ON ${chapter.slug}.* TO '${chapter.slug}'@'localhost' IDENTIFIED BY '${pass}'"`, cb);
 								});
 							});
 						});
