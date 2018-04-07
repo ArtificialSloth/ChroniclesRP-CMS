@@ -12,5 +12,16 @@ module.exports = (crp, callback) => {
 		subPage: '/chapters/create/index.njk'
 	});
 
+	crp.db.find('games', {}, {}, (err, games) => {
+		for (var i in games) {
+			crp.pages.push({
+				slug: '/chapters/' + games[i].slug,
+				path: '/chapters/index.njk',
+				subPage: '/chapters/browse/index.njk',
+				context: {filter: games[i]._id}
+			});
+		}
+	});
+
 	callback();
 };

@@ -35,10 +35,10 @@ async.waterfall([
 		if (err) return console.error(err);
 
 		crp.express.app.listen(process.env.PORT || 3000, () => {
-			if (process.send) process.send('online');
-
 			crp.proxy.register(process.env.DOMAIN, '127.0.0.1:' + (process.env.PORT || 3000));
 			crp.proxy.register('127.0.0.1', '127.0.0.1:' + (process.env.PORT || 3000));
+
+			if (process.send) process.send('online');
 			console.log('\nThe Chronicles RP is up and running!');
 		});
 	});

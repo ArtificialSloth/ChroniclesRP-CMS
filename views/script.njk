@@ -30,7 +30,7 @@
 	function crpGetPage(page) {
 		$('.content-blackout').addClass('active');
 		crpAjax('/api/get-page', {page: page}, (res) => {
-			$('.content').html(res);
+			$('.content-main').html(res);
 			$('.content-blackout').removeClass('active');
 
 			window.history.pushState({page: page}, page + ' - The Chronicles RP', page);

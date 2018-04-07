@@ -20,7 +20,7 @@
 			if (res._id) {
 				if (res.type == 'group' || res.type == 'page') return crpGetPage('/chapters/' + res.slug);
 
-				window.location = res.slug + window.location.hostname;
+				window.location = `//${res.slug}.${window.location.hostname}`;
 			} else {
 				switch (res) {
 					case 'noCaptcha':

@@ -13,22 +13,26 @@
 
 <ul class="sub-header noselect">
 	{% for game in games %}
-		<li onclick="crpGetPage('/chapters/{{game.slug}}')">{{game.name}}</li>
+		<li onclick="crpGetSubPage('/chapters/{{game.slug}}', '.chapters', true)">{{game.name}}</li>
 	{% endfor %}
 </ul>
 
-<ul class="all active">
+<ul class="content">
 	{% for chapter in chapters %}
 		{% set game = crp.util.findObjectInArray(games, '_id', chapter.game.toString()) %}
-		<li class="chapter">
-			<ul>
-				<li><img src="{{chapter.img.icon or '/img/chapters/icon.png'}}" /></li>
-				<li>
-					<a onclick="crpGetPage('/chapters/{{chapter.nicename}}')">{{chapter.name}}</a>
-					<p>{{chapter.desc}}</p>
-				</li>
-				<li>Game: <a onclick="crpGetPage('/chapter/{{game.slug}}')">{{game.name}}</a></li>
-			</ul>
-		</li>
+		{% if not filter or game._id.equals(filter) %}
+			<li class="chapter">
+				<ul>
+					<li><img src="{{chapter.img.icon or '/img/chapters/icon.png'}}" /></li>
+					<li>
+						{{crp.util.getChapterLink(chapter, chapter.name) | safe}}
+						<p>{{chapter.desc}}</p>
+					</li>
+					<li>Game: <a onclick="crpGetSubPage('/chapters/{{game.slug}}', '.chapters', true)">{{game.name}}</a></li>
+				</ul>
+			</li>
+		{% endif %}
 	{% endfor %}
 </ul>
+
+{% include "./script.njk" %}

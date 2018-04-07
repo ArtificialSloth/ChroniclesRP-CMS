@@ -1,1 +1,22 @@
-Chapters
+{% include "./style.njk" %}
+{% lookup 'users', {_id: userid}, 'user' %}
+{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+
+<ul class="chapters">
+	{% for chapter in chapters %}
+		{% if crp.util.findObjectInArray(chapter.members, '_id', user._id.toString()) %}
+			{% lookup 'games', {_id: chapter.game}, 'game' %}
+
+			<li class="chapter">
+				<ul>
+					<li><img src="{{chapter.img.icon or '/img/chapters/icon.png'}}" /></li>
+					<li>
+						{{crp.util.getChapterLink(chapter, chapter.name) | safe}}
+						<p>{{chapter.desc}}</p>
+					</li>
+					<li>Game: <a onclick="crpGetPage('/chapters/{{game.slug}}')">{{game.name}}</a></li>
+				</ul>
+			</li>
+		{% endif %}
+	{% endfor %}
+</ul>

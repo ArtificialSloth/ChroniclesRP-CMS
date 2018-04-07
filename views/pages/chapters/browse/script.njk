@@ -1,0 +1,9 @@
+<script>
+	function chaptersToggleFilter(tab, filter) {
+		$('.chapters .sub-header .active').removeClass('active');
+		$(tab).addClass('active');
+
+		$('.chapters .filter.active').removeClass('active');
+		$('.chapters .filter.' + filter).addClass('active');
+	}
+</script>

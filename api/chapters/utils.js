@@ -62,12 +62,27 @@ module.exports = (crp, callback) => {
 		});
 	};
 
+	crp.util.getChapterLink = (chapter, text) => {
+		if (!chapter) return;
+
+		switch (chapter.type) {
+			case 'hosted':
+				return `<a href="//${chapter.slug}.${process.env.DOMAIN || 'chroniclesrp.com'}">${text}</a>`;
+				break;
+			case 'url':
+				return `<a href="//${chapter.slug}">${text}</a>`;
+				break;
+			default:
+				return `<a onclick="crpGetPage('/chapters/${chapter.slug}')">${text}</a>`;
+		}
+	};
+
 	crp.util.deployPHP = (sname, cb) => {
 		crp.fs.readFile(crp.ROOT + '/deploy/php-fpm/pool.conf', 'utf8', (err, data) => {
 			if (err) return cb(err);
 
 			var pool = crp.util.parseString(data, [['SNAME', sname]]);
-			crp.fs.writeFile('/etc/php/7.0/fpm/pool.d/' + sname + '.conf', pool, (err) => {
+			crp.fs.writeFile(`/etc/php/7.0/fpm/pool.d/${sname}.conf`, pool, (err) => {
 				if (err) return cb(err);
 
 				crp.cmd('systemctl reload php7.0-fpm', cb);
@@ -98,7 +113,7 @@ module.exports = (crp, callback) => {
 								['SNAME', chapter.slug],
 								['GENPASS', pass]
 							]);
-							crp.fs.writeFile('/var/www/' + chapter.slug + '/wp-config.php', config, (err) => {
+							crp.fs.writeFile(`/var/www/${chapter.slug}/wp-config.php`, config, (err) => {
 								if (err) return cb(err);
 
 								crp.cmd(`useradd ${chapter.slug} && chown -R /var/www/${chapter.slug}`, (err, stdout, stderr) => {
