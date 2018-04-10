@@ -28,7 +28,12 @@
 						{{crp.util.getChapterLink(chapter, chapter.name) | safe}}
 						<p>{{chapter.desc}}</p>
 					</li>
-					<li>Game: <a onclick="crpGetSubPage('/chapters/{{game.slug}}', '.chapters', true)">{{game.name}}</a></li>
+					<li>
+						Game: <a onclick="crpGetSubPage('/chapters/{{game.slug}}', '.chapters', true)">{{game.name}}</a>
+						{% if crp.util.findObjectInArray(chapter.members, '_id', user._id.toString()) or user.role == 'administrator' %}
+							<span><a onclick="crpGetPage('/chapters/{{chapter.nicename}}/edit')">Edit</a> | <a onclick="removeChapter('{{chapter._id}}')">Delete</a></span>
+						{% endif %}
+					</li>
 				</ul>
 			</li>
 		{% endif %}

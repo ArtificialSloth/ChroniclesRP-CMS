@@ -17,34 +17,32 @@
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/add-chapter', formData, (res) => {
-			if (res._id) {
-				if (res.type == 'group' || res.type == 'page') return crpGetPage('/chapters/' + res.slug);
-
-				window.location = `//${res.slug}.${window.location.hostname}`;
-			} else {
-				switch (res) {
-					case 'noCaptcha':
-						$('.add-chapter .error').addClass('active').html('Please click the captcha first.');
-						break;
-					case 'nameTaken':
-						$('.add-chapter .error').addClass('active').html('That Chapter name is taken!');
-						break;
-					case 'noGame':
-						$('.add-chapter .error').addClass('active').html('You need to select a game!');
-						break;
-					case 'noType':
-						$('.add-chapter .error').addClass('active').html('You need to pick a type!');
-						break;
-					case 'noName':
-						$('.add-chapter .error').addClass('active').html('Your Chapter needs a name.');
-						break;
-					case 'badDomain':
-						$('.add-chapter .error').addClass('active').html('That Chapter name is not allowed.');
-						break;
-					default:
-						console.log(res);
-						$('.add-chapter .error').addClass('active').html('Something went wrong :(');
-				}
+			switch (res) {
+				case (res._id):
+					if (res.type == 'group' || res.type == 'page') return crpGetPage('/chapters/' + res.slug);
+					window.location = `//${res.slug}.${window.location.hostname}`;
+					break;
+				case 'noCaptcha':
+					$('.add-chapter .error').addClass('active').html('Please click the captcha first.');
+					break;
+				case 'nameTaken':
+					$('.add-chapter .error').addClass('active').html('That Chapter name is taken!');
+					break;
+				case 'noGame':
+					$('.add-chapter .error').addClass('active').html('You need to select a game!');
+					break;
+				case 'noType':
+					$('.add-chapter .error').addClass('active').html('You need to pick a type!');
+					break;
+				case 'noName':
+					$('.add-chapter .error').addClass('active').html('Your Chapter needs a name.');
+					break;
+				case 'badDomain':
+					$('.add-chapter .error').addClass('active').html('That Chapter name is not allowed.');
+					break;
+				default:
+					console.log(res);
+					$('.add-chapter .error').addClass('active').html('Something went wrong :(');
 			}
 		});
 	});

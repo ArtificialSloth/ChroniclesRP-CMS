@@ -6,4 +6,16 @@
 		$('.chapters .filter.active').removeClass('active');
 		$('.chapters .filter.' + filter).addClass('active');
 	}
+
+	function removeChapter(chapterid) {
+		if (window.confirm('Are you sure?')) {
+			crpAjax('/api/remove-chapter', {chapterid: chapterid}, (res) => {
+				if (typeof res == 'object') {
+					crpGetPage(window.location.pathname);
+				} else {
+					console.log(error);
+				}
+			});
+		}
+	}
 </script>

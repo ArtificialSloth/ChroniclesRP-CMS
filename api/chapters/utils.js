@@ -3,6 +3,11 @@ module.exports = (crp, callback) => {
 		crp.db.find('chapters', filter, {}, cb);
 	};
 
+	crp.util.getChapterData = (chapterid, cb) => {
+		if (typeof chapterid != 'object') chapterid = crp.db.objectID(chapterid);
+		crp.db.findOne('chapters', {_id: chapterid}, cb);
+	};
+
 	crp.util.addChapter = (data, cb) => {
 		crp.util.getChapters({name: data.name}, (err, chapters) => {
 			if (err) return cb(err);
@@ -15,6 +20,7 @@ module.exports = (crp, callback) => {
 				var chapter = {
 					type: data.type,
 					name: data.name,
+					nicename: crp.util.urlSafe(data.name),
 					slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name),
 					game: game._id,
 					desc: data.desc || '',
@@ -39,7 +45,7 @@ module.exports = (crp, callback) => {
 					if (err) return cb(err);
 
 					if (chapter.type == 'hosted') {
-						crp.util.deployChapter(data.cms, chapter, data.user, (err) => {
+						crp.util.deployChapter(data.cms, chapter, (err) => {
 							crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
 
 							cb(err, chapter);
@@ -59,6 +65,25 @@ module.exports = (crp, callback) => {
 					}
 				});
 			});
+		});
+	};
+
+	crp.util.removeChapter = (chapterid, cb) => {
+		crp.util.getChapterData(chapterid, (err, chapter) => {
+			if (err) return cb(err);
+			if (!chapter) return cb('noChapter');
+
+			switch (chapter.type) {
+				case 'hosted':
+					crp.util.disbandChapter(chapter, (err) => {
+						if (err) return cb(err);
+
+						crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
+					});
+					break;
+				default:
+					crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
+			}
 		});
 	};
 
@@ -90,7 +115,7 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.deployWordpress = (chapter, user, cb) => {
+	crp.util.deployWordpress = (chapter, cb) => {
 		crp.util.deployPHP(chapter.slug, (err, stdout, stderr) => {
 			if (err) return cb(err);
 			if (stderr) return cb(stderr);
@@ -127,14 +152,24 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.deployChapter = (cms, chapter, user, cb) => {
+	crp.util.deployChapter = (cms, chapter, cb) => {
 		switch (cms) {
 			case 'wordpress':
-				crp.util.deployWordpress(chapter, user, cb);
+				crp.util.deployWordpress(chapter, cb);
 				break;
 			default:
 				cb();
 		}
+	};
+
+	crp.util.disbandChapter = (chapter, cb) => {
+		crp.fs.rmdir('/var/www/' + chapter.slug, (err) => {
+			if (err) return cb(err);
+
+			crp.fs.unlink(`/etc/php/7.0/fpm/pool.d/${chapter.slug}.conf`, (err) => {
+				crp.cmd(`mysql -e "DROP DATABASE ${chapter.slug}" && userdel ${chapter.slug}`, cb);
+			});
+		});
 	};
 
 	callback()
