@@ -23,8 +23,8 @@
 					</label>
 				</div>
 
-				<div class="option disabled">
-					<input type="radio" name="type" value="group" disabled />
+				<div class="option">
+					<input type="radio" name="type" value="group" />
 					<label for="type" onclick="labelClick(this)">
 						<h1>Chapter Group</h1>
 						<span>Your Chapter will be set up as a group on the main Chronicles site allowing you to add users to your Chapter and giving your Chapter its own private members only forum.</span>
@@ -50,10 +50,11 @@
 		</li>
 
 		{% include "./hosted/index.njk" %}
+		{% include "./group/index.njk" %}
 	</ul>
 
 	<div class="nav noselect">
-		<span class="previous disabled" onclick="multistepPrev(this)">&#10094;</span>
+		<span class="previous disabled">&#10094;</span>
 		<span class="next disabled" onclick="multistepNext(this)">&#10095;</span>
 		<span class="submit hidden" onclick="$(this).parents('.add-chapter').submit()">Create Chapter</span>
 		<span class='error'></span>

@@ -5,7 +5,7 @@
 
 	$('.add-chapter .cms input').change((e) => {
 		if (e.target.checked) {
-			$('.add-chapter .cms + .step').removeClass('disabled');
+			$('.add-chapter .hosted.final').removeClass('disabled');
 			$('.add-chapter .nav .next').removeClass('disabled');
 			multistepNext($('.add-chapter .nav .next'));
 			$('.add-chapter .header').html('type › hosted › ' + e.target.value);

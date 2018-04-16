@@ -31,11 +31,11 @@
 				{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
 				{% for game in games %}
 					<li class="menu-item page-has-childred">
-						<a><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
+						<a onclick="crpGetPage('/chapters/{{game.slug}}')"><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
 						{% query 'chapters', {game: game._id}, {sort: [['name', 1]]}, 'chapters' %}
 						{% for chapter in chapters %}
 							<ul class="sub-menu">
-								<li class="menu-item"><a onclick="crpGetPage('/chapters/{{chapter.slug}}')">{{chapter.name}}</a></li>
+								<li class="menu-item">{{crp.util.getChapterLink(chapter) | safe}}</li>
 							</ul>
 						{% endfor %}
 					</li>

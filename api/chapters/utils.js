@@ -9,9 +9,9 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.addChapter = (data, cb) => {
-		crp.util.getChapters({name: data.name}, (err, chapters) => {
+		crp.util.getChapters({$and: [{name: data.name}, {slug: data.slug}]}, (err, chapters) => {
 			if (err) return cb(err);
-			if (chapters.length != 0) return cb(null, 'nameTaken');
+			if (chapters.length != 0) return cb(null, 'taken');
 
 			crp.db.findOne('games', {_id: data.game}, (err, game) => {
 				if (err) return cb(err);
@@ -87,18 +87,18 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.getChapterLink = (chapter, text) => {
+	crp.util.getChapterLink = (chapter) => {
 		if (!chapter) return;
 
 		switch (chapter.type) {
 			case 'hosted':
-				return `<a href="//${chapter.slug}.${process.env.DOMAIN || 'chroniclesrp.com'}">${text}</a>`;
+				return `<a href="//${chapter.slug}.${process.env.DOMAIN || 'chroniclesrp.com'}">${chapter.name}</a>`;
 				break;
 			case 'url':
-				return `<a href="//${chapter.slug}">${text}</a>`;
+				return `<a href="//${chapter.slug}">${chapter.name}</a>`;
 				break;
 			default:
-				return `<a onclick="crpGetPage('/chapters/${chapter.slug}')">${text}</a>`;
+				return `<a onclick="crpGetPage('/chapters/${chapter.nicename}')">${chapter.name}</a>`;
 		}
 	};
 

@@ -94,6 +94,8 @@ module.exports = (crp, callback) => {
 		noCache: true
 	}));
 
+	crp.proxy.register(process.env.DOMAIN, '127.0.0.1:' + (process.env.PORT || 3000));
+	crp.proxy.register('127.0.0.1', '127.0.0.1:' + (process.env.PORT || 3000));
 	crp.express.ready = (cb) => {
 		crp.util.requireFiles('/app.js', (err) => {
 			if (err) return cb(err);

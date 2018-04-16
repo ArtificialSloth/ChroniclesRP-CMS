@@ -2,13 +2,28 @@
 <script>
 	$('.add-chapter .types input').change((e) => {
 		if (e.target.checked) {
-			if (e.target.value == 'hosted') {
-				$('.add-chapter .cms').removeClass('disabled');
-				$('.add-chapter .nav .next').removeClass('disabled');
-				multistepNext($('.add-chapter .nav .next'));
-				$('.add-chapter .header').html('type › hosted');
-			}
+			switch (e.target.value) {
+				case 'hosted':
+					$('.add-chapter .cms').removeClass('disabled');
+					$('.add-chapter .nav .next').removeClass('disabled');
+					multistepNext($('.add-chapter .nav .next'));
+					$('.add-chapter .header').html('type › hosted');
+					break;
+				case 'group':
+					$('.add-chapter .group.final').removeClass('disabled');
+					$('.add-chapter .nav .next').removeClass('disabled');
+					multistepNext($('.add-chapter .nav .next'));
+					$('.add-chapter .header').html('type › group');
+					break;
+				default:
+					console.log(e.target.value);
+			};
 		}
+	});
+
+	$('.add-chapter .nav .previous').click((e) => {
+		multistepPrev(e.target);
+		if ($(e.target).hasClass('disabled')) $('.add-chapter .step:not(.types)').addClass('disabled');
 	});
 
 	$('.add-chapter').submit((e) => {
