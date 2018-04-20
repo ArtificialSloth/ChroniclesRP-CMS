@@ -76,6 +76,10 @@
 	    }, 250);
 	}
 
+	function crpMirror(e, selector) {
+		$(selector).val($(e).val());
+	}
+
 	function multistepPrev(e) {
 		if ($(e).hasClass('disabled')) return;
 

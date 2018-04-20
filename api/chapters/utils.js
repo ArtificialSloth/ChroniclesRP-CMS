@@ -9,9 +9,8 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.addChapter = (data, cb) => {
-		crp.util.getChapters({$and: [{name: data.name}, {slug: data.slug}]}, (err, chapters) => {
+		crp.util.getChapters({}, (err, chapters) => {
 			if (err) return cb(err);
-			if (chapters.length != 0) return cb(null, 'taken');
 
 			crp.db.findOne('games', {_id: data.game}, (err, game) => {
 				if (err) return cb(err);
@@ -31,8 +30,10 @@ module.exports = (crp, callback) => {
 				if (!types.includes(chapter.type)) return cb(null, 'noType');
 
 				if (!chapter.name) return cb(null, 'noName');
+				if (crp.util.findObjectInArray(chapters, 'name', chapter.name)) return cb(null, 'nameTaken');
 
 				if (chapter.slug == 'www') return cb(null, 'badDomain');
+				if (crp.util.findObjectInArray(chapters, 'slug', chapter.slug)) return cb(null, 'slugTaken');
 
 				if (data.user) {
 					chapter.members = [{

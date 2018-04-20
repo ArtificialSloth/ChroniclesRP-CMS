@@ -52,6 +52,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.urlSafe = (str) => {
+		if (!str) return;
 		return str.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 	};
 
