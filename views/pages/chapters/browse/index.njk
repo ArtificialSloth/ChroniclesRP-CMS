@@ -23,10 +23,10 @@
 		{% if not filter or game._id.equals(filter) %}
 			<li class="chapter">
 				<ul>
-					<li><img src="{{chapter.img.icon or '/img/chapters/icon.png'}}" /></li>
+					<li><img src="{{chapter.img.profile or '/img/chapters/profile.png'}}" /></li>
 					<li>
 						{{crp.util.getChapterLink(chapter) | safe}}
-						<p>{{chapter.desc}}</p>
+						<p>{{chapter.tagline}}</p>
 					</li>
 					<li>
 						Game: <a onclick="crpGetSubPage('/chapters/{{game.slug}}', '.chapters', true)">{{game.name}}</a>

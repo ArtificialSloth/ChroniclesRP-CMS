@@ -139,11 +139,13 @@ module.exports = (crp, callback) => {
 		}
 	};
 
-	crp.util.replaceFile = (oldFile, newFile, newPath, cb) => {
+	crp.util.replaceFile = (oldFile, newFile, newPath) => {
 		crp.fs.unlink(oldFile, (err) => {
-			if (err) return console.error(err);
+			if (err && err.code != 'ENOENT') return console.error(err);
 
-			crp.fs.rename(newFile, newPath, console.error);
+			crp.fs.rename(newFile, newPath, (err) => {
+				if (err) return console.error(err);
+			});
 		});
 	};
 

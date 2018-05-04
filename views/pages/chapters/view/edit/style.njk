@@ -1,0 +1,29 @@
+<style>
+	.chapter .standard-form {
+		display:flex;
+		flex-wrap:wrap;
+	}
+
+	.chapter .standard-form label {
+		width:50%;
+		border-right:0.0625em solid {{css.colors.bg}}; /* 1/16 */
+	}
+
+	.chapter .standard-form .standard-input {
+		width:50%;
+	}
+
+	.chapter .standard-form label.fill,
+	.chapter .standard-form .standard-input.fill {
+		flex-basis:100%;
+	}
+
+	.chapter .standard-form input:not([type=submit]),
+	.chapter .standard-form select {
+		width:50%;
+	}
+
+	.chapter .standard-form input[type=submit] {
+		margin-left:auto;
+	}
+</style>

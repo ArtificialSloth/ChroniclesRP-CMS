@@ -12,7 +12,17 @@ module.exports = (crp, callback) => {
 		subPage: '/chapters/create/index.njk'
 	});
 
+	crp.db.find('chapters', {}, {}, (err, chapters) => {
+		if (err) return console.error(err);
+
+		for (var i in chapters) {
+			crp.util.addChapterPage(chapters[i]);
+		}
+	});
+
 	crp.db.find('games', {}, {}, (err, games) => {
+		if (err) return console.error(err);
+
 		for (var i in games) {
 			crp.pages.push({
 				slug: '/chapters/' + games[i].slug,

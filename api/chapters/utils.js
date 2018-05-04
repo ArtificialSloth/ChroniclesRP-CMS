@@ -8,6 +8,46 @@ module.exports = (crp, callback) => {
 		crp.db.findOne('chapters', {_id: chapterid}, cb);
 	};
 
+	crp.util.setChapterData = (chapter, data, cb) => {
+		crp.util.getChapters({name: data.name}, (err, chapters) => {
+			if (err) return cb(err);
+			if (chapters.length > 1) return cb(null, 'nameTaken');
+
+			crp.db.findOne('games', {_id: data.game}, (err, game) => {
+				if (err) return cb(err);
+				if (!game) return cb(null, 'noGame');
+
+				var newChapter = chapter;
+				newChapter.name = data.name;
+				newChapter.nicename = crp.util.urlSafe(data.name);
+				newChapter.game = data.game;
+				newChapter.tagline = data.tagline;
+				newChapter.discord = data.discord;
+
+				if (newChapter.tagline.length > 140) return cb(null, 'badTagline');
+
+				if (data.img && data.img.profile) {
+					var path = `/img/chapters/${newChapter._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+
+					crp.util.replaceFile(crp.PUBLICDIR + chapter.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
+					newChapter.img.profile = path;
+				}
+
+				if (data.img && data.img.cover) {
+					var path = `/img/chapters/${newChapter._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+
+					crp.util.replaceFile(crp.PUBLICDIR + chapter.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
+					newChapter.img.cover = path;
+				}
+
+				newChapter = crp.util.sanitizeObject(newChapter);
+				crp.db.replaceOne('chapters', {_id: chapter._id}, newChapter, (err, result) => {
+					cb(err, newChapter);
+				});
+			});
+		});
+	};
+
 	crp.util.addChapter = (data, cb) => {
 		crp.util.getChapters({}, (err, chapters) => {
 			if (err) return cb(err);
@@ -15,6 +55,7 @@ module.exports = (crp, callback) => {
 			crp.db.findOne('games', {_id: data.game}, (err, game) => {
 				if (err) return cb(err);
 				if (!game) return cb(null, 'noGame');
+				if (!data.user) return cb(null, 'noUser');
 
 				var chapter = {
 					type: data.type,
@@ -22,8 +63,13 @@ module.exports = (crp, callback) => {
 					nicename: crp.util.urlSafe(data.name),
 					slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name),
 					game: game._id,
-					desc: data.desc || '',
-					discord: data.discord || ''
+					tagline: data.tagline || '',
+					discord: data.discord || '',
+					img: data.img || {},
+					members: [{
+						_id: data.user._id,
+						role: 'leader'
+					}]
 				};
 
 				var types = ['hosted', 'group', 'page', 'url'];
@@ -35,35 +81,28 @@ module.exports = (crp, callback) => {
 				if (chapter.slug == 'www') return cb(null, 'badDomain');
 				if (crp.util.findObjectInArray(chapters, 'slug', chapter.slug)) return cb(null, 'slugTaken');
 
-				if (data.user) {
-					chapter.members = [{
-						_id: data.user._id,
-						role: 'leader'
-					}];
-				}
+				if (chapter.tagline.length > 140) return cb(null, 'badTagline');
 
 				crp.db.insertOne('chapters', chapter, (err, result) => {
 					if (err) return cb(err);
 
-					if (chapter.type == 'hosted') {
-						crp.util.deployChapter(data.cms, chapter, (err) => {
-							crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+					crp.db.findOne('chapters', {_id: result.insertedId}, (err, chapter) => {
+						crp.fs.mkdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
+							if (err) return cb(err);
 
-							cb(err, chapter);
+							if (chapter.type == 'hosted') {
+								crp.util.deployChapter(data.cms, chapter, (err) => {
+									crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+
+									crp.util.addChapterPage(chapter);
+									cb(err, chapter);
+								});
+							} else {
+								crp.util.addChapterPage(chapter);
+								cb(null, chapter);
+							}
 						});
-					} else {
-						if (chapter.type == 'group' || chapter.type == 'page') {
-							crp.pages.push({
-								slug: '/chapters/' + chapter.slug,
-								path: '/chapters/view/index.njk',
-								context: {
-									chapterid: chapter._id
-								}
-							});
-						}
-
-						cb(null, chapter);
-					}
+					});
 				});
 			});
 		});
@@ -74,18 +113,40 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			switch (chapter.type) {
-				case 'hosted':
-					crp.util.disbandChapter(chapter, (err) => {
-						if (err) return cb(err);
+			crp.fs.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
+				if (err) return cb(err);
 
+				switch (chapter.type) {
+					case 'hosted':
+						crp.util.disbandChapter(chapter, (err) => {
+							if (err) return cb(err);
+
+							crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
+						});
+						break;
+					default:
 						crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
-					});
-					break;
-				default:
-					crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
-			}
+				}
+			});
 		});
+	};
+
+	crp.util.addChapterPage = (chapter) => {
+		crp.pages.push({
+			slug: `/chapters/${chapter.nicename}/edit`,
+			path: '/chapters/view/index.njk',
+			subPage: '/chapters/view/edit/index.njk',
+			context: {chapterid: chapter._id}
+		});
+
+		if (chapter.type == 'group') {
+			crp.pages.push({
+				slug: `/chapters/${chapter.nicename}`,
+				path: '/chapters/view/index.njk',
+				subPage: '/chapters/view/about/index.njk',
+				context: {chapterid: chapter._id}
+			});
+		}
 	};
 
 	crp.util.getChapterLink = (chapter) => {

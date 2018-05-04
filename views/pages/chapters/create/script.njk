@@ -30,7 +30,7 @@
 	});
 
 	$('.add-chapter .details input[name=desc]').on('keyup', (e) => {
-		crpMirror(e.target, '.add-chapter .details input[name=desc]');
+		crpMirror(e.target, '.add-chapter .details input[name=tagline]');
 	});
 
 	$('.add-chapter .details input[name=discord]').on('keyup', (e) => {
@@ -71,6 +71,9 @@
 						break;
 					case 'badDomain':
 						$('.add-chapter .error').addClass('active').html('That Chapter name is not allowed.');
+						break;
+					case 'badTagline':
+						$('.add-chapter .error').addClass('active').html('Your Chapter\'s tagline cannot be more than 140 characters.');
 						break;
 					default:
 						console.log(res);

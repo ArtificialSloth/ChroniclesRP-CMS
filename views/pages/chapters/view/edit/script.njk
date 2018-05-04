@@ -1,0 +1,17 @@
+<script>
+	$('.chapter-edit-form').submit((e) => {
+		e.preventDefault();
+
+		var formData = new FormData(e.target);
+		crpAjaxUpload('/api/edit-chapter', formData, (res) => {
+			if (typeof res == 'object') {
+				crpGetPage(window.location.pathname);
+			} else {
+				switch (res) {
+					default:
+						console.log(res);
+				}
+			}
+		});
+	});
+</script>

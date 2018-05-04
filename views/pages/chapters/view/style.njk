@@ -1,0 +1,62 @@
+<style>
+	.chapter .header {
+		background-position:center top;
+		background-repeat:no-repeat;
+		background-size:cover;
+		display:flex;
+		flex-direction:column-reverse;
+		height:31.25em; /* 500/16 */
+		margin-bottom:0.625em; /* 10/16 */
+	}
+
+	.chapter .header .meta {
+		background-color:rgba(0, 0, 0, 0.8);
+		height:50%;
+	}
+
+	.chapter .header .meta img {
+		display:block;
+		height:9.375em; /* 150/16 */
+		margin:-4.6875em auto; /* 75/16 */
+		width:9.375em; /* 150/16 */
+	}
+
+	.chapter .header .meta h1 {
+		font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif;
+		font-size:1.875em; /* 30/16 */
+		font-weight:bold;
+		margin:3em auto 0.5em auto; /* 90/30 */ /* 15/30 */
+		text-align:center;
+		text-transform:uppercase;
+	}
+
+	.chapter .header .meta p {
+		font-size:0.9em;
+		text-align:center;
+	}
+
+	.chapter .nav {
+		background-color:{{css.colors.primary}};
+		display:flex;
+		list-style:none;
+		margin:0 1.875em; /* 30/16 */
+		min-height:2.375em;
+	}
+
+	.chapter .nav li {
+		border-right:1px solid {{css.colors.bg}};
+		flex-grow:1;
+		padding:10px;
+		text-align:center;
+		transition:all 0.2s ease-in-out;
+	}
+
+	.chapter .nav li:hover {
+		cursor:pointer;
+		background-color:{{css.colors.secondary}};
+	}
+
+	.chapter .content {
+		padding:0 1.875em 1.875em 1.875em; /* 30/16 */ /* 30/16 */ /* 30/16 */
+	}
+</style>

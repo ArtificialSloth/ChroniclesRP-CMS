@@ -60,6 +60,7 @@ module.exports = (crp, callback) => {
 		crp.util.getUserData(userid, (err, user) => {
 			if (err) return cb(err);
 			if (!user) return cb(null, 'noUser');
+
 			crp.util.getUsers({login: data.login}, (err, users) => {
 				if (err) return cb(err);
 
@@ -117,16 +118,16 @@ module.exports = (crp, callback) => {
 				}
 
 				if (data.img && data.img.profile) {
-					var path = '/img/members/' + newUser.nicename + '/' + data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
+					var path = `${crp.PUBLICDIR}/img/members/${newUser._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
+					crp.util.replaceFile(crp.PUBLICDIR + user.img.profile, data.img.profile[0].path, path);
 					newUser.img.profile = path;
 				}
 
 				if (data.img && data.img.cover) {
-					var path = '/img/members/' + newUser.nicename + '/' + data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
+					var path = `${crp.PUBLICDIR}/img/members/${newUser._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
+					crp.util.replaceFile(crp.PUBLICDIR + user.img.cover, data.img.cover[0].path, path);
 					newUser.img.cover = path;
 				}
 
@@ -219,8 +220,12 @@ module.exports = (crp, callback) => {
 					crp.db.insertOne('users', user, (err, result) => {
 						if (err) return cb(err);
 
-						crp.util.addProfilePage(user);
-						cb(null, user);
+						crp.fs.mkdir(`${crp.PUBLICDIR}/img/members/${result.insertedId}`, (err) => {
+							if (err) return cb(err);
+
+							crp.util.addProfilePage(user);
+							cb(null, user);
+						});
 					});
 
 				});
@@ -232,8 +237,12 @@ module.exports = (crp, callback) => {
 				crp.db.insertOne('users', user, (err, result) => {
 					if (err) return cb(err);
 
-					crp.util.addProfilePage(user);
-					cb(null, user);
+					crp.fs.mkdir(`${crp.PUBLICDIR}/img/members/${result.insertedId}`, (err) => {
+						if (err) return cb(err);
+
+						crp.util.addProfilePage(user);
+						cb(null, user);
+					});
 				});
 			}
 		});
@@ -244,7 +253,11 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb();
 
-			crp.db.deleteOne('users', {_id: user._id}, cb);
+			crp.fs.rmdir(`${crp.PUBLICDIR}/img/members/${user._id}`, (err) => {
+				if (err) return cb(err);
+
+				crp.db.deleteOne('users', {_id: user._id}, cb);
+			});
 		});
 	};
 

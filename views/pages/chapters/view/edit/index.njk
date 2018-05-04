@@ -1,0 +1,58 @@
+<form class="chapter-edit-form standard-form">
+	{% include "./style.njk" %}
+	{% lookup 'chapters', {_id: chapterid}, 'chapter' %}
+
+	<label for="name">Chapter Name</label>
+	<div class="standard-input">
+		<input type="text" name="name" value="{{chapter.name}}" />
+		<span class="input-error"></span>
+	</div>
+
+	<label for="game">Game</label>
+	<div class="standard-input">
+		{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
+
+		<select name="game">
+			{% for game in games %}
+				<option value="{{game._id}}" {% if game._id.equals(chapter.game) %}selected{% endif %}>{{game.name}}</option>
+			{% endfor %}
+		</select>
+	</div>
+
+	<label for="discord">Chapter Discord</label>
+	<div class="standard-input">
+		<input type="text" name="discord" value="{{chapter.discord}}" />
+		<span class="input-error"></span>
+	</div>
+
+	<label for="tagline">Chapter Tagline</label>
+	<div class="standard-input">
+		<input type="text" name="tagline" value="{{chapter.tagline}}" />
+		<span class="input-error"></span>
+	</div>
+
+	<label for="profile_pic">Chapter Image</label>
+	<div class="standard-input">
+		{% if chapter.img.profile %}
+			<img class="profile-pic" src="{{chapter.img.profile}}" width="150px" height="150px" />
+			<br />
+		{% endif %}
+		<input type="file" name="profile_pic" />
+		<span class="input-error"></span>
+	</div>
+
+	<label for="cover_pic">Cover Image</label>
+	<div class="standard-input">
+		{% if chapter.img.cover %}
+			<img class="cover-pic" src="{{chapter.img.cover}}" height="150px" />
+			<br />
+		{% endif %}
+		<input type="file" name="cover_pic" />
+		<span class="input-error"></span>
+	</div>
+
+	<input type="hidden" name="chapterid" value="{{chapter._id}}" />
+	<input type="submit" value="Save" />
+
+	{% include "./script.njk" %}
+</form>
