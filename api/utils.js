@@ -149,6 +149,28 @@ module.exports = (crp, callback) => {
 		});
 	};
 
+	crp.util.rmdir = (path, cb) => {
+		crp.fs.readdir(path, (err, files) => {
+			if (err) return cb(err);
+
+			crp.async.each(files, (file, callback) => {
+				crp.fs.stat(`${path}/${file}`, (err, stats) => {
+					if (err) return callback(err);
+
+					if (stats.isDirectory()) {
+						return crp.util.rmdir(`${path}/${file}`, callback);
+					}
+
+					crp.fs.unlink(`${path}/${file}`, callback);
+				});
+			}, (err) => {
+				if (err) return callback(err);
+
+				crp.fs.rmdir(path, cb);
+			});
+		});
+	};
+
 	crp.util.editSite = (data, cb) => {
 		crp.db.findOne('site', {}, (err, site) => {
 			if (err) return cb(err);

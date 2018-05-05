@@ -22,6 +22,7 @@ module.exports = (crp, callback) => {
 				newChapter.nicename = crp.util.urlSafe(data.name);
 				newChapter.game = data.game;
 				newChapter.tagline = data.tagline;
+				newChapter.desc = data.desc;
 				newChapter.discord = data.discord;
 
 				if (newChapter.tagline.length > 140) return cb(null, 'badTagline');
@@ -64,6 +65,7 @@ module.exports = (crp, callback) => {
 					slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name),
 					game: game._id,
 					tagline: data.tagline || '',
+					desc: data.desc || '',
 					discord: data.discord || '',
 					img: data.img || {},
 					members: [{
@@ -113,7 +115,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.fs.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
+			crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
 				if (err) return cb(err);
 
 				switch (chapter.type) {

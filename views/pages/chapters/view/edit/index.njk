@@ -51,6 +51,13 @@
 		<span class="input-error"></span>
 	</div>
 
+	<label for="desc" class="fill">Chapter Description</label>
+	<div class="standard-input fill">
+		<textarea name="desc" class="tinymce">{{chapter.desc}}</textarea>
+		<script>crpTinyMCE()</script>
+		<span class="input-error"></span>
+	</div>
+
 	<input type="hidden" name="chapterid" value="{{chapter._id}}" />
 	<input type="submit" value="Save" />
 

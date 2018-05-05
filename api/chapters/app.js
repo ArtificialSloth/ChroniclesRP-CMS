@@ -12,6 +12,7 @@ module.exports = (crp, callback) => {
 						slug: req.body.slug,
 						game: crp.db.objectID(req.body.game),
 						tagline: req.body.tagline,
+						desc: req.body.desc,
 						discord: req.body.discord,
 						user: user
 					};
@@ -47,6 +48,7 @@ module.exports = (crp, callback) => {
 						name: req.body.name,
 						game: crp.db.objectID(req.body.game),
 						tagline: req.body.tagline,
+						desc: req.body.desc,
 						discord: req.body.discord,
 						img: {}
 					};

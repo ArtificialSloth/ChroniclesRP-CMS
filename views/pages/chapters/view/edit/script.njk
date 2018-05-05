@@ -1,6 +1,7 @@
 <script>
 	$('.chapter-edit-form').submit((e) => {
 		e.preventDefault();
+		tinymce.triggerSave();
 
 		var formData = new FormData(e.target);
 		crpAjaxUpload('/api/edit-chapter', formData, (res) => {

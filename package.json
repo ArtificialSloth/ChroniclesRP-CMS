@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"description": "The Chronicles RP CMS",
 	"author": "ArtificialSloth",
-	"license": "MIT",
+	"license": "AGPL-3.0-or-later",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ArtificialSloth/ChroniclesRP-CMS"

@@ -1,2 +1,4 @@
+{% include "./style.njk" %}
 {% lookup 'chapters', {_id: chapterid}, 'chapter' %}
-{{chapter.name}} - {{chapter.tagline}}
+
+<div class="desc">{{chapter.desc | safe}}</div>
