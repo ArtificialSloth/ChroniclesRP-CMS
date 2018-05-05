@@ -90,12 +90,12 @@ module.exports = (crp, callback) => {
 			css: {
 				colors: {
 					font: '#EDEDED',
-					link: '#3bc492',
+					link: '#8558CB',
 					bg: '#141414',
 					bodyBg: '#1D1D1D',
 					header: '#323232',
 					primary: '#242424',
-					secondary: '#0c9060'
+					secondary: '#53377F'
 				},
 				img: {
 					bg: '/img/bg.jpg'
