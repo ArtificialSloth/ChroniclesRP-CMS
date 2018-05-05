@@ -118,16 +118,16 @@ module.exports = (crp, callback) => {
 				}
 
 				if (data.img && data.img.profile) {
-					var path = `${crp.PUBLICDIR}/img/members/${newUser._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+					var path = `/img/members/${newUser._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.img.profile, data.img.profile[0].path, path);
+					crp.util.replaceFile(crp.PUBLICDIR + user.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
 					newUser.img.profile = path;
 				}
 
 				if (data.img && data.img.cover) {
-					var path = `${crp.PUBLICDIR}/img/members/${newUser._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+					var path = `/img/members/${newUser._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.img.cover, data.img.cover[0].path, path);
+					crp.util.replaceFile(crp.PUBLICDIR + user.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
 					newUser.img.cover = path;
 				}
 
