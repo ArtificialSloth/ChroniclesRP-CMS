@@ -1,0 +1,21 @@
+<script>
+	function joinChapter(chapterid) {
+		crpAjax('/api/join-chapter', {chapterid: chapterid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.log(res);
+			}
+		});
+	}
+
+	function leaveChapter(chapterid) {
+		crpAjax('/api/leave-chapter', {chapterid: chapterid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.log(res);
+			}
+		});
+	}
+</script>

@@ -1,28 +1,10 @@
 module.exports = (crp, callback) => {
 	crp.express.app.post('/api/add-chapter', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.util.addChapter(req.body, req.user, (err, result) => {
 				if (err) return res.send(err);
 
-				if (user.role == 'chapter_leader' || user.role == 'administrator') {
-					var chapterData = {
-						type: req.body.type,
-						cms: req.body.cms,
-						name: req.body.name,
-						slug: req.body.slug,
-						game: crp.db.objectID(req.body.game),
-						tagline: req.body.tagline,
-						desc: req.body.desc,
-						discord: req.body.discord,
-						user: user
-					};
-
-					crp.util.addChapter(chapterData, (err, result) => {
-						if (err) return res.send(err);
-
-						res.send(result);
-					});
-				}
+				res.send(result);
 			});
 		}).catch((err) => {
 			res.send('noCaptcha');
@@ -42,8 +24,7 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!chapter) return res.send('noChapter');
 
-				var member = crp.util.findObjectInArray(chapter.members, '_id', user._id.toString());
-				if ((member && member.role == 'leader') || user.role == 'administrator') {
+				if (chapter.members.indexOf({_id: user._id, role: 'leader'}) != -1  || user.role == 'administrator') {
 					var chapterData = {
 						name: req.body.name,
 						game: crp.db.objectID(req.body.game),
@@ -69,21 +50,26 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/remove-chapter', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.util.removeChapter(req.body.chapterid, req.user, (err, result) => {
 			if (err) return res.send(err);
-			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
-				if (err) return res.send(err);
+			res.send(result);
+		});
+	});
 
-				if (chapter.members.indexOf({_id: user._id, role: 'leader'}) != -1 || user.role == 'administrator') {
-					crp.util.removeChapter(chapter._id, (err, result) => {
-						if (err) return res.send(err);
+	crp.express.app.post('/api/join-chapter', (req, res) => {
+		crp.util.joinChapter(req.body.chapterid, req.user, (err, result) => {
+			if (err) return res.send(err);
 
-						res.send(result);
-					});
-				}
-			});
+			res.send(result);
+		});
+	});
+
+	crp.express.app.post('/api/leave-chapter', (req, res) => {
+		crp.util.leaveChapter(req.body.chapterid, req.user, (err, result) => {
+			if (err) return res.send(err);
+
+			res.send(result);
 		});
 	});
 

@@ -49,60 +49,65 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addChapter = (data, cb) => {
-		crp.util.getChapters({}, (err, chapters) => {
+	crp.util.addChapter = (data, userid, cb) => {
+		crp.util.getUserData(userid, (err, user) => {
 			if (err) return cb(err);
+			if (!user) return cb('noUser');
 
-			crp.db.findOne('games', {_id: data.game}, (err, game) => {
+			if (user.role != 'chapter_leader' && user.role != 'administrator') return cb('notAllowed');
+			crp.util.getChapters({}, (err, chapters) => {
 				if (err) return cb(err);
-				if (!game) return cb(null, 'noGame');
-				if (!data.user) return cb(null, 'noUser');
 
-				var chapter = {
-					type: data.type,
-					name: data.name,
-					nicename: crp.util.urlSafe(data.name),
-					slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name),
-					game: game._id,
-					tagline: data.tagline || '',
-					desc: data.desc || '',
-					discord: data.discord || '',
-					img: data.img || {},
-					members: [{
-						_id: data.user._id,
-						role: 'leader'
-					}]
-				};
-
-				var types = ['hosted', 'group', 'page', 'url'];
-				if (!types.includes(chapter.type)) return cb(null, 'noType');
-
-				if (!chapter.name) return cb(null, 'noName');
-				if (crp.util.findObjectInArray(chapters, 'name', chapter.name)) return cb(null, 'nameTaken');
-
-				if (chapter.slug == 'www') return cb(null, 'badDomain');
-				if (crp.util.findObjectInArray(chapters, 'slug', chapter.slug)) return cb(null, 'slugTaken');
-
-				if (chapter.tagline.length > 140) return cb(null, 'badTagline');
-
-				crp.db.insertOne('chapters', chapter, (err, result) => {
+				crp.db.findOne('games', {_id: crp.db.objectID(data.game)}, (err, game) => {
 					if (err) return cb(err);
+					if (!game) return cb('noGame');
 
-					crp.db.findOne('chapters', {_id: result.insertedId}, (err, chapter) => {
-						crp.fs.mkdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
-							if (err) return cb(err);
+					var chapter = {
+						type: data.type,
+						name: data.name,
+						nicename: crp.util.urlSafe(data.name),
+						slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name),
+						game: game._id,
+						tagline: data.tagline || '',
+						desc: data.desc || '',
+						discord: data.discord || '',
+						img: data.img || {},
+						members: [{
+							_id: user._id,
+							role: 'leader'
+						}]
+					};
 
-							if (chapter.type == 'hosted') {
-								crp.util.deployChapter(data.cms, chapter, (err) => {
-									crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+					var types = ['hosted', 'group', 'page', 'url'];
+					if (!types.includes(chapter.type)) return cb('noType');
 
+					if (!chapter.name) return cb('noName');
+					if (crp.util.findObjectInArray(chapters, 'name', chapter.name)) return cb('nameTaken');
+
+					if (chapter.slug == 'www') return cb('badDomain');
+					if (crp.util.findObjectInArray(chapters, 'slug', chapter.slug)) return cb('slugTaken');
+
+					if (chapter.tagline.length > 140) return cb('badTagline');
+
+					crp.db.insertOne('chapters', chapter, (err, result) => {
+						if (err) return cb(err);
+
+						crp.db.findOne('chapters', {_id: result.insertedId}, (err, chapter) => {
+							crp.fs.mkdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
+								if (err) return cb(err);
+
+								if (chapter.type == 'hosted') {
+									crp.util.deployChapter(data.cms, chapter, (err) => {
+										crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+
+										crp.util.addChapterPage(chapter);
+										cb(err, chapter);
+									});
+								} else {
 									crp.util.addChapterPage(chapter);
-									cb(err, chapter);
-								});
-							} else {
-								crp.util.addChapterPage(chapter);
-								cb(null, chapter);
-							}
+									cb(null, chapter);
+								}
+							});
 						});
 					});
 				});
@@ -110,27 +115,73 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeChapter = (chapterid, cb) => {
+	crp.util.removeChapter = (chapterid, userid, cb) => {
 		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
+			crp.util.getUserData(userid, (err, user) => {
 				if (err) return cb(err);
+				if (!user) return cb('noUser');
 
-				switch (chapter.type) {
-					case 'hosted':
-						crp.util.disbandChapter(chapter, (err) => {
-							if (err) return cb(err);
+				if (crp.util.getChapterMember(chapter, user._id).role != 'leader' && user.role != 'administrator') return cb('notAllowed');
+				crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
+					if (err) return cb(err);
 
+					switch (chapter.type) {
+						case 'hosted':
+							crp.util.disbandChapter(chapter, (err) => {
+								if (err) return cb(err);
+
+								crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
+							});
+							break;
+						default:
 							crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
-						});
-						break;
-					default:
-						crp.db.deleteOne('chapters', {_id: chapter._id}, cb);
-				}
+					}
+				});
 			});
 		});
+	};
+
+	crp.util.joinChapter = (chapterid, userid, cb) => {
+		crp.util.getChapterData(chapterid, (err, chapter) => {
+			if (err) return cb(err);
+			if (!chapter) return cb('noChapter');
+
+			crp.util.getUserData(userid, (err, user) => {
+				if (err) return cb(err);
+				if (!user) return cb('noUser');
+
+				if (crp.util.getChapterMember(chapter, user._id)) return cb('isMember');
+
+				chapter.members.push({_id: user._id, role: 'member'});
+				crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
+			});
+		});
+	};
+
+	crp.util.leaveChapter = (chapterid, userid, cb) => {
+		crp.util.getChapterData(chapterid, (err, chapter) => {
+			if (err) return cb(err);
+			if (!chapter) return cb('noChapter');
+
+			crp.util.getUserData(userid, (err, user) => {
+				if (err) return cb(err);
+				if (!user) return cb('noUser');
+
+				var member = crp.util.getChapterMember(chapter, user._id);
+				if (!member) return cb('notMember');
+
+				chapter.members.splice(chapter.members.indexOf(member), 1);
+				crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
+			});
+		});
+	};
+
+	crp.util.getChapterMember = (chapter, userid) => {
+		if (!chapter) return;
+		return crp.util.findObjectInArray(chapter.members, '_id', userid.toString());
 	};
 
 	crp.util.addChapterPage = (chapter) => {
