@@ -8,42 +8,61 @@ module.exports = (crp, callback) => {
 		crp.db.findOne('chapters', {_id: chapterid}, cb);
 	};
 
-	crp.util.setChapterData = (chapter, data, cb) => {
-		crp.util.getChapters({name: data.name}, (err, chapters) => {
+	crp.util.setChapterData = (chapterid, data, userid, cb) => {
+		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
-			if (chapters.length > 1) return cb(null, 'nameTaken');
+			if (!chapter) return cb('noChapter');
 
-			crp.db.findOne('games', {_id: data.game}, (err, game) => {
+			crp.util.getUserData(userid, (err, user) => {
 				if (err) return cb(err);
-				if (!game) return cb(null, 'noGame');
+				if (!user) return cb('noUser');
 
-				var newChapter = chapter;
-				newChapter.name = data.name;
-				newChapter.nicename = crp.util.urlSafe(data.name);
-				newChapter.game = data.game;
-				newChapter.tagline = data.tagline;
-				newChapter.desc = data.desc;
-				newChapter.discord = data.discord;
+				crp.db.findOne('games', {_id: crp.db.objectID(data.game)}, (err, game) => {
+					if (err) return cb(err);
+					if (!game) return cb('noGame');
 
-				if (newChapter.tagline.length > 140) return cb(null, 'badTagline');
+					var newChapter = {
+						_id: chapter._id,
+						type: chapter.type,
+						name: data.name || chapter.name,
+						nicename: crp.util.urlSafe(data.name) || chapter.nicename,
+						slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name) || chapter.slug,
+						game: game._id || chapter.game,
+						tagline: data.tagline || chapter.tagline,
+						desc: data.desc || chapter.desc,
+						discord: data.discord || chapter.discord,
+						img: chapter.img || {},
+						members: chapter.members || {}
+					};
 
-				if (data.img && data.img.profile) {
-					var path = `/img/chapters/${newChapter._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+					crp.util.getChapters({name: newChapter.name}, (err, chapters) => {
+						if (err) return cb(err);
+						if (chapters && newChapter.name != chapter.name) return cb('nameTaken');
 
-					crp.util.replaceFile(crp.PUBLICDIR + chapter.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
-					newChapter.img.profile = path;
-				}
+						if (newChapter.name.length > 90) return cb('badName');
+						if (newChapter.slug.length > 90) return cb('badSlug');
+						if (newChapter.tagline.length > 140) return cb('badTagline');
+						if (newChapter.discord.length > 19) return cb('badDiscord');
 
-				if (data.img && data.img.cover) {
-					var path = `/img/chapters/${newChapter._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+						if (data.img && data.img.profile) {
+							var path = `/img/chapters/${newChapter._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
 
-					crp.util.replaceFile(crp.PUBLICDIR + chapter.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
-					newChapter.img.cover = path;
-				}
+							crp.util.replaceFile(crp.PUBLICDIR + chapter.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
+							newChapter.img.profile = path;
+						}
 
-				newChapter = crp.util.sanitizeObject(newChapter);
-				crp.db.replaceOne('chapters', {_id: chapter._id}, newChapter, (err, result) => {
-					cb(err, newChapter);
+						if (data.img && data.img.cover) {
+							var path = `/img/chapters/${newChapter._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+
+							crp.util.replaceFile(crp.PUBLICDIR + chapter.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
+							newChapter.img.cover = path;
+						}
+
+						newChapter = crp.util.sanitizeObject(newChapter);
+						crp.db.replaceOne('chapters', {_id: chapter._id}, newChapter, (err, result) => {
+							cb(err, newChapter);
+						});
+					});
 				});
 			});
 		});
