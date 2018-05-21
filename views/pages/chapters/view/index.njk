@@ -10,7 +10,7 @@
 			<p>{{chapter.tagline}}</p>
 			{% if crp.util.getChapterMember(chapter, user._id) %}
 				<p><a onclick="leaveChapter('{{chapter._id}}')">Leave Chapter</a></p>
-			{% else %}
+			{% elseif chapter.open %}
 				<p><a onclick="joinChapter('{{chapter._id}}')">Join Chapter</a></p>
 			{% endif %}
 		</div>

@@ -21,6 +21,14 @@
 			</select>
 		</div>
 
+		<label for="open">Mempership</label>
+		<div class="standard-input">
+			<select name="open">
+					<option value="1" {% if chapter.open %}selected{% endif %}>Open</option>
+					<option value="0" {% if not chapter.open %}selected{% endif %}>Invite Only</option>
+			</select>
+		</div>
+
 		<label for="discord">Chapter Discord</label>
 		<div class="standard-input">
 			<input type="text" name="discord" value="{{chapter.discord}}" />

@@ -28,8 +28,9 @@ module.exports = (crp, callback) => {
 						nicename: crp.util.urlSafe(data.name) || chapter.nicename,
 						slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name) || chapter.slug,
 						game: game._id || chapter.game,
+						open: data.open ? !!+data.open : chapter.open,
 						tagline: data.tagline || chapter.tagline,
-						desc: data.desc || chapter.desc,
+						desc: (data.desc != chapter.desc) ? data.desc : chapter.desc,
 						discord: data.discord || chapter.discord,
 						img: chapter.img || {},
 						members: chapter.members || {}
@@ -87,6 +88,7 @@ module.exports = (crp, callback) => {
 						nicename: crp.util.urlSafe(data.name),
 						slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name),
 						game: game._id,
+						open: false,
 						tagline: data.tagline || '',
 						desc: data.desc || '',
 						discord: data.discord || '',
@@ -167,6 +169,7 @@ module.exports = (crp, callback) => {
 		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
+			if (!chapter.open) return cb('closed');
 
 			crp.util.getUserData(userid, (err, user) => {
 				if (err) return cb(err);

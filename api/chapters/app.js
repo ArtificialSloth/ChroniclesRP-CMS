@@ -27,37 +27,6 @@ module.exports = (crp, callback) => {
 
 			res.send(result);
 		});
-		/*crp.util.getUserData(req.user, (err, user) => {
-			if (err) return res.send(err);
-			if (!user) return res.send('noUser');
-
-			crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
-				if (err) return res.send(err);
-				if (!chapter) return res.send('noChapter');
-
-				if (chapter.members.indexOf({_id: user._id, role: 'leader'}) != -1  || user.role == 'administrator') {
-					var chapterData = {
-						name: req.body.name,
-						game: crp.db.objectID(req.body.game),
-						tagline: req.body.tagline,
-						desc: req.body.desc,
-						discord: req.body.discord,
-						img: {}
-					};
-
-					if (req.files) {
-						if (req.files.profile_pic) chapterData.img.profile = req.files.profile_pic;
-						if (req.files.cover_pic) chapterData.img.cover = req.files.cover_pic;
-					}
-
-					crp.util.setChapterData(chapter, chapterData, (err, result) => {
-						if (err) return res.send(err);
-
-						res.send(result);
-					});
-				}
-			});
-		});*/
 	});
 
 	crp.express.app.post('/api/remove-chapter', (req, res) => {

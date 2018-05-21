@@ -31,25 +31,20 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!topic) return cb('noTopic');
 
-			var newTopic = topic;
+			var newTopic = {
+				_id: topic._id,
+				author: data.author || topic.author,
+				title: data.title || topic.title,
+				type: topic.type,
+				content: data.content || topic.content,
+				date: topic.date,
+				parent: data.parent || topic.parent,
+				likes: (typeof data.likes == 'number') ? data.likes : topic.likes,
+				dislikes: (typeof data.dislikes == 'number') ? data.dislikes : topic.dislikes
+			};
 
-			if (data.title && data.title != newTopic.title) {
-				if (data.title.length < 4) return cb('titleLength');
-
-				newTopic.title = data.title;
-			}
-
-			if (data.author && data.author != newTopic.author) newTopic.author = data.author;
-
-			if (data.content && data.content != newTopic.content) {
-				if (data.content.length < 4) return cb('bodyLength');
-
-				newTopic.content = data.content;
-			}
-
-			if (data.parent && data.parent != newTopic.parent) newTopic.parent = data.parent;
-			if (data.likes !== undefined && data.likes != newTopic.likes) newTopic.likes = data.likes;
-			if (data.dislikes !== undefined && data.dislikes != newTopic.dislikes) newTopic.dislikes = data.dislikes;
+			if (newTopic.title.length < 4 || newTopic.title.length > 80) return cb('titleLength');
+			if (newTopic.content.length < 4) return cb('bodyLength');
 
 			newTopic = crp.util.sanitizeObject(newTopic);
 			crp.db.replaceOne('topics', {_id: topic._id}, newTopic, (err, result) => {
@@ -123,18 +118,17 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!reply) return cb('noReply');
 
-			var newReply = reply;
+			var newReply = {
+				_id: reply._id,
+				author: data.author || reply.author,
+				content: data.content || reply.content,
+				date: reply.date,
+				parent: reply.parent,
+				likes: (typeof data.likes == 'number') ? data.likes : reply.likes,
+				dislikes: (typeof data.dislikes == 'number') ? data.dislikes : reply.dislikes
+			};
 
-			if (data.author && data.author != newReply.author) newReply.author = data.author;
-
-			if (data.content && data.content != newReply.content) {
-				if (data.content.length < 4) return cb('bodyLength');
-
-				newReply.content = data.content;
-			}
-
-			if (data.likes !== undefined && data.likes != newReply.likes) newReply.likes = data.likes;
-			if (data.dislikes !== undefined && data.dislikes != newReply.dislikes) newReply.dislikes = data.dislikes;
+			if (data.content.length < 4) return cb('bodyLength');
 
 			newReply = crp.util.sanitizeObject(newReply);
 			crp.db.replaceOne('replies', {_id: reply._id}, newReply, (err, result) => {
