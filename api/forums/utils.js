@@ -1,4 +1,8 @@
 module.exports = (crp, callback) => {
+	crp.util.getCategories = (filter, cb) => {
+		crp.db.find('categories', filter, {}, cb);
+	};
+
 	crp.util.getForums = (filter, cb) => {
 		crp.db.find('forums', filter, {}, cb);
 	};
@@ -9,6 +13,11 @@ module.exports = (crp, callback) => {
 
 	crp.util.getReplies = (filter, cb) => {
 		crp.db.find('replies', filter, {}, cb);
+	};
+
+	crp.util.getCategoryData = (categoryid, cb) => {
+		if (typeof categoryid != 'object') categoryid = crp.db.objectID(categoryid);
+		crp.db.findOne('categories', {_id: categoryid}, cb);
 	};
 
 	crp.util.getForumData = (forumid, cb) => {
@@ -24,6 +33,42 @@ module.exports = (crp, callback) => {
 	crp.util.getReplyData = (replyid, cb) => {
 		if (typeof replyid != 'object') replyid = crp.db.objectID(replyid);
 		crp.db.findOne('replies', {_id: replyid}, cb);
+	};
+
+	crp.util.addForum = (data, cb) => {
+		crp.util.getForums({}, (err, forums) => {
+			if (err) return cb(err);
+
+			var forum = {
+				name: data.name,
+				slug: crp.util.urlSafe(data.name),
+				desc: data.desc || '',
+				category: crp.db.objectID(data.category),
+				order: data.order || 0
+			};
+
+			if (forum.name.length < 4 || forum.name.length > 80) return cb('nameLength');
+			if (crp.util.findObjectInArray(forums, 'slug', forum.slug)) return cb('slugTaken');
+			if (forum.desc.length > 140) return cb('descLength');
+
+			crp.util.getCategoryData(forum.category, (err, category) => {
+				if (err) return cb(err);
+				if (!category) return cb('badCategory');
+
+				forum = crp.util.sanitizeObject(forum);
+				crp.db.insertOne('forums', forum, (err, result) => {
+					if (err) return cb(err);
+
+					crp.pages.push({
+						slug: '/forums/' + forum.slug,
+						path: '/forums/forum/index.njk',
+						context: {forumid: result.insertedId}
+					});
+
+					cb(null, result);
+				});
+			});
+		});
 	};
 
 	crp.util.setTopicData = (topicid, data, cb) => {
@@ -142,22 +187,20 @@ module.exports = (crp, callback) => {
 			author: data.author,
 			content: data.content,
 			date: data.date || Date.now(),
-			parent: data.parent,
+			parent: crp.db.objectID(data.parent),
 			likes: data.likes || 0,
 			dislikes: data.dislikes || 0
 		};
 
 		crp.util.getUserData(reply.author, (err, user) => {
 			if (err) return cb(err);
-			if (!user || user.role == 'pending') return cb(null, 'generic');;
+			if (!user || user.role == 'pending') return cb('generic');;
 
-			if (!reply.content || reply.content.length < 4) return cb(null, 'bodyLength');
+			if (!reply.content || reply.content.length < 4) return cb('bodyLength');
 
 			crp.util.getTopicData(reply.parent, (err, topic) => {
 				if (err) return cb(err);
-				if (!topic) return cb(null, 'generic');
-
-				reply.parent = topic._id;
+				if (!topic) return cb('generic');
 
 				reply = crp.util.sanitizeObject(reply);
 				crp.db.insertOne('replies', reply, (err, result) => {
