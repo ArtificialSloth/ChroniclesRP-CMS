@@ -3,21 +3,13 @@ module.exports = (crp, callback) => {
 		crp.db.find('categories', filter, {}, cb);
 	};
 
-	crp.util.getForums = (filter, cb) => {
-		crp.db.find('forums', filter, {}, cb);
-	};
-
-	crp.util.getTopics = (filter, cb) => {
-		crp.db.find('topics', filter, {}, cb);
-	};
-
-	crp.util.getReplies = (filter, cb) => {
-		crp.db.find('replies', filter, {}, cb);
-	};
-
 	crp.util.getCategoryData = (categoryid, cb) => {
 		if (typeof categoryid != 'object') categoryid = crp.db.objectID(categoryid);
 		crp.db.findOne('categories', {_id: categoryid}, cb);
+	};
+
+	crp.util.getForums = (filter, cb) => {
+		crp.db.find('forums', filter, {}, cb);
 	};
 
 	crp.util.getForumData = (forumid, cb) => {
@@ -25,14 +17,73 @@ module.exports = (crp, callback) => {
 		crp.db.findOne('forums', {_id: forumid}, cb);
 	};
 
+	crp.util.getTopics = (filter, cb) => {
+		crp.db.find('topics', filter, {}, cb);
+	};
+
 	crp.util.getTopicData = (topicid, cb) => {
 		if (typeof topicid != 'object') topicid = crp.db.objectID(topicid);
 		crp.db.findOne('topics', {_id: topicid}, cb);
 	};
 
+	crp.util.getReplies = (filter, cb) => {
+		crp.db.find('replies', filter, {}, cb);
+	};
+
 	crp.util.getReplyData = (replyid, cb) => {
 		if (typeof replyid != 'object') replyid = crp.db.objectID(replyid);
 		crp.db.findOne('replies', {_id: replyid}, cb);
+	};
+
+	crp.util.setForumData = (forumid, data, cb) => {
+		crp.util.getForumData(forumid, (err, forum) => {
+			if (err) return cb(err);
+			if (!forum) return cb('noForum');
+
+			var newForum = {
+				_id: forum._id,
+				name: data.name || forum.name,
+				slug: crp.util.urlSafe(data.name) || forum.slug,
+				desc: (data.desc != forum.desc) ? data.desc : forum.desc,
+				chapter: crp.db.objectID(data.chapter) || forum.chapter,
+				category: crp.db.objectID(data.category) || forum.chapter,
+				order: data.order || forum.order
+			};
+
+			if (forum.name.length < 4 || forum.name.length > 80) return cb('nameLength');
+			if (forum.desc.length > 140) return cb('descLength');
+
+			crp.util.getForums({slug: newForum.slug}, (err, forums) => {
+				if (err) return cb(err);
+				if (forums && newForum.slug != forum.slug) return cb('slugTaken');
+
+				crp.util.getCategoryData(newForum.category, (err, category) => {
+					if (err) return cb(err);
+					if (!category) return cb('noCategory');
+
+					crp.util.getChapterData(newForum.chapter, (err, chapter) => {
+						if (err) return cb(err);
+						if (newForum.chapter && !chapter) return cb('noChapter');
+
+						newForum = crp.util.sanitizeObject(newForum);
+						crp.db.replaceOne('forums', newForum, (err, result) => {
+							if (err) return cb(err);
+
+							var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/forums/' + forum.slug));
+							if (index > -1) crp.pages.splice(index, 1);
+
+							crp.pages.push({
+								slug: '/forums/' + newForum.slug,
+								path: '/forums/forum/index.njk',
+								context: {forumid: newForum._id}
+							});
+
+							cb(null, newForum);
+						});
+					});
+				});
+			});
+		});
 	};
 
 	crp.util.addForum = (data, cb) => {
@@ -43,6 +94,7 @@ module.exports = (crp, callback) => {
 				name: data.name,
 				slug: crp.util.urlSafe(data.name),
 				desc: data.desc || '',
+				chapter: crp.db.objectID(data.chapter) || null,
 				category: crp.db.objectID(data.category),
 				order: data.order || 0
 			};
@@ -53,19 +105,24 @@ module.exports = (crp, callback) => {
 
 			crp.util.getCategoryData(forum.category, (err, category) => {
 				if (err) return cb(err);
-				if (!category) return cb('badCategory');
+				if (!category) return cb('noCategory');
 
-				forum = crp.util.sanitizeObject(forum);
-				crp.db.insertOne('forums', forum, (err, result) => {
+				crp.util.getChapterData(forum.chapter, (err, chapter) => {
 					if (err) return cb(err);
+					if (forum.chapter && !chapter) return cb('noChapter');
 
-					crp.pages.push({
-						slug: '/forums/' + forum.slug,
-						path: '/forums/forum/index.njk',
-						context: {forumid: result.insertedId}
+					forum = crp.util.sanitizeObject(forum);
+					crp.db.insertOne('forums', forum, (err, result) => {
+						if (err) return cb(err);
+
+						crp.pages.push({
+							slug: '/forums/' + forum.slug,
+							path: '/forums/forum/index.njk',
+							context: {forumid: result.insertedId}
+						});
+
+						cb(null, result);
 					});
-
-					cb(null, result);
 				});
 			});
 		});
