@@ -128,6 +128,32 @@ module.exports = (crp, callback) => {
 		});
 	};
 
+	crp.util.removeForum = (forumid, cb) => {
+		crp.util.getForumData(forumid, (err, forum) => {
+			if (err) return cb(err);
+			if (!forum) return cb('noForum');
+
+			crp.util.getTopics({parent: forum._id}, (err, topics) => {
+				if (err) return cb(err);
+
+				crp.async.each(topics, (topic, callback) => {
+					if (!topic) return callback();
+
+					crp.util.removeTopic(topic._id, callback);
+				}, (err) => {
+					if (err) return cb(err);
+
+					crp.db.deleteOne('forums', {_id: forum._id}, (err, result) => {
+						if (err) return cb(err);
+
+						crp.pages.splice(crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'context', {forumid: forum._id})), 1);
+						cb(null, result);
+					});
+				});
+			});
+		});
+	};
+
 	crp.util.setTopicData = (topicid, data, cb) => {
 		crp.util.getTopicData(topicid, (err, topic) => {
 			if (err) return cb(err);
