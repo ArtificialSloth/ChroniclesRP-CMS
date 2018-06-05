@@ -5,6 +5,7 @@
 		{% lookup 'topics', {_id: topicid}, 'topic' %}
 		{% lookup 'forums', {_id: topic.parent}, 'forum' %}
 		{% lookup 'categories', {_id: forum.category}, 'category' %}
+		{% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
 		{% lookup 'users', {_id: topic.author}, 'author' %}
 		{% lookup 'users', {_id: userid}, 'user' %}
 
@@ -18,7 +19,7 @@
 			<span>{{topic.title}}</span>
 		</p>
 
-		{% if not category.role or category.role == user.role or user.role == 'administrator' %}
+		{% if (not chapter or crp.util.getChapterMember(chapter, user._id)) and not category.role or category.role == user.role or user.role == 'administrator' %}
 			<li class="header">
 				<ul>
 					<li>Author</li>

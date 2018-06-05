@@ -35,6 +35,52 @@ module.exports = (crp, callback) => {
 		crp.db.findOne('replies', {_id: replyid}, cb);
 	};
 
+	crp.util.addCategory = (data, cb) => {
+		crp.util.getCategories({}, (err, categories) => {
+			if (err) return cb(err);
+
+			crp.util.getChapterData(data.chapter, (err, chapter) => {
+				if (err) return cb(err);
+
+				var category = {
+					name: data.name,
+					chapter: crp.db.objectID(data.chapter) || null,
+					role: data.role || null,
+					order: data.order
+				};
+
+				if (!category.name) return cb('noName');
+				if (category.name.length > 80) return cb('nameLength');
+				if (category.chapter && !chapter) return cb('noChapter');
+
+				var sorted = crp.util.sortObjectArray(categories, 'order');
+				if (!category.order) category.order = sorted[sorted.length - 1].order + 1;
+
+				crp.db.insertOne('categories', category, cb);
+			});
+		});
+	};
+
+	crp.util.removeCategory = (categoryid, cb) => {
+		crp.util.getCategoryData(categoryid, (err, category) => {
+			if (err) return cb(err);
+
+			crp.util.getForums({category: category._id}, (err, forums) => {
+				if (err) return cb(err);
+
+				crp.async.each(forums, (forum, callback) => {
+					if (!forum) return callback();
+
+					crp.util.removeForum(forum._id, callback);
+				}, (err) => {
+					if (err) return cb(err);
+
+					crp.db.deleteOne('categories', {_id: category._id}, cb);
+				});
+			});
+		});
+	};
+
 	crp.util.setForumData = (forumid, data, cb) => {
 		crp.util.getForumData(forumid, (err, forum) => {
 			if (err) return cb(err);
@@ -45,7 +91,6 @@ module.exports = (crp, callback) => {
 				name: data.name || forum.name,
 				slug: crp.util.urlSafe(data.name) || forum.slug,
 				desc: (data.desc != forum.desc) ? data.desc : forum.desc,
-				chapter: crp.db.objectID(data.chapter) || forum.chapter,
 				category: crp.db.objectID(data.category) || forum.chapter,
 				order: data.order || forum.order
 			};
@@ -61,25 +106,20 @@ module.exports = (crp, callback) => {
 					if (err) return cb(err);
 					if (!category) return cb('noCategory');
 
-					crp.util.getChapterData(newForum.chapter, (err, chapter) => {
+					newForum = crp.util.sanitizeObject(newForum);
+					crp.db.replaceOne('forums', newForum, (err, result) => {
 						if (err) return cb(err);
-						if (newForum.chapter && !chapter) return cb('noChapter');
 
-						newForum = crp.util.sanitizeObject(newForum);
-						crp.db.replaceOne('forums', newForum, (err, result) => {
-							if (err) return cb(err);
+						var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/forums/' + forum.slug));
+						if (index > -1) crp.pages.splice(index, 1);
 
-							var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/forums/' + forum.slug));
-							if (index > -1) crp.pages.splice(index, 1);
-
-							crp.pages.push({
-								slug: '/forums/' + newForum.slug,
-								path: '/forums/forum/index.njk',
-								context: {forumid: newForum._id}
-							});
-
-							cb(null, newForum);
+						crp.pages.push({
+							slug: '/forums/' + newForum.slug,
+							path: '/forums/forum/index.njk',
+							context: {forumid: newForum._id}
 						});
+
+						cb(null, newForum);
 					});
 				});
 			});
@@ -94,7 +134,6 @@ module.exports = (crp, callback) => {
 				name: data.name,
 				slug: crp.util.urlSafe(data.name),
 				desc: data.desc || '',
-				chapter: crp.db.objectID(data.chapter) || null,
 				category: crp.db.objectID(data.category),
 				order: data.order || 0
 			};
@@ -107,22 +146,17 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 				if (!category) return cb('noCategory');
 
-				crp.util.getChapterData(forum.chapter, (err, chapter) => {
+				forum = crp.util.sanitizeObject(forum);
+				crp.db.insertOne('forums', forum, (err, result) => {
 					if (err) return cb(err);
-					if (forum.chapter && !chapter) return cb('noChapter');
 
-					forum = crp.util.sanitizeObject(forum);
-					crp.db.insertOne('forums', forum, (err, result) => {
-						if (err) return cb(err);
-
-						crp.pages.push({
-							slug: '/forums/' + forum.slug,
-							path: '/forums/forum/index.njk',
-							context: {forumid: result.insertedId}
-						});
-
-						cb(null, result);
+					crp.pages.push({
+						slug: '/forums/' + forum.slug,
+						path: '/forums/forum/index.njk',
+						context: {forumid: result.insertedId}
 					});
+
+					cb(null, result);
 				});
 			});
 		});
@@ -195,29 +229,40 @@ module.exports = (crp, callback) => {
 
 		crp.util.getUserData(topic.author, (err, user) => {
 			if (err) return cb(err);
-			if (!user || user.role == 'pending') return cb(null, 'generic');
+			if (!user || user.role == 'pending') return cb('generic');
 
-			if (!topic.title || topic.title.length < 4) return cb(null, 'titleShort');
+			if (!topic.title || topic.title.length < 4) return cb('titleShort');
 			if (topic.title.length > 80) return cb(null, 'titleLong');
-			if (!topic.content || topic.content.length < 4) return cb(null, 'bodyLength');
+			if (!topic.content || topic.content.length < 4) return cb('bodyLength');
 
 			crp.util.getForumData(topic.parent, (err, forum) => {
 				if (err) return cb(err);
-				if (!forum) return cb(null, 'generic');
+				if (!forum) return cb('generic');
 
-				topic.parent = forum._id;
-
-				topic = crp.util.sanitizeObject(topic);
-				crp.db.insertOne('topics', topic, (err, result) => {
+				crp.util.getCategoryData(forum.category, (err, category) => {
 					if (err) return cb(err);
+					if (!category) return cb('generic');
+					if (category.role && user.role != category.role && user.role != 'administrator') return cb('notAllowed');
 
-					crp.pages.push({
-						slug: '/forums/' + forum.slug + '/' + result.insertedId.toString(),
-						path: '/forums/topic/index.njk',
-						context: {topicid: result.insertedId}
+					crp.util.getChapterData(category.chapter, (err, chapter) => {
+						if (err) return cb(err);
+						if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role != 'administrator') return cb('notAllowed');
+
+						topic.parent = forum._id;
+
+						topic = crp.util.sanitizeObject(topic);
+						crp.db.insertOne('topics', topic, (err, result) => {
+							if (err) return cb(err);
+
+							crp.pages.push({
+								slug: '/forums/' + forum.slug + '/' + result.insertedId.toString(),
+								path: '/forums/topic/index.njk',
+								context: {topicid: result.insertedId}
+							});
+
+							cb(null, topic);
+						});
 					});
-
-					cb(null, topic);
 				});
 			});
 		});
@@ -285,9 +330,25 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 				if (!topic) return cb('generic');
 
-				reply = crp.util.sanitizeObject(reply);
-				crp.db.insertOne('replies', reply, (err, result) => {
-					cb(err, reply)
+				crp.util.getForumData(topic.parent, (err, forum) => {
+					if (err) return cb(err);
+					if (!forum) return cb('generic');
+
+					crp.util.getCategoryData(forum.category, (err, category) => {
+						if (err) return cb(err);
+						if (!category) return cb('generic');
+						if (category.role && user.role != category.role && user.role != 'administrator') return cb('notAllowed');
+
+						crp.util.getChapterData(category.chapter, (err, chapter) => {
+							if (err) return cb(err);
+							if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role != 'administrator') return cb('notAllowed');
+
+							reply = crp.util.sanitizeObject(reply);
+							crp.db.insertOne('replies', reply, (err, result) => {
+								cb(err, reply)
+							});
+						});
+					});
 				});
 			});
 		});

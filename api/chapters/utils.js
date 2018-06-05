@@ -128,11 +128,10 @@ module.exports = (crp, callback) => {
 										});
 										break;
 									case 'group':
-										crp.util.getCategories({name: 'Chapters'}, (err, categories) => {
+										crp.util.addCategory({name: chapter.name, chapter: chapter._id}, (err, result) => {
 											if (err) return cb(err);
-											if (!categories) return cb('noCategories');
 
-											crp.util.addForum({name: chapter.name, desc: chapter.tagline, chapter: chapter._id, category: categories[0]._id}, (err, result) => {
+											crp.util.addForum({name: chapter.name, desc: chapter.tagline, category: result.insertedId}, (err, result) => {
 												if (err) return cb(err);
 
 												crp.util.addChapterPage(chapter);
@@ -161,7 +160,8 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 
-				if (crp.util.getChapterMember(chapter, user._id).role != 'leader' && user.role != 'administrator') return cb('notAllowed');
+				var member = crp.util.getChapterMember(chapter, user._id);
+				if ((member && member.role != 'leader') && user.role != 'administrator') return cb('notAllowed');
 				crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
 					if (err) return cb(err);
 
@@ -179,11 +179,11 @@ module.exports = (crp, callback) => {
 							});
 							break;
 						case 'group':
-							crp.util.getForums({chapter: chapter._id}, (err, forums) => {
+							crp.util.getCategories({chapter: chapter._id}, (err, categories) => {
 								if (err) return cb(err);
-								if (!forums) return cb('noForums');
+								if (!categories) return cb('noCategories');
 
-								crp.util.removeForum(forums[0]._id, (err, result) => {
+								crp.util.removeCategory(categories[0]._id, (err, result) => {
 									if (err) return cb(err);
 
 									crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {

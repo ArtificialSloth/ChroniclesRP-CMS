@@ -38,7 +38,7 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				if (topic.author == user._id || user.role == 'administrator') {
+				if (topic.author.equals(user._id) || user.role == 'administrator') {
 					crp.util.removeTopic(topic._id, (err, result) => {
 						if (err) return res.send(err);
 
@@ -60,7 +60,7 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				if (reply.author == user._id || user.role == 'administrator') {
+				if (reply.author.equals(user._id) || user.role == 'administrator') {
 					crp.util.removeReply(reply._id, (err, result) => {
 						if (err) return res.send(err);
 
