@@ -229,7 +229,7 @@ module.exports = (crp, callback) => {
 
 		crp.util.getUserData(topic.author, (err, user) => {
 			if (err) return cb(err);
-			if (!user || user.role == 'pending') return cb('generic');
+			if (!user || user.role <= 0) return cb('generic');
 
 			if (!topic.title || topic.title.length < 4) return cb('titleShort');
 			if (topic.title.length > 80) return cb(null, 'titleLong');
@@ -242,11 +242,11 @@ module.exports = (crp, callback) => {
 				crp.util.getCategoryData(forum.category, (err, category) => {
 					if (err) return cb(err);
 					if (!category) return cb('generic');
-					if (category.role && user.role != category.role && user.role != 'administrator') return cb('notAllowed');
+					if (category.role && user.role < category.role) return cb('notAllowed');
 
 					crp.util.getChapterData(category.chapter, (err, chapter) => {
 						if (err) return cb(err);
-						if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role != 'administrator') return cb('notAllowed');
+						if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
 
 						topic.parent = forum._id;
 
@@ -322,7 +322,7 @@ module.exports = (crp, callback) => {
 
 		crp.util.getUserData(reply.author, (err, user) => {
 			if (err) return cb(err);
-			if (!user || user.role == 'pending') return cb('generic');;
+			if (!user || user.role <= 0) return cb('generic');;
 
 			if (!reply.content || reply.content.length < 4) return cb('bodyLength');
 
@@ -337,11 +337,11 @@ module.exports = (crp, callback) => {
 					crp.util.getCategoryData(forum.category, (err, category) => {
 						if (err) return cb(err);
 						if (!category) return cb('generic');
-						if (category.role && user.role != category.role && user.role != 'administrator') return cb('notAllowed');
+						if (category.role && user.role < category.role) return cb('notAllowed');
 
 						crp.util.getChapterData(category.chapter, (err, chapter) => {
 							if (err) return cb(err);
-							if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role != 'administrator') return cb('notAllowed');
+							if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
 
 							reply = crp.util.sanitizeObject(reply);
 							crp.db.insertOne('replies', reply, (err, result) => {

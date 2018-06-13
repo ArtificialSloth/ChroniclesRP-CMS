@@ -6,7 +6,7 @@
 <ul class="header noselect">
 	<li class="active" onclick="crpGetSubPage('/chapters', '.chapters', true)">All Chapters</li>
 
-	{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+	{% if user.role >= 2 %}
 		<li onclick="crpGetSubPage('/chapters/create', '.chapters', true)">Create a Chapter</li>
 	{% endif %}
 </ul>
@@ -30,7 +30,7 @@
 					</li>
 					<li>
 						Game: <a onclick="crpGetSubPage('/chapters/{{game.slug}}', '.chapters', true)">{{game.name}}</a>
-						{% if crp.util.getChapterMember(chapter, user._id).role == 'leader' or user.role == 'administrator' %}
+						{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
 							<span><a onclick="crpGetPage('/chapters/{{chapter.nicename}}/edit')">Edit</a> | <a onclick="removeChapter('{{chapter._id}}')">Delete</a></span>
 						{% endif %}
 					</li>

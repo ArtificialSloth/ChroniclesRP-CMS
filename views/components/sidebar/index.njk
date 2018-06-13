@@ -41,7 +41,7 @@
 					{% lookup 'forums', {_id: topic.parent}, 'forum' %}
 					{% lookup 'categories', {_id: forum.category}, 'category' %}
 
-					{% if not category.role or category.role == user.role or user.role == 'administrator' %}
+					{% if not category.role or user.role >= category.role %}
 						<li>
 							<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a>
 							by

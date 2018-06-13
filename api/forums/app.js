@@ -38,7 +38,7 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				if (topic.author.equals(user._id) || user.role == 'administrator') {
+				if (topic.author.equals(user._id) || user.role >= 3) {
 					crp.util.removeTopic(topic._id, (err, result) => {
 						if (err) return res.send(err);
 
@@ -60,7 +60,7 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				if (reply.author.equals(user._id) || user.role == 'administrator') {
+				if (reply.author.equals(user._id) || user.role >= 3) {
 					crp.util.removeReply(reply._id, (err, result) => {
 						if (err) return res.send(err);
 
@@ -76,7 +76,7 @@ module.exports = (crp, callback) => {
 	crp.express.app.post('/api/admin/new-topic', (req, res) => {
 		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
-			if (!user || user.role != 'administrator') return res.send('notAllowed');
+			if (!user || user.role < 3) return res.send('notAllowed');
 
 			var topicData = {
 				author: crp.db.objectID(req.body.topic_author),
@@ -103,7 +103,7 @@ module.exports = (crp, callback) => {
 
 			crp.util.getUserData(req.user, (err, user) => {
 				if (err) return res.send(err);
-				if (!user || user.role != 'administrator') return res.send('notAllowed');
+				if (!user || user.role < 3) return res.send('notAllowed');
 
 				var topicData = {
 					author: crp.db.objectID(req.body.topic_author),
@@ -126,7 +126,7 @@ module.exports = (crp, callback) => {
 	crp.express.app.post('/api/admin/new-reply', (req, res) => {
 		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
-			if (!user || user.role != 'administrator') return res.send('notAllowed');
+			if (!user || user.role < 3) return res.send('notAllowed');
 
 			var replyData = {
 				author: crp.db.objectID(req.body.reply_author),
@@ -152,7 +152,7 @@ module.exports = (crp, callback) => {
 
 			crp.util.getUserData(req.user, (err, user) => {
 				if (err) return res.send(err);
-				if (!user || user.role != 'administrator') return res.send('notAllowed');
+				if (!user || user.role < 3) return res.send('notAllowed');
 
 				var replyData = {
 					author: crp.db.objectID(req.body.reply_author),

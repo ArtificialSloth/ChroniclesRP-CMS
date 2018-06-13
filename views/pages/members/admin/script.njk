@@ -20,7 +20,7 @@
 
 				$('.' + res._id + ' .login').html(res.login);
 				$('.' + res._id + ' .email').html(res.email);
-				$('.' + res._id + ' .role').html(res.role);
+				$('.' + res._id + ' .role').html(usersParseRole(res.role));
 				$(e.target).find('.user-saved').addClass('active');
 
 				setTimeout(() => {

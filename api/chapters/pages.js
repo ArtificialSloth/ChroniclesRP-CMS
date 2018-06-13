@@ -8,7 +8,7 @@ module.exports = (crp, callback) => {
 	crp.pages.push({
 		slug: '/chapters/create',
 		path: '/chapters/index.njk',
-		role: 'chapter_leader',
+		role: 2,
 		subPage: '/chapters/create/index.njk'
 	});
 

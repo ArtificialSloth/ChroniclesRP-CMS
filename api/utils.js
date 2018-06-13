@@ -109,9 +109,9 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 
 				var canView = true;
-				if (page.role && user.role != page.role) canView = false;
+				if (page.role && user.role < page.role) canView = false;
 
-				if (canView || user.role == 'administrator') {
+				if (canView || user.role >= 3) {
 					path = page.path;
 					if (page.subPage) context.subPage = page.subPage;
 					if (page.context) context = Object.assign(context, page.context);

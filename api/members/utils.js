@@ -40,7 +40,7 @@ module.exports = (crp, callback) => {
 			register_date: user.register_date || Date.now(),
 			display_name: user.display_name || user.login,
 			nicename: user.nicename || crp.util.urlSafe(user.login),
-			role: user.role || 'pending',
+			role: parseInt(user.role) || 0,
 			locked: user.locked || false,
 			timezone: user.timezone || crp.moment.tz.guess(),
 			date_of_birth: user.date_of_birth,
@@ -72,7 +72,7 @@ module.exports = (crp, callback) => {
 
 				if (admin) {
 					newUser.role = data.role || user.role;
-					newUser.locked = data.locked || user.locked;
+					newUser.locked = (data.locked == 'on') ? true : false;
 				}
 
 				if (data.login && data.login != user.login) {
@@ -259,6 +259,25 @@ module.exports = (crp, callback) => {
 				crp.db.deleteOne('users', {_id: user._id}, cb);
 			});
 		});
+	};
+
+	crp.util.parseRole = (role) => {
+		switch (role) {
+			case 0:
+				return 'Pending';
+				break;
+			case 1:
+				return 'Member';
+				break;
+			case 2:
+				return 'Chapter Leader';
+				break;
+			case 3:
+				return 'Administrator';
+				break;
+			default:
+				return 'Guest';
+		}
 	};
 
 	crp.util.addProfilePage = (user) => {

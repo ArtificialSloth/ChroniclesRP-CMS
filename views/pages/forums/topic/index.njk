@@ -19,7 +19,7 @@
 			<span>{{topic.title}}</span>
 		</p>
 
-		{% if (not chapter or crp.util.getChapterMember(chapter, user._id)) and not category.role or category.role == user.role or user.role == 'administrator' %}
+		{% if (not chapter or crp.util.getChapterMember(chapter, user._id)) and not category.role or user.role >= category.role %}
 			<li class="header">
 				<ul>
 					<li>Author</li>
@@ -30,7 +30,7 @@
 			<li class="sub-header">
 				<ul>
 					<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
-					<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a>Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+					<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a>Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 				</ul>
 			</li>
 
@@ -39,7 +39,7 @@
 					<li>
 						<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
 						<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-						<div class="role">{{author.role.replace('_', ' ')}}</div>
+						<div class="role">{{crp.util.parseRole(author.role)}}</div>
 					</li>
 					<li>{{topic.content | safe}}</li>
 				</ul>
@@ -52,7 +52,7 @@
 				<li class="sub-header reply">
 					<ul>
 						<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>
-						<li>{% if author._id.equals(user._id) or user.role == 'administrator' %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+						<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 					</ul>
 				</li>
 				<li class="reply body">
@@ -61,14 +61,14 @@
 
 							<img src="{{author.img.profile or '/img/members/profile.png'}}" width="80" height="80" />
 							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-							<div class="role">{{author.role.replace('_', ' ')}}</div>
+							<div class="role">{{crp.util.parseRole(author.role)}}</div>
 						</li>
 						<li>{{reply.content | safe}}</li>
 					</ul>
 				</li>
 			{% endfor %}
 
-			{% if user and user.role != 'pending' %}
+			{% if user and user.role > 0 %}
 				<script>crpTinyMCE()</script>
 				<fieldset class="new-post">
 					<legend>Reply to: {{topic.title}}</legend>

@@ -19,7 +19,7 @@
 			<ul class="sub-menu">
 				<li class="menu-item"><a onclick="crpGetPage('/resources')">Mod Suggestions</a></li>
 				<li class="menu-item"><a onclick="crpGetPage('/events')">Chronicles Events</a></li>
-				{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+				{% if user.role >= 2 %}
 					<li class="menu-item"><a onclick="crpGetPage('/global-blacklist')">Global Blacklist</a></li>
 				{% endif %}
 			</ul>
@@ -43,7 +43,7 @@
 					{% endif %}
 				{% endfor %}
 
-				{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+				{% if user.role >=2 %}
 					<li class="menu-item">
 						<a onclick="crpGetPage('/chapters/create')">Create a Chapter</a>
 					</li>
@@ -58,7 +58,7 @@
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}')">Activity</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/account')">Account</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/settings')">Settings</a></li>
-					{% if user.role == 'administrator' %}
+					{% if user.role >= 3 %}
 						<li class="menu-item"><a onclick="crpGetPage('/admin/users')">Admin</a></li>
 					{% endif %}
 				</ul>
@@ -70,7 +70,7 @@
 		{% endif %}
 	</ul>
 
-	{% if user.role == "pending" %}
+	{% if user.role == 0 %}
 		<div class="warning">
 			<span>You're not done! You need to use the code we sent to you're email address to activate you're account and complete the registration process.</span>
 

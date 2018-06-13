@@ -4,7 +4,7 @@
 <ul class="header noselect">
 	<li onclick="crpGetSubPage('/chapters', '.chapters', true)">All Chapters</li>
 
-	{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+	{% if user.role >= 2 %}
 		<li class="active" onclick="crpGetSubPage('/chapters/create', '.chapters', true)">Create a Chapter</li>
 	{% endif %}
 </ul>

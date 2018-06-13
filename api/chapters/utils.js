@@ -74,7 +74,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');
 
-			if (user.role != 'chapter_leader' && user.role != 'administrator') return cb('notAllowed');
+			if (user.role < 2) return cb('notAllowed');
 			crp.util.getChapters({}, (err, chapters) => {
 				if (err) return cb(err);
 
@@ -95,7 +95,7 @@ module.exports = (crp, callback) => {
 						img: data.img || {},
 						members: [{
 							_id: user._id,
-							role: 'leader'
+							role: 2
 						}]
 					};
 
@@ -161,7 +161,7 @@ module.exports = (crp, callback) => {
 				if (!user) return cb('noUser');
 
 				var member = crp.util.getChapterMember(chapter, user._id);
-				if ((member && member.role != 'leader') && user.role != 'administrator') return cb('notAllowed');
+				if ((member && member.role != 2) && user.role < 3) return cb('notAllowed');
 				crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
 					if (err) return cb(err);
 
@@ -220,7 +220,7 @@ module.exports = (crp, callback) => {
 
 				if (crp.util.getChapterMember(chapter, user._id)) return cb('isMember');
 
-				chapter.members.push({_id: user._id, role: 'member'});
+				chapter.members.push({_id: user._id, role: 1});
 				crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
 			});
 		});

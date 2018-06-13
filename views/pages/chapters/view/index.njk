@@ -20,7 +20,7 @@
 		<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}', '.chapter .content', true)">Home</li>
 		<li>Forums</li>
 		<li>Members</li>
-		{% if crp.util.getChapterMember(chapter, user._id).role == 'leader' or  user.role == 'administrator' %}
+		{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or  user.role >= 3 %}
 			<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}/edit', '.chapter .content', true)">Manage</li>
 		{% endif %}
 	</ul>

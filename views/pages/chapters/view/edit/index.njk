@@ -2,7 +2,7 @@
 {% lookup 'users', {_id: userid}, 'user' %}
 {% lookup 'chapters', {_id: chapterid}, 'chapter' %}
 
-{% if crp.util.getChapterMember(chapter, user._id).role == 'leader' or user.role == 'administrator' %}
+{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
 	<form class="chapter-edit-form standard-form">
 		<label for="name">Chapter Name</label>
 		<div class="standard-input">

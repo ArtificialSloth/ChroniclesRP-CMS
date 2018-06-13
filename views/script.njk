@@ -80,6 +80,25 @@
 		$(selector).val($(e).val());
 	}
 
+	function usersParseRole(role) {
+		switch (role) {
+			case 0:
+				return 'Pending';
+				break;
+			case 1:
+				return 'Member';
+				break;
+			case 2:
+				return 'Chapter Leader';
+				break;
+			case 3:
+				return 'Administrator';
+				break;
+			default:
+				return 'Guest';
+		}
+	}
+
 	function multistepPrev(e) {
 		if ($(e).hasClass('disabled')) return;
 

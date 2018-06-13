@@ -70,8 +70,8 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 
 			if (user && user.activation_code == req.body.code) {
-				if (user.role == 'pending') {
-					crp.util.setUserData(user._id, {role: 'member'}, true, (err, result) => {
+				if (user.role == 0) {
+					crp.util.setUserData(user._id, {role: 1}, true, (err, result) => {
 						if (err) return res.send(err);
 						crp.util.removeUserData(user._id, ['activation_code'], (err, result) => {
 							if (err) return res.send(err);
@@ -103,7 +103,7 @@ module.exports = (crp, callback) => {
 		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
 
-			if (req.body.user_id == user._id || user.role == 'administrator') {
+			if (req.body.user_id == user._id || user.role >= 3) {
 				var userData = {
 					login: req.body.user_login,
 					old_pass: req.body.old_pass,
@@ -126,7 +126,7 @@ module.exports = (crp, callback) => {
 					if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
 				}
 
-				crp.util.setUserData(req.body.user_id, userData, (user.role == 'administrator'), (err, result) => {
+				crp.util.setUserData(req.body.user_id, userData, (user.role >= 3), (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -139,14 +139,14 @@ module.exports = (crp, callback) => {
 		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
 
-			if (user.role == 'administrator') {
+			if (user.role >= 3) {
 				var userData = {
 					login: req.body.user_login,
 					pass: req.body.user_pass,
 					encrypted: req.body.encrypted,
 					email: req.body.user_email,
 					register_date: req.body.register_date,
-					role: 'member'
+					role: 1
 				};
 
 				crp.util.addUser(userData, true, (err, result) => {
@@ -162,7 +162,7 @@ module.exports = (crp, callback) => {
 		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
 
-			if (user.role == 'administrator') {
+			if (user.role >= 3) {
 				crp.util.removeUser(crp.db.objectID(req.body.userid), (err, result) => {
 					if (err) return res.send(err);
 

@@ -1,7 +1,7 @@
 <ul class="{{user._id}} {% if user.locked %}locked{% endif %} noselect" onclick="$(this).next().toggleClass('active')">
 	<li class="login">{{user.login}}</li>
 	<li class="email">{{user.email}}</li>
-	<li class="role">{{user.role}}</li>
+	<li class="role">{{crp.util.parseRole(user.role)}}</li>
 </ul>
 
 <form class="user-settings-form">
@@ -25,10 +25,10 @@
 
 	<label for="user_role">Role: </label>
 	<select name="user_role" class="user_role">
-		<option value="pending" {% if user.role == "pending" %}selected{% endif %}>Pending</option>
-		<option value="member" {% if user.role == "member" %}selected{% endif %}>Member</option>
-		<option value="chapter_leader" {% if user.role == "chapter_leader" %}selected{% endif %}>Chapter Leader</option>
-		<option value="administrator" {% if user.role == "administrator" %}selected{% endif %}>Administrator</option>
+		<option value="0" {% if user.role == 0 %}selected{% endif %}>Pending</option>
+		<option value="1" {% if user.role == 1 %}selected{% endif %}>Member</option>
+		<option value="2" {% if user.role == 2 %}selected{% endif %}>Chapter Leader</option>
+		<option value="3" {% if user.role == 3 %}selected{% endif %}>Administrator</option>
 	</select>
 
 	<br />

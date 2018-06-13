@@ -28,7 +28,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.adminNotify = (subject, msg) => {
-		crp.util.getUsers({role: 'administrator'}, (err, users) => {
+		crp.util.getUsers({role: 3}, (err, users) => {
 			var to = []
 			for (var i in users) {
 				to.push(users[i].email);

@@ -55,7 +55,7 @@
 				<div class="warning">This forum has no topics.</div>
 			{% endif %}
 
-			{% if user and user.role != 'pending' %}
+			{% if user and user.role >= 1 %}
 				<fieldset class="new-post">
 					<legend>Create New Topic in {{forum.name}}</legend>
 					<form>
@@ -65,7 +65,7 @@
 						<textarea name="topic_body" class="topic_body tinymce"></textarea>
 						<script>crpTinyMCE()</script>
 
-						{% if user.role == 'chapter_leader' or user.role == 'administrator' %}
+						{% if user.role >= 2 %}
 							<label for="topic_type">Topic Type:</label>
 							<select name="topic_type" class="topic_type">
 								<option value="normal" selected>Normal</option>

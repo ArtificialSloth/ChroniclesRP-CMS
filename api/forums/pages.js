@@ -7,7 +7,7 @@ module.exports = (crp, callback) => {
 	crp.pages.push({
 		slug: '/admin/forums',
 		path: '/admin/index.njk',
-		role: 'administrator',
+		role: 3,
 		subPage: '/forums/admin/index.njk'
 	});
 
