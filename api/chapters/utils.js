@@ -264,11 +264,18 @@ module.exports = (crp, callback) => {
 				subPage: '/chapters/view/about/index.njk',
 				context: {chapterid: chapter._id}
 			});
+
+			crp.pages.push({
+				slug: `/chapters/${chapter.nicename}/forums`,
+				path: '/chapters/view/index.njk',
+				subPage: '/chapters/view/forums/index.njk',
+				context: {chapterid: chapter._id}
+			});
 		}
 	};
 
 	crp.util.removeChapterPage = (chapter) => {
-		var chapterPages = ['edit'];
+		var chapterPages = ['edit', 'forums'];
 
 		var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', `/chapters/${chapter.nicename}`));
 		if (index > -1) crp.pages.splice(index, 1);

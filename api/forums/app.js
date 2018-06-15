@@ -1,4 +1,37 @@
 module.exports = (crp, callback) => {
+	crp.express.app.post('/api/new-forum', (req, res) => {
+		crp.util.getCategoryData(req.body.category, (err, category) => {
+			if (err) return res.send(err);
+			if (!category) return res.send('noCategory');
+
+			crp.util.getChapterData(category.chapter, (err, chapter) => {
+				if (err) return res.send(err);
+
+				crp.util.getUserData(req.user, (err, user) => {
+					if (err) return res.send(err);
+					if (!user) return res.send('noUser');
+
+					var member = crp.util.getChapterMember(chapter, user._id);
+					if ((member && member.role >= 2) || user.role >= 3) {
+						var forumData = {
+							name: req.body.name,
+							desc: req.body.desc,
+							category: req.body.category
+						};
+
+						crp.util.addForum(forumData, (err, result) => {
+							if (err) return res.send(err);
+
+							res.send(result);
+						});
+					} else {
+						res.send('notAllowed');
+					}
+				});
+			});
+		});
+	});
+
 	crp.express.app.post('/api/new-topic', (req, res) => {
 		var topicData = {
 			author: req.user,
@@ -26,6 +59,38 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 
 			res.send(result);
+		});
+	});
+
+	crp.express.app.post('/api/remove-forum', (req, res) => {
+		crp.util.getForumData(req.body.forumid, (err, forum) => {
+			if (err) return res.send(err);
+			if (!forum) return res.send('noForum');
+
+			crp.util.getCategoryData(forum.category, (err, category) => {
+				if (err) return res.send(err);
+				if (!category) return res.send('noCategory');
+
+				crp.util.getChapterData(category.chapter, (err, chapter) => {
+					if (err) return res.send(err);
+
+					crp.util.getUserData(req.user, (err, user) => {
+						if (err) return res.send(err);
+						if (!user) return res.send('noUser');
+
+						var member = crp.util.getChapterMember(chapter, user._id);
+						if ((member && member.role >= 2) || user.role >= 3) {
+							crp.util.removeForum(forum._id, (err, result) => {
+								if (err) return res.send(err);
+
+								res.send(result);
+							});
+						} else {
+							res.send('notAllowed');
+						}
+					});
+				});
+			});
 		});
 	});
 

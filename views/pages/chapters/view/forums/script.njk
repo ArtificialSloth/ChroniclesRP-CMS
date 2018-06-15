@@ -1,0 +1,24 @@
+<script>
+	function chaptersDeleteForum(forumid) {
+		crpAjax('/api/remove-forum', {forumid: forumid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.log(res);
+			}
+		});
+	}
+
+	$('.forums form').submit((e) => {
+		e.preventDefault();
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/new-forum', formData, (res) => {
+			if (typeof res == 'object') {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.log(res);
+			}
+		});
+	});
+</script>
