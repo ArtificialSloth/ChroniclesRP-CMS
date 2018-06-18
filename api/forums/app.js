@@ -62,6 +62,51 @@ module.exports = (crp, callback) => {
 		});
 	});
 
+	crp.express.app.post('/api/edit-topic', (req, res) => {
+		crp.util.getTopicData(req.body.topicid, (err, topic) => {
+			if (err) return res.send(err);
+			if (!topic) return res.send('noTopic');
+
+			crp.util.getUserData(req.user, (err, user) => {
+				if (err) return res.send(err);
+				if (!user || (!topic.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
+
+				var topicData = {
+					title: req.body.title,
+					content: req.body.body,
+				};
+
+				crp.util.setTopicData(topic._id, topicData, (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
+			});
+		});
+	});
+
+	crp.express.app.post('/api/edit-reply', (req, res) => {
+		crp.util.getReplyData(req.body.replyid, (err, reply) => {
+			if (err) return res.send(err);
+			if (!reply) return res.send('noReply');
+
+			crp.util.getUserData(req.user, (err, user) => {
+				if (err) return res.send(err);
+				if (!user || (!reply.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
+
+				var replyData = {
+					content: req.body.body,
+				};
+
+				crp.util.setReplyData(reply._id, replyData, (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
+			});
+		});
+	});
+
 	crp.express.app.post('/api/remove-forum', (req, res) => {
 		crp.util.getForumData(req.body.forumid, (err, forum) => {
 			if (err) return res.send(err);

@@ -160,6 +160,13 @@
 		display:none !important;
 	}
 
+	.input-error:not(:empty) {
+		background-color: #9D3834;
+		border:0.0625em dashed #fff; /* 1/16 */
+		padding:0.3125em 0.625em; /* 5/16 */ /* 10/16 */
+		text-align:center;
+	}
+
 	.standard-form {
 		overflow:hidden;
 	}
@@ -191,12 +198,8 @@
 		border:0.0625em solid #ff0000; /* 1/16 */
 	}
 
-	.standard-form .standard-input .input-error {
-		background-color: #9D3834;
-		border:0.0625em dashed #fff; /* 1/16 */
+	.standard-form .standard-input.error .input-error {
 		display:none;
-		padding:0.3125em 0.625em; /* 5/16 */ /* 10/16 */
-		text-align:center;
 	}
 
 	.standard-form .standard-input.error .input-error {

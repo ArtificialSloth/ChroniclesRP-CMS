@@ -30,7 +30,7 @@
 			<li class="sub-header">
 				<ul>
 					<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
-					<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a>Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+					<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editToggle(this)">Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 				</ul>
 			</li>
 
@@ -42,6 +42,19 @@
 						<div class="role">{{crp.util.parseRole(author.role)}}</div>
 					</li>
 					<li>{{topic.content | safe}}</li>
+					<li>
+						{% if author._id.equals(user._id) or user.role >= 3 %}
+							<script>crpTinyMCE()</script>
+							<form class="edit-topic">
+								<input type="text" name="title" value="{{topic.title}}" />
+								<textarea class="tinymce" name="body">{{topic.content}}</textarea>
+
+								<input type="hidden" name="topicid" value="{{topic._id}}" />
+								<input type="submit" value="Save" />
+								<span class="input-error"></span>
+							</form>
+						{% endif %}
+					</li>
 				</ul>
 			</li>
 
@@ -52,7 +65,7 @@
 				<li class="sub-header reply">
 					<ul>
 						<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>
-						<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editReply('{{reply._id}}')">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+						<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editToggle(this)">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
 					</ul>
 				</li>
 				<li class="reply body">
@@ -64,6 +77,18 @@
 							<div class="role">{{crp.util.parseRole(author.role)}}</div>
 						</li>
 						<li>{{reply.content | safe}}</li>
+						<li>
+							{% if author._id.equals(user._id) or user.role >= 3 %}
+								<script>crpTinyMCE()</script>
+								<form class="edit-reply">
+									<textarea class="tinymce" name="body">{{reply.content}}</textarea>
+
+									<input type="hidden" name="replyid" value="{{reply._id}}" />
+									<input type="submit" value="Save" />
+									<span class="input-error"></span>
+								</form>
+							{% endif %}
+						</li>
 					</ul>
 				</li>
 			{% endfor %}
@@ -77,7 +102,7 @@
 
 						<input type="hidden" name="parent" class="parent" value="{{topic._id}}" />
 						<input type="submit" value="Post" />
-						<span class="reply-error"></span>
+						<span class="input-error"></span>
 					</form>
 				</fieldset>
 			{% endif %}

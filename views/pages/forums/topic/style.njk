@@ -74,6 +74,29 @@
 		font-style:italic;
 	}
 
+	.topic .body ul li:nth-child(2).edit {
+		display:none;
+	}
+
+	.topic .body ul li:nth-child(2):not(.edit) + li {
+		display:none;
+	}
+
+	.topic .body ul li:last-child form input:first-child {
+		margin-bottom:10px;
+		width:100%;
+	}
+
+	.topic .body ul li:last-child form input[type=submit] {
+		float:right;;
+		margin-top:10px;
+	}
+
+	.topic .body ul li:last-child form .input-error {
+		display:inline-block;
+		margin-top:10px;
+	}
+
 	.topic .body ul li {
 		text-align:left;
 		width:82%;

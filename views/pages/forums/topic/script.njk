@@ -23,25 +23,87 @@
 		}
 	}
 
+	function editToggle(e) {
+		if ($(e).html() == 'Edit') {
+			$(e).html('Cancel');
+		} else {
+			$(e).html('Edit');
+		}
+
+		$(e).parents('.sub-header').next().find('li:nth-child(2)').toggleClass('edit');
+	}
+
 	$('.new-post form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 
-		if ($('.new-post .reply').val().length < 4) return $('.new-post .reply-error').html('Reply must be at least 4 characters');
+		if ($('.new-post .reply').val().length < 4) return $('.new-post .input-error').html('Reply must be at least 4 characters');
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/new-reply', formData, (res) => {
 			if (typeof res != 'object') {
 				if (res == 'bodyLength') {
-					return $('.new-post .reply-error').html('Reply must be at least 4 characters');
+					return $('.new-post .input-error').html('Reply must be at least 4 characters');
 				} else {
 					console.error(res);
-					return $('.new-post .reply-error').html('Something went wrong :(');
+					return $('.new-post .input-error').html('Something went wrong :(');
 				}
 			} else {
 				crpGetPage(window.location.pathname);
 			}
+		});
+	});
 
+	$('.edit-topic').submit((e) => {
+		e.preventDefault();
+		tinymce.triggerSave();
+
+		$(e.target).find('.input-error').html('');
+		if ($(e.target).find('input[name=title]').val().length < 4) return $(e.target).find('.input-error').html('Title must be at least 4 characters!');
+		if ($(e.target).find('input[name=title]').val().length > 80) return $(e.target).find('.input-error').html('Title cannot be more than 80 characters!');
+		if ($(e.target).find('textarea').val().length < 4) return $(e.target).find('.input-error').html('Topic body must be at least 4 characters!');
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/edit-topic', formData, (res) => {
+			if (typeof res != 'object') {
+				switch (res) {
+					case 'titleLength':
+						return $(e.target).find('.input-error').html('Topic title must be at least 4 characters, but no more that 80 characters!');
+						break;
+					case 'bodyLength':
+						return $(e.target).find('.input-error').html('Topic body must be at least 4 characters!');
+						break;
+					default:
+						console.error(res);
+						return $(e.target).find('.input-error').html('Something went wrong :(');
+				}
+			} else {
+				crpGetPage(window.location.pathname);
+			}
+		});
+	});
+
+	$('.edit-reply').submit((e) => {
+		e.preventDefault();
+		tinymce.triggerSave();
+
+		$(e.target).find('.input-error').html('');
+		if ($(e.target).find('textarea').val().length < 4) return $(e.target).find('.input-error').html('Reply must be at least 4 characters');
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/edit-reply', formData, (res) => {
+			if (typeof res != 'object') {
+				switch (res) {
+					case 'bodyLength':
+						return $(e.target).find('.input-error').html('Reply must be at least 4 characters');
+						break;
+					default:
+						console.error(res);
+						return $(e.target).find('.input-error').html('Something went wrong :(');
+				}
+			} else {
+				crpGetPage(window.location.pathname);
+			}
 		});
 	});
 </script>
