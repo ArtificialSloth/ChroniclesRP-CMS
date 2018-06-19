@@ -17,6 +17,8 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 
+				var member = crp.util.getChapterMember(chapter, user._id);
+				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
 				crp.db.findOne('games', {_id: crp.db.objectID(data.game)}, (err, game) => {
 					if (err) return cb(err);
 					if (!game) return cb('noGame');
@@ -161,7 +163,7 @@ module.exports = (crp, callback) => {
 				if (!user) return cb('noUser');
 
 				var member = crp.util.getChapterMember(chapter, user._id);
-				if ((member && member.role != 2) && user.role < 3) return cb('notAllowed');
+				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
 				crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
 					if (err) return cb(err);
 
@@ -249,6 +251,30 @@ module.exports = (crp, callback) => {
 		return crp.util.findObjectInArray(chapter.members, '_id', userid.toString());
 	};
 
+	crp.util.setChapterMemberRole = (chapterid, data, userid, cb) => {
+		crp.util.getChapterData(chapterid, (err, chapter) => {
+			if (err) return cb(err);
+			if (!chapter) return cb('noChapter');
+
+			crp.util.getUserData(userid, (err, user) => {
+				if (err) return cb(err);
+				if (!user) return cb('noUser');
+
+				var member = crp.util.getChapterMember(chapter, user._id);
+				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
+				crp.util.getUserData(data.userid, (err, member) => {
+					if (err) return cb(err);
+					if (!member) return cb('noUser');
+					if (!parseInt(data.role)) return cb('badRole');
+
+					var memberEntry = crp.util.getChapterMember(chapter, member._id);
+					chapter.members[chapter.members.indexOf(memberEntry)] = {_id: member._id, role: parseInt(data.role)};
+					crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
+				});
+			});
+		});
+	};
+
 	crp.util.addChapterPage = (chapter) => {
 		crp.pages.push({
 			slug: `/chapters/${chapter.nicename}/edit`,
@@ -269,6 +295,13 @@ module.exports = (crp, callback) => {
 				slug: `/chapters/${chapter.nicename}/forums`,
 				path: '/chapters/view/index.njk',
 				subPage: '/chapters/view/forums/index.njk',
+				context: {chapterid: chapter._id}
+			});
+
+			crp.pages.push({
+				slug: `/chapters/${chapter.nicename}/members`,
+				path: '/chapters/view/index.njk',
+				subPage: '/chapters/view/members/index.njk',
 				context: {chapterid: chapter._id}
 			});
 		}

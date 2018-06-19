@@ -53,6 +53,43 @@ module.exports = (crp, callback) => {
 		});
 	});
 
+	crp.express.app.post('/api/promote-chapter-member', (req, res) => {
+		crp.util.setChapterMemberRole(req.body.chapterid, {userid: req.body.userid, role: 2}, req.user, (err, result) => {
+			if (err) return res.send(err);
+
+			res.send(result);
+		});
+	});
+
+	crp.express.app.post('/api/demote-chapter-member', (req, res) => {
+		crp.util.setChapterMemberRole(req.body.chapterid, {userid: req.body.userid, role: 1}, req.user, (err, result) => {
+			if (err) return res.send(err);
+
+			res.send(result);
+		});
+	});
+
+	crp.express.app.post('/api/remove-chapter-member', (req, res) => {
+		crp.util.getUserData(req.user, (err, user) => {
+			if (err) return res.send(err);
+			if (!user) return res.send('noUser');
+
+			crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+				if (err) return res.send(err);
+				if (!chapter) return res.send('noChapter');
+
+				var member = crp.util.getChapterMember(chapter, user._id);
+				if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
+
+				crp.util.leaveChapter(chapter._id, req.body.userid, (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
+			});
+		});
+	});
+
 	crp.util.getChapters({}, (err, chapters) => {
 		for (var i in chapters) {
 			crp.proxy.register(chapters[i].slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');

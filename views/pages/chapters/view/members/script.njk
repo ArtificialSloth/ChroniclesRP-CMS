@@ -1,0 +1,32 @@
+<script>
+	function promoteChapterMember(chapterid, userid) {
+		console.log('called');
+		crpAjax('/api/promote-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetSubPage(window.location.pathname, '.chapter .content', true)
+			} else {
+				console.log(res);
+			}
+		});
+	}
+
+	function demoteChapterMember(chapterid, userid) {
+		crpAjax('/api/demote-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetSubPage(window.location.pathname, '.chapter .content', true)
+			} else {
+				console.log(res);
+			}
+		});
+	}
+
+	function removeChapterMember(chapterid, userid) {
+		crpAjax('/api/remove-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetSubPage(window.location.pathname, '.chapter .content', true)
+			} else {
+				console.log(res);
+			}
+		});
+	}
+</script>

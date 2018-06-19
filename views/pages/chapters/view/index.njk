@@ -19,7 +19,7 @@
 	<ul class="nav noselect">
 		<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}', '.chapter .content', true)">Home</li>
 		<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}/forums', '.chapter .content', true)">Forums</li>
-		<li>Members</li>
+		<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}/members', '.chapter .content', true)">Members</li>
 		{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or  user.role >= 3 %}
 			<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}/edit', '.chapter .content', true)">Manage</li>
 		{% endif %}
