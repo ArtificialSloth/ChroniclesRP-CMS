@@ -1,4 +1,10 @@
 {% include "./style.njk" %}
 {% lookup 'chapters', {_id: chapterid}, 'chapter' %}
 
-<div class="desc">{{chapter.desc | safe}}</div>
+<div class="desc">
+	{% if chapter.desc %}
+		{{chapter.desc | safe}}
+	{% else %}
+		<div class="warning">{{chapter.name}} doesn't currently have a description for their Chapter.</div>
+	{% endif %}
+</div>

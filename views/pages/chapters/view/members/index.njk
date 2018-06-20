@@ -9,34 +9,42 @@
 <div class="members">
 	<div class="divider">Leaders</div>
 	<div class="leaders">
-		{% for member in leaders %}
-			{% set member = crp.util.findObjectInArray(users, '_id', member._id.toString()) %}
-			<ul>
-				<li><img class="profile-pic" src="{{member.img.profile or '/img/members/profile.png'}}" /></li>
-				<li>
-					<h1><a onclick="crpGetPage('/members/{{member.nicename}}')">{{member.display_name}}</a></h1>
-					{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
-						<span><a onclick="removeChapterMember('{{chapter._id}}', '{{member._id}}')">Kick</a> | <a onclick="demoteChapterMember('{{chapter._id}}', '{{member._id}}')">Demote</a></span>
-					{% endif %}
-				</li>
-			</ul>
-		{% endfor %}
+		{% if leaders.length > 0 %}
+			{% for member in leaders %}
+				{% set member = crp.util.findObjectInArray(users, '_id', member._id.toString()) %}
+				<ul>
+					<li><img class="profile-pic" src="{{member.img.profile or '/img/members/profile.png'}}" /></li>
+					<li>
+						<h1><a onclick="crpGetPage('/members/{{member.nicename}}')">{{member.display_name}}</a></h1>
+						{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+							<span><a onclick="removeChapterMember('{{chapter._id}}', '{{member._id}}')">Kick</a> | <a onclick="demoteChapterMember('{{chapter._id}}', '{{member._id}}')">Demote</a></span>
+						{% endif %}
+					</li>
+				</ul>
+			{% endfor %}
+		{% else %}
+			<div class="warning">{{chapter.name}} has no leaders :(</div>
+		{% endif %}
 	</div>
 
 	<div class="divider">Members</div>
 	<div class="members">
-		{% for member in members %}
-			{% set member = crp.util.findObjectInArray(users, '_id', member._id.toString()) %}
-			<ul>
-				<li><img class="profile-pic" src="{{member.img.profile or '/img/members/profile.png'}}" /></li>
-				<li>
-					<h1><a onclick="crpGetPage('/members/{{member.nicename}}')">{{member.display_name}}</a></h1>
-					{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
-						<span><a onclick="removeChapterMember('{{chapter._id}}', '{{member._id}}')">Kick</a> | <a onclick="promoteChapterMember('{{chapter._id}}', '{{member._id}}')">Promote</a></span>
-					{% endif %}
-				</li>
-			</ul>
-		{% endfor %}
+		{% if members.length > 0 %}
+			{% for member in members %}
+				{% set member = crp.util.findObjectInArray(users, '_id', member._id.toString()) %}
+				<ul>
+					<li><img class="profile-pic" src="{{member.img.profile or '/img/members/profile.png'}}" /></li>
+					<li>
+						<h1><a onclick="crpGetPage('/members/{{member.nicename}}')">{{member.display_name}}</a></h1>
+						{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+							<span><a onclick="removeChapterMember('{{chapter._id}}', '{{member._id}}')">Kick</a> | <a onclick="promoteChapterMember('{{chapter._id}}', '{{member._id}}')">Promote</a></span>
+						{% endif %}
+					</li>
+				</ul>
+			{% endfor %}
+		{% else %}
+			<div class="warning">{{chapter.name}} has no members :(</div>
+		{% endif %}
 	</div>
 </div>
 

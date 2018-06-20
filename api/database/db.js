@@ -8,7 +8,6 @@ module.exports = (crp, callback) => {
 		crp.db = {
 			mongodb: db,
 			prefix: 'CRP_',
-			objectID: mongodb.ObjectId,
 			sanitize: require('mongo-sanitize')
 		};
 
@@ -34,6 +33,14 @@ module.exports = (crp, callback) => {
 
 		crp.db.deleteMany = (collection, filter, cb) => {
 			crp.db.mongodb.collection(crp.db.prefix + collection).deleteMany(filter, cb);
+		};
+
+		crp.db.objectID = (oid) => {
+			try {
+				return mongodb.ObjectId(oid);
+			} catch (e) {
+				return e;
+			}
 		};
 
 		crp.pages = [];

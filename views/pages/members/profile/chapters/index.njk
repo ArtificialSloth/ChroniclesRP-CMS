@@ -1,10 +1,12 @@
 {% include "./style.njk" %}
-{% lookup 'users', {_id: userid}, 'user' %}
+{% lookup 'users', {_id: profileid}, 'profile' %}
 {% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
 
 <ul class="chapters">
+	{% set chapterCount = 0 %}
 	{% for chapter in chapters %}
-		{% if crp.util.findObjectInArray(chapter.members, '_id', user._id.toString()) %}
+		{% if crp.util.getChapterMember(chapter, profile._id) %}
+			{% set chapterCount = chapterCount + 1 %}
 			{% lookup 'games', {_id: chapter.game}, 'game' %}
 
 			<li class="chapter">
@@ -19,4 +21,8 @@
 			</li>
 		{% endif %}
 	{% endfor %}
+
+	{% if chapterCount == 0 %}
+		<div class="warning">You're not a member of any Chapters.</div>
+	{% endif %}
 </ul>
