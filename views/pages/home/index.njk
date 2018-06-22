@@ -7,23 +7,25 @@
 			<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="/img/discord.png" width="100%"></a>
 		</div>
 
-		<div class="chapter-discord-widget">
-			<h3>Your Discords</h3>
+		{% if user %}
+			<div class="chapter-discord-widget">
+				<h3>Your Discords</h3>
 
-			{% set count = 0 %}
-			{% query 'chapters', {}, {}, 'chapters' %}
-			{% for chapter in chapters %}
-				{% if crp.util.getChapterMember(chapter, user._id) and chapter.discord %}
-					{% set count = count + 1 %}
-					<iframe src="https://discordapp.com/widget?id={{chapter.discord}}&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
+				{% set count = 0 %}
+				{% query 'chapters', {}, {}, 'chapters' %}
+				{% for chapter in chapters %}
+					{% if crp.util.getChapterMember(chapter, user._id) and chapter.discord %}
+						{% set count = count + 1 %}
+						<iframe src="https://discordapp.com/widget?id={{chapter.discord}}&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
+					{% endif %}
+				{% endfor %}
+
+				{% if count == 0 %}
+					It looks like none of your chapters have set up their Discord.
 				{% endif %}
-			{% endfor %}
-
-			{% if count == 0 %}
-				It looks like none of your chapters have set up their Discord.
-			{% endif %}
-		</div>
-
+			</div>
+		{% endif %}
+		
 		<div class="chronicles-discord-widget">
 			<h3>The Chronicles (RP)</h3>
 			<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>

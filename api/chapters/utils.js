@@ -247,7 +247,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.getChapterMember = (chapter, userid) => {
-		if (!chapter) return;
+		if (!chapter || !userid) return;
 		return crp.util.findObjectInArray(chapter.members, '_id', userid.toString());
 	};
 
