@@ -40,7 +40,7 @@ module.exports = (crp, callback) => {
 			slug: data.slug || '/posts/' + data.title.replace(' ', '-').toLowerCase(),
 			img: data.img || '',
 			content: data.content,
-			date: data.date || Date.now()
+			date: Date.parse(data.date) || Date.now()
 		};
 
 		if (!post.author || !post.title || !post.content) return cb('missingInfo');

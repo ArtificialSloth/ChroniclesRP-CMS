@@ -1,5 +1,6 @@
 /.git
 /node_modules
 /public/uploads
+/public/img/posts
 /public/img/members
 /public/img/chapters

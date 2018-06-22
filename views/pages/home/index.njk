@@ -1,8 +1,64 @@
-<div class="page">
+<div class="home page">
 	{% include "./style.njk" %}
+	{% lookup 'users', {_id: userid}, 'user' %}
 
-	<div class="home">
-		Home
+	<div class="sidebar left">
+		<div class="discord-widget">
+			<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="/img/discord.png" width="100%"></a>
+		</div>
+
+		<div class="chapter-discord-widget">
+			<h3>Your Discords</h3>
+
+			{% set count = 0 %}
+			{% query 'chapters', {}, {}, 'chapters' %}
+			{% for chapter in chapters %}
+				{% if crp.util.getChapterMember(chapter, user._id) and chapter.discord %}
+					{% set count = count + 1 %}
+					<iframe src="https://discordapp.com/widget?id={{chapter.discord}}&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
+				{% endif %}
+			{% endfor %}
+
+			{% if count == 0 %}
+				It looks like none of your chapters have set up their Discord.
+			{% endif %}
+		</div>
+
+		<div class="chronicles-discord-widget">
+			<h3>The Chronicles (RP)</h3>
+			<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
+		</div>
+
+		<div class="donate-widget">
+			<h3>Help Us</h3>
+			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+				<input type="hidden" name="cmd" value="_s-xclick">
+				<input type="hidden" name="hosted_button_id" value="S7UPCZZ9UYXZ6">
+				<input type="image" src="https://chroniclesrp.com/wp-content/uploads/2017/08/PayPal-Donate-Button-High-Quality-PNG.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+				<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+			</form>
+		</div>
+	</div>
+
+	<div class="featured-content">
+		<h1>Featured Content</h1>
+
+		{% query 'posts', {type: 'featured_content'}, {sort: [['date', -1]]}, 'posts' %}
+		{% for post in posts %}
+			<ul>
+				{% if post.img %}
+					<li><a><img src="{{post.img}}" /></a></li>
+				{% endif %}
+				<li class="title"><a onclick="crpGetPage('{{post.slug}}')">{{post.title}}</a></li>
+				<li class="date">{{crp.moment(post.date).fromNow()}}</li>
+				<li class="content">
+					{{post.content | truncate}}
+					{% if post.content.length > 255 %}
+						<a onclick="crpGetPage('{{post.slug}}')">[Read More]</a>
+					{% endif %}
+				</li>
+			</ul>
+		{% endfor %}
 	</div>
 
 	{% include "components/sidebar/index.njk" %}

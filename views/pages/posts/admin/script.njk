@@ -29,6 +29,15 @@
 		});
 	});
 
+	$('input[name=upload]').change((e) => {
+		var formData = new FormData();
+		formData.append('img', e.target.files[0]);
+		crpAjaxUpload('/api/admin/image-upload', formData, (res) => {
+			$(e.target).val('');
+			$(e.target).prev().val(res);
+		});
+	});
+
 	function postsRemove(postid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/admin/remove-post', {postid: postid}, (response) => {
