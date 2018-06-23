@@ -18,9 +18,10 @@ module.exports = (crp, callback) => {
 				author: data.author || post.author,
 				title: data.title || post.title,
 				type: data.type || post.type,
-				slug: data.slug || post.slug,
+				slug: (data.slug.length > 0) ? data.slug : '/posts/' + crp.util.urlSafe(data.title),
 				img: data.img || '',
-				content: data.content || post.content
+				content: data.content || post.content,
+				date: Date.parse(data.date) || post.date
 			};
 
 			postid = crp.db.sanitize(postid);
@@ -37,7 +38,7 @@ module.exports = (crp, callback) => {
 			author: data.author,
 			title: data.title,
 			type: data.type || 'page',
-			slug: data.slug || '/posts/' + data.title.replace(' ', '-').toLowerCase(),
+			slug: (data.slug.length > 0) ? data.slug : '/posts/' + crp.util.urlSafe(data.title),
 			img: data.img || '',
 			content: data.content,
 			date: Date.parse(data.date) || Date.now()

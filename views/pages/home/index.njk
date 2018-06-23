@@ -25,7 +25,7 @@
 				{% endif %}
 			</div>
 		{% endif %}
-		
+
 		<div class="chronicles-discord-widget">
 			<h3>The Chronicles (RP)</h3>
 			<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
@@ -54,7 +54,7 @@
 				<li class="title"><a onclick="crpGetPage('{{post.slug}}')">{{post.title}}</a></li>
 				<li class="date">{{crp.moment(post.date).fromNow()}}</li>
 				<li class="content">
-					{{post.content | truncate}}
+					{{post.content | safe | striptags(true) | truncate}}
 					{% if post.content.length > 255 %}
 						<a onclick="crpGetPage('{{post.slug}}')">[Read More]</a>
 					{% endif %}

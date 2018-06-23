@@ -22,7 +22,7 @@
 						{{crp.moment(activity.date).fromNow()}}
 
 						<div>
-							{{activity.content | safe | truncate}}
+							{{activity.content | safe | striptags(true) | truncate}}
 							{% if activity.content.length > 255 %}
 								<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
 							{% endif %}
@@ -45,7 +45,7 @@
 							{{crp.moment(activity.date).fromNow()}}
 
 							<div>
-								{{activity.content | safe | truncate}}
+								{{activity.content | safe | striptags(true) | truncate}}
 								{% if activity.content.length > 255 %}
 									<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
 								{% endif %}

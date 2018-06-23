@@ -28,11 +28,12 @@ module.exports = (crp, callback) => {
 			if (user.role < 3) return res.send('notAllowed');
 
 			var postData = {
-				title: req.body.post_title,
-				type: req.body.post_type,
-				slug: req.body.post_slug,
-				img: req.body.post_img,
-				content: req.body.post_content
+				title: req.body.title,
+				type: req.body.type,
+				slug: req.body.slug,
+				img: req.body.img,
+				content: req.body.content,
+				date: req.body.date
 			};
 
 			crp.util.setPostData(req.body.postid, postData, (err, result) => {

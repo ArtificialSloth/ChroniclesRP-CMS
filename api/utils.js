@@ -53,7 +53,7 @@ module.exports = (crp, callback) => {
 
 	crp.util.urlSafe = (str) => {
 		if (!str) return;
-		return str.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+		return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]+/g, '');
 	};
 
 	crp.util.dateToStr = (date, tz) => {
@@ -126,7 +126,7 @@ module.exports = (crp, callback) => {
 			crp.util.getPosts({slug: path}, (err, posts) => {
 				if (err) return cb(err);
 
-				if (posts[0] && posts[0].type == 'page') {
+				if (posts[0]) {
 					path = '/posts/index.njk';
 					context.postid = posts[0]._id;
 				} else {
