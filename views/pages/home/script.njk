@@ -1,0 +1,20 @@
+<script>
+	$('.home .slider .slides .post img').click((e) => {
+		sliderNext();
+	});
+
+	function sliderNext() {
+		var slider = $('.home .slider .slides'),
+		slides = slider.find('.post'),
+		left = parseInt(slider.css('left')),
+		width = slider.width();
+
+		slider.animate({left: `${left - width}px`}, () => {
+			if (slider.css('left') == `-${width * (slides.length - 1)}px`) {
+				slider.css('left', '-100%');
+			}
+		});
+	}
+
+	window.setTimeout(sliderNext, 3000);
+</script>

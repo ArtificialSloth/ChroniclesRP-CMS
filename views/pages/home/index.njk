@@ -2,6 +2,50 @@
 	{% include "./style.njk" %}
 	{% lookup 'users', {_id: userid}, 'user' %}
 
+	<div class="slider">
+		<div class="slides">
+			{% query 'posts', {type: 'news'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
+
+			{% lookup 'users', {_id: posts[posts.length - 1].author}, 'author' %}
+			<div class="post" style="transform:translate(0)">
+				<img src="{{posts[posts.length - 1].img}}" alt="{{posts[posts.length - 1].title}}" />
+				<ul>
+					<li>News</li>
+					<li><a onclick="crpGetPage('{{posts[posts.length - 1].slug}}')">{{posts[posts.length - 1].title}}</a></li>
+					<li><a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[posts.length - 1].date)}}</li>
+					<li>{{posts[posts.length - 1].content | safe | striptags(true) | truncate(150)}}</li>
+					<li><a onclick="crpGetPage('{{posts[posts.length - 1].slug}}')">Read More</a></li>
+				</ul>
+			</div>
+
+			{% for post in posts %}
+				{% lookup 'users', {_id: post.author}, 'author' %}
+				<div class="post" style="transform:translate({{posts.indexOf(post) + 1}}00%)">
+					<img src="{{post.img}}" alt="{{post.title}}" />
+					<ul>
+						<li>News</li>
+						<li><a onclick="crpGetPage('{{post.slug}}')">{{post.title}}</a></li>
+						<li><a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</li>
+						<li>{{post.content | safe | striptags(true) | truncate(150)}}</li>
+						<li><a onclick="crpGetPage('{{post.slug}}')">Read More</a></li>
+					</ul>
+				</div>
+			{% endfor %}
+
+			{% lookup 'users', {_id: posts[0].author}, 'author' %}
+			<div class="post" style="transform:translate({{posts.length + 1}}00%)">
+				<img src="{{posts[0].img}}" alt="{{posts[0].title}}" />
+				<ul>
+					<li>News</li>
+					<li><a onclick="crpGetPage('{{posts[0].slug}}')">{{posts[0].title}}</a></li>
+					<li><a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[0].date)}}</li>
+					<li>{{posts[0].content | safe | striptags(true) | truncate(150)}}</li>
+					<li><a onclick="crpGetPage('{{posts[0].slug}}')">Read More</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
 	<div class="sidebar left">
 		<div class="discord-widget">
 			<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="/img/discord.png" width="100%"></a>
@@ -45,7 +89,7 @@
 	<div class="featured-content">
 		<h1>Featured Content</h1>
 
-		{% query 'posts', {type: 'featured_content'}, {sort: [['date', -1]]}, 'posts' %}
+		{% query 'posts', {type: 'featured_content'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
 		{% for post in posts %}
 			<ul>
 				{% if post.img %}
@@ -64,4 +108,5 @@
 	</div>
 
 	{% include "components/sidebar/index.njk" %}
+	{% include "./script.njk" %}
 </div>

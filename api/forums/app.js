@@ -41,7 +41,7 @@ module.exports = (crp, callback) => {
 			parent: req.body.topic_parent
 		};
 
-		crp.util.addTopic(topicData, (err, result) => {
+		crp.util.addTopic(topicData, false, (err, result) => {
 			if (err) return res.send(err);
 
 			res.send(result);
@@ -198,7 +198,7 @@ module.exports = (crp, callback) => {
 				dislikes: parseInt(req.body.topic_dislikes)
 			};
 
-			crp.util.addTopic(topicData, (err, result) => {
+			crp.util.addTopic(topicData, true, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);

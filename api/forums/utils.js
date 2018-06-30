@@ -215,7 +215,7 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addTopic = (data, cb) => {
+	crp.util.addTopic = (data, admin, cb) => {
 		var topic = {
 			author: data.author,
 			title: data.title,
@@ -242,11 +242,11 @@ module.exports = (crp, callback) => {
 				crp.util.getCategoryData(forum.category, (err, category) => {
 					if (err) return cb(err);
 					if (!category) return cb('generic');
-					if (category.role && user.role < category.role) return cb('notAllowed');
+					if (category.role && !admin && user.role < category.role) return cb('notAllowed');
 
 					crp.util.getChapterData(category.chapter, (err, chapter) => {
 						if (err) return cb(err);
-						if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
+						if (chapter && !admin && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
 
 						topic.parent = forum._id;
 
