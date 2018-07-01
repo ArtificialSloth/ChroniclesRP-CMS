@@ -55,7 +55,7 @@ module.exports = (crp, callback) => {
 			parent: req.body.parent
 		};
 
-		crp.util.addReply(replyData, (err, result) => {
+		crp.util.addReply(replyData, false, (err, result) => {
 			if (err) return res.send(err);
 
 			res.send(result);
@@ -247,7 +247,7 @@ module.exports = (crp, callback) => {
 				dislikes: parseInt(req.body.reply_dislikes)
 			};
 
-			crp.util.addReply(replyData, (err, result) => {
+			crp.util.addReply(replyData, true, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);

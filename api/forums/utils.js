@@ -310,7 +310,7 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addReply = (data, cb) => {
+	crp.util.addReply = (data, admin, cb) => {
 		var reply = {
 			author: data.author,
 			content: data.content,
@@ -337,11 +337,11 @@ module.exports = (crp, callback) => {
 					crp.util.getCategoryData(forum.category, (err, category) => {
 						if (err) return cb(err);
 						if (!category) return cb('generic');
-						if (category.role && user.role < category.role) return cb('notAllowed');
+						if (category.role && !admin && user.role < category.role) return cb('notAllowed');
 
 						crp.util.getChapterData(category.chapter, (err, chapter) => {
 							if (err) return cb(err);
-							if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
+							if (chapter && !admin && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
 
 							reply = crp.util.sanitizeObject(reply);
 							crp.db.insertOne('replies', reply, (err, result) => {

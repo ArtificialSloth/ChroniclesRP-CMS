@@ -7,8 +7,7 @@
 			{% query 'posts', {type: 'news'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
 
 			{% lookup 'users', {_id: posts[posts.length - 1].author}, 'author' %}
-			<div class="post" style="transform:translate(0)">
-				<img src="{{posts[posts.length - 1].img}}" alt="{{posts[posts.length - 1].title}}" />
+			<div class="post" style="transform:translate(0); background-image:url({{posts[posts.length - 1].img}})">
 				<ul>
 					<li>News</li>
 					<li><a onclick="crpGetPage('{{posts[posts.length - 1].slug}}')">{{posts[posts.length - 1].title}}</a></li>
@@ -20,8 +19,7 @@
 
 			{% for post in posts %}
 				{% lookup 'users', {_id: post.author}, 'author' %}
-				<div class="post" style="transform:translate({{posts.indexOf(post) + 1}}00%)">
-					<img src="{{post.img}}" alt="{{post.title}}" />
+				<div class="post" style="transform:translate({{posts.indexOf(post) + 1}}00%); background-image:url({{post.img}})">
 					<ul>
 						<li>News</li>
 						<li><a onclick="crpGetPage('{{post.slug}}')">{{post.title}}</a></li>
@@ -33,8 +31,7 @@
 			{% endfor %}
 
 			{% lookup 'users', {_id: posts[0].author}, 'author' %}
-			<div class="post" style="transform:translate({{posts.length + 1}}00%)">
-				<img src="{{posts[0].img}}" alt="{{posts[0].title}}" />
+			<div class="post" style="transform:translate({{posts.length + 1}}00%); background-image:url({{posts[0].img}})">
 				<ul>
 					<li>News</li>
 					<li><a onclick="crpGetPage('{{posts[0].slug}}')">{{posts[0].title}}</a></li>
