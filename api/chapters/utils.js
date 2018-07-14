@@ -8,63 +8,56 @@ module.exports = (crp, callback) => {
 		crp.db.findOne('chapters', {_id: chapterid}, cb);
 	};
 
-	crp.util.setChapterData = (chapterid, data, userid, cb) => {
+	crp.util.setChapterData = (chapterid, data, cb) => {
 		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.getUserData(userid, (err, user) => {
+			crp.db.findOne('games', {_id: crp.db.objectID(data.game)}, (err, game) => {
 				if (err) return cb(err);
-				if (!user) return cb('noUser');
+				if (!game) return cb('noGame');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
-				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.db.findOne('games', {_id: crp.db.objectID(data.game)}, (err, game) => {
+				var newChapter = {
+					_id: chapter._id,
+					type: chapter.type,
+					name: data.name || chapter.name,
+					nicename: crp.util.urlSafe(data.name) || chapter.nicename,
+					slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name) || chapter.slug,
+					game: game._id || chapter.game,
+					open: data.open ? !!+data.open : chapter.open,
+					tagline: data.tagline || chapter.tagline,
+					desc: (data.desc != chapter.desc) ? data.desc : chapter.desc,
+					discord: data.discord || chapter.discord,
+					img: chapter.img || {},
+					members: chapter.members || {}
+				};
+
+				crp.util.getChapters({name: newChapter.name}, (err, chapters) => {
 					if (err) return cb(err);
-					if (!game) return cb('noGame');
+					if (chapters.length > 0 && newChapter.name != chapter.name) return cb('nameTaken');
 
-					var newChapter = {
-						_id: chapter._id,
-						type: chapter.type,
-						name: data.name || chapter.name,
-						nicename: crp.util.urlSafe(data.name) || chapter.nicename,
-						slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name) || chapter.slug,
-						game: game._id || chapter.game,
-						open: data.open ? !!+data.open : chapter.open,
-						tagline: data.tagline || chapter.tagline,
-						desc: (data.desc != chapter.desc) ? data.desc : chapter.desc,
-						discord: data.discord || chapter.discord,
-						img: chapter.img || {},
-						members: chapter.members || {}
-					};
+					if (newChapter.name.length > 90) return cb('badName');
+					if (newChapter.slug.length > 90) return cb('badSlug');
+					if (newChapter.tagline.length > 140) return cb('badTagline');
+					if (newChapter.discord.length > 19) return cb('badDiscord');
 
-					crp.util.getChapters({name: newChapter.name}, (err, chapters) => {
-						if (err) return cb(err);
-						if (chapters && newChapter.name != chapter.name) return cb('nameTaken');
+					if (data.img && data.img.profile) {
+						var path = `/img/chapters/${newChapter._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
 
-						if (newChapter.name.length > 90) return cb('badName');
-						if (newChapter.slug.length > 90) return cb('badSlug');
-						if (newChapter.tagline.length > 140) return cb('badTagline');
-						if (newChapter.discord.length > 19) return cb('badDiscord');
+						crp.util.replaceFile(crp.PUBLICDIR + chapter.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
+						newChapter.img.profile = path;
+					}
 
-						if (data.img && data.img.profile) {
-							var path = `/img/chapters/${newChapter._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+					if (data.img && data.img.cover) {
+						var path = `/img/chapters/${newChapter._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
 
-							crp.util.replaceFile(crp.PUBLICDIR + chapter.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
-							newChapter.img.profile = path;
-						}
+						crp.util.replaceFile(crp.PUBLICDIR + chapter.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
+						newChapter.img.cover = path;
+					}
 
-						if (data.img && data.img.cover) {
-							var path = `/img/chapters/${newChapter._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
-
-							crp.util.replaceFile(crp.PUBLICDIR + chapter.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
-							newChapter.img.cover = path;
-						}
-
-						newChapter = crp.util.sanitizeObject(newChapter);
-						crp.db.replaceOne('chapters', {_id: chapter._id}, newChapter, (err, result) => {
-							cb(err, newChapter);
-						});
+					newChapter = crp.util.sanitizeObject(newChapter);
+					crp.db.replaceOne('chapters', {_id: chapter._id}, newChapter, (err, result) => {
+						cb(err, newChapter);
 					});
 				});
 			});
@@ -76,7 +69,6 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');
 
-			if (user.role < 2) return cb('notAllowed');
 			crp.util.getChapters({}, (err, chapters) => {
 				if (err) return cb(err);
 
@@ -153,23 +145,33 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeChapter = (chapterid, userid, cb) => {
+	crp.util.removeChapter = (chapterid, cb) => {
 		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.getUserData(userid, (err, user) => {
+			crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
 				if (err) return cb(err);
-				if (!user) return cb('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
-				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
-					if (err) return cb(err);
+				switch (chapter.type) {
+					case 'hosted':
+						crp.util.disbandChapter(chapter, (err) => {
+							if (err) return cb(err);
 
-					switch (chapter.type) {
-						case 'hosted':
-							crp.util.disbandChapter(chapter, (err) => {
+							crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
+								if (err) return cb(err);
+
+								crp.util.removeChapterPage(chapter);
+								cb(null, result);
+							});
+						});
+						break;
+					case 'group':
+						crp.util.getCategories({chapter: chapter._id}, (err, categories) => {
+							if (err) return cb(err);
+							if (!categories) return cb('noCategories');
+
+							crp.util.removeCategory(categories[0]._id, (err, result) => {
 								if (err) return cb(err);
 
 								crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
@@ -179,56 +181,43 @@ module.exports = (crp, callback) => {
 									cb(null, result);
 								});
 							});
-							break;
-						case 'group':
-							crp.util.getCategories({chapter: chapter._id}, (err, categories) => {
-								if (err) return cb(err);
-								if (!categories) return cb('noCategories');
+						});
+						break;
+					default:
+						crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
+							if (err) return cb(err);
 
-								crp.util.removeCategory(categories[0]._id, (err, result) => {
-									if (err) return cb(err);
-
-									crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
-										if (err) return cb(err);
-
-										crp.util.removeChapterPage(chapter);
-										cb(null, result);
-									});
-								});
-							});
-							break;
-						default:
-							crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
-								if (err) return cb(err);
-
-								crp.util.removeChapterPage(chapter);
-								cb(null, result);
-							});
-					}
-				});
+							crp.util.removeChapterPage(chapter);
+							cb(null, result);
+						});
+				}
 			});
 		});
 	};
 
-	crp.util.joinChapter = (chapterid, userid, cb) => {
+	crp.util.getChapterMember = (chapter, userid) => {
+		if (!chapter || !userid) return;
+		return crp.util.findObjectInArray(chapter.members, '_id', userid.toString());
+	};
+
+	crp.util.addChapterMember = (chapterid, data, cb) => {
 		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
-			if (!chapter.open) return cb('closed');
 
-			crp.util.getUserData(userid, (err, user) => {
+			crp.util.getUserData(data._id, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 
 				if (crp.util.getChapterMember(chapter, user._id)) return cb('isMember');
 
-				chapter.members.push({_id: user._id, role: 1});
+				chapter.members.push({_id: user._id, role: parseInt(data.role) || 0});
 				crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
 			});
 		});
 	};
 
-	crp.util.leaveChapter = (chapterid, userid, cb) => {
+	crp.util.removeChapterMember = (chapterid, userid, cb) => {
 		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
@@ -246,31 +235,19 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.getChapterMember = (chapter, userid) => {
-		if (!chapter || !userid) return;
-		return crp.util.findObjectInArray(chapter.members, '_id', userid.toString());
-	};
-
-	crp.util.setChapterMemberRole = (chapterid, data, userid, cb) => {
+	crp.util.setChapterMemberRole = (chapterid, data, cb) => {
 		crp.util.getChapterData(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.getUserData(userid, (err, user) => {
+			crp.util.getUserData(data.userid, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
+				if (!data.role) return cb('noRole');
 
 				var member = crp.util.getChapterMember(chapter, user._id);
-				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.util.getUserData(data.userid, (err, member) => {
-					if (err) return cb(err);
-					if (!member) return cb('noUser');
-					if (!parseInt(data.role)) return cb('badRole');
-
-					var memberEntry = crp.util.getChapterMember(chapter, member._id);
-					chapter.members[chapter.members.indexOf(memberEntry)] = {_id: member._id, role: parseInt(data.role)};
-					crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
-				});
+				chapter.members[chapter.members.indexOf(member)] = {_id: member._id, role: parseInt(data.role)};
+				crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
 			});
 		});
 	};
