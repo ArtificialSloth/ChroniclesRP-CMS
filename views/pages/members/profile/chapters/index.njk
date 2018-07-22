@@ -5,7 +5,7 @@
 <ul class="chapters">
 	{% set chapterCount = 0 %}
 	{% for chapter in chapters %}
-		{% if crp.util.getChapterMember(chapter, profile._id) %}
+		{% if crp.util.getChapterMember(chapter, profile._id).role > 0 %}
 			{% set chapterCount = chapterCount + 1 %}
 			{% lookup 'games', {_id: chapter.game}, 'game' %}
 

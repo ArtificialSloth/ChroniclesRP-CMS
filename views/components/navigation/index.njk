@@ -53,7 +53,14 @@
 
 		{% if user %}
 			<li class="menu-item menu-has-childred">
-				<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
+				<a onclick="crpGetPage('/members/{{user.nicename}}')">
+					{{user.display_name}}
+					{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+					{% set chapters = crp.util.getChapterInvites(chapters, user._id) %}
+					{% if chapters.length > 0 %}
+						<span onclick="crpGetPage('/members/{{user.nicename}}/messages')" class="count">{{chapters.length}}</span>
+					{% endif %}
+				</a>
 				<ul class="sub-menu">
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}')">Activity</a></li>
 					<li class="menu-item"><a onclick="crpGetPage('/members/{{user.nicename}}/account')">Account</a></li>

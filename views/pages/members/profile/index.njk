@@ -27,7 +27,14 @@
 			<a onclick="crpGetSubPage('/members/{{profile.nicename}}/chapters', '.profile-content .containor', true)">Chapters</a>
 			{% lookup 'users', {_id: userid}, 'user' %}
 			{% if profile._id.equals(user._id) %}
-				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/messages', '.profile-content .containor', true)">Messages</a>
+				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/messages', '.profile-content .containor', true)">
+					Messages
+					{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+					{% set chapters = crp.util.getChapterInvites(chapters, profile._id) %}
+					{% if chapters.length > 0 %}
+						<span class="count">{{chapters.length}}</span>
+					{% endif %}
+				</a>
 				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/account', '.profile-content .containor', true)">Account</a>
 				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/settings', '.profile-content .containor', true)">Settings</a>
 			{% endif %}

@@ -99,7 +99,7 @@ module.exports = (crp, callback) => {
 				if (!user) return res.send('noUser');
 
 				var member = crp.util.getChapterMember(chapter, user._id);
-				if (!member || member.role != 0) return cb('notAllowed');
+				if (!member || member.role != 0) return res.send('notAllowed');
 				crp.util.setChapterMemberRole(req.body.chapterid, {userid: req.user, role: 1}, (err, result) => {
 					if (err) return res.send(err);
 
@@ -165,6 +165,19 @@ module.exports = (crp, callback) => {
 
 					res.send(result);
 				});
+			});
+		});;
+	});
+
+	crp.express.app.post('/api/get-chapter-invites', (req, res) => {
+		crp.util.getChapters({}, (err, chapters) => {
+			if (err) return res.send(err);
+
+			crp.util.getUserData(req.user, (err, user) => {
+				if (err) return res.send(err);
+				if (!user) return res.send('noUser');
+
+				res.send(crp.util.getChapterInvites(chapters, user._id));
 			});
 		});;
 	});

@@ -1,1 +1,20 @@
-Messages
+{% include "./style.njk" %}
+
+{% lookup 'users', {_id: profileid}, 'profile' %}
+{% lookup 'users', {_id: userid}, 'user' %}
+{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+{% set chapters = crp.util.getChapterInvites(chapters, profile._id) %}
+
+{% if profile._id.equals(user._id) %}
+	<ul class="invites">
+		{% if chapters.length > 0 %}
+			{% for chapter in chapters %}
+				<li>You've been invited to join the <a onclick="crpGetPage('/chapters/{{chapter.slug}}')">{{chapter.name}}</a>. <span><a onclick="declineChapterInvite('{{chapter._id}}')">Decline</a> | <a onclick="acceptChapterInvite('{{chapter._id}}')">Accept</a></span></li>
+			{% endfor %}
+		{% else %}
+			<div class="warning">You don't have any messages.</div>
+		{% endif %}
+	</ul>
+{% endif %}
+
+{% include "./script.njk" %}

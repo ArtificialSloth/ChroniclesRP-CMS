@@ -311,6 +311,20 @@ module.exports = (crp, callback) => {
 		}
 	};
 
+	crp.util.getChapterInvites = (chapters, userid) => {
+		if (!chapters || !userid) return;
+
+		var result = [];
+		for (var i in chapters) {
+			var member = crp.util.getChapterMember(chapters[i], userid);
+			if (member && member.role == 0) {
+				result.push(chapters[i]);
+			}
+		}
+
+		return result;
+	};
+
 	crp.util.deployPHP = (sname, cb) => {
 		crp.fs.readFile(crp.ROOT + '/deploy/php-fpm/pool.conf', 'utf8', (err, data) => {
 			if (err) return cb(err);

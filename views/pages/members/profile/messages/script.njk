@@ -1,0 +1,43 @@
+<script>
+	function acceptChapterInvite(chapterid) {
+		crpAjax('/api/accept-chapter-invite', {chapterid: chapterid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetSubPage(window.location.pathname, '.profile-content .containor');
+				getChapterInvites((chapters) => {
+					if (chapters.length == 0) {
+						$('#navigation .count').remove();
+						$('.profile .nav .count').remove();
+					}
+				});
+			} else {
+				console.log(res);
+			}
+		});
+	}
+
+	function declineChapterInvite(chapterid) {
+		crpAjax('/api/leave-chapter', {chapterid: chapterid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetSubPage(window.location.pathname, '.profile-content .containor');
+				getChapterInvites((chapters) => {
+					if (chapters.length == 0) {
+						$('#navigation .count').remove();
+						$('.profile .nav .count').remove();
+					}
+				});
+			} else {
+				console.log(res);
+			}
+		});
+	}
+
+	function getChapterInvites(cb) {
+		crpAjax('/api/get-chapter-invites', {}, (res) => {
+			if (typeof res == 'object') {
+				return cb(res);
+			} else {
+				console.log(res);
+			}
+		});
+	}
+</script>
