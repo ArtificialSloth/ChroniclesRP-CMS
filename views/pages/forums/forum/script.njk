@@ -3,9 +3,9 @@
 		e.preventDefault();
 		tinymce.triggerSave();
 
-		if ($('.new-post .topic_title').val().length < 4) return $('.new-post .topic-error').html('Title must be at least 4 characters!');
-		if ($('.new-post .topic_title').val().length > 80) return $('.new-post .topic-error').html('Title cannot be more than 80 characters!');
-		if ($('.new-post .topic_body').val().length < 4) return $('.new-post .topic-error').html('Topic body must be at least 4 characters');
+		if ($('.new-post input[type=text]').val().length < 4) return $('.new-post .topic-error').html('Title must be at least 4 characters!');
+		if ($('.new-post input[type=text]').val().length > 80) return $('.new-post .topic-error').html('Title cannot be more than 80 characters!');
+		if ($('.new-post textarea').val().length < 4) return $('.new-post .topic-error').html('Topic body must be at least 4 characters');
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/new-topic', formData, (res) => {

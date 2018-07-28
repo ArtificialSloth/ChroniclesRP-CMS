@@ -37,7 +37,7 @@
 		e.preventDefault();
 		tinymce.triggerSave();
 
-		if ($('.new-post .reply').val().length < 4) return $('.new-post .input-error').html('Reply must be at least 4 characters');
+		if ($('.new-post textarea').val().length < 4) return $('.new-post .input-error').html('Reply must be at least 4 characters');
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/new-reply', formData, (res) => {

@@ -33,32 +33,79 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/new-topic', (req, res) => {
-		var topicData = {
-			author: req.user,
-			title: req.body.topic_title,
-			content: req.body.topic_body,
-			type: req.body.topic_type,
-			parent: req.body.topic_parent
-		};
-
-		crp.util.addTopic(topicData, false, (err, result) => {
+		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
+			if (!user || user.role < 1) return res.send('notAllowed');
 
-			res.send(result);
+			crp.util.getForumData(req.body.parent, (err, forum) => {
+				if (err) return res.send(err);
+				if (!forum) return res.send('noForum');
+
+				crp.util.getCategoryData(forum.category, (err, category) => {
+					if (err) return res.send(err);
+					if (!category) return res.send('noCategory');
+					if (category.role && user.role < category.role && user.role < 3) return res.send('notAllowed');
+
+					crp.util.getChapterData(category.chapter, (err, chapter) => {
+						if (err) return res.send(err);
+						if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
+
+						var topicData = {
+							author: req.user,
+							title: req.body.title,
+							content: req.body.body,
+							type: req.body.type,
+							parent: req.body.parent
+						};
+
+						crp.util.addTopic(topicData, (err, result) => {
+							if (err) return res.send(err);
+
+							res.send(result);
+						});
+					});
+				});
+			});
 		});
 	});
 
 	crp.express.app.post('/api/new-reply', (req, res) => {
-		var replyData = {
-			author: req.user,
-			content: req.body.reply,
-			parent: req.body.parent
-		};
-
-		crp.util.addReply(replyData, false, (err, result) => {
+		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
+			if (!user || user.role < 1) return res.send('notAllowed');
 
-			res.send(result);
+			crp.util.getTopicData(req.body.parent, (err, topic) => {
+				if (err) return res.send(err);
+				if (!topic) return res.send('noTopic');
+
+				crp.util.getForumData(topic.parent, (err, forum) => {
+					if (err) return res.send(err);
+					if (!forum) return res.send('noForum');
+
+					crp.util.getCategoryData(forum.category, (err, category) => {
+						if (err) return res.send(err);
+						if (!category) return res.send('noCategory');
+						if (category.role && user.role < category.role && user.role < 3) return res.send('notAllowed');
+
+						crp.util.getChapterData(category.chapter, (err, chapter) => {
+							if (err) return res.send(err);
+							if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
+
+							var replyData = {
+								author: req.user,
+								content: req.body.reply,
+								parent: req.body.parent
+							};
+
+							crp.util.addReply(replyData, (err, result) => {
+								if (err) return res.send(err);
+
+								res.send(result);
+							});
+						});
+					});
+				});
+			});
 		});
 	});
 
@@ -189,16 +236,14 @@ module.exports = (crp, callback) => {
 			if (!user || user.role < 3) return res.send('notAllowed');
 
 			var topicData = {
-				author: crp.db.objectID(req.body.topic_author),
-				title: req.body.topic_title,
-				content: req.body.topic_body,
-				date: Date.parse(req.body.topic_date),
-				parent: crp.db.objectID(req.body.topic_parent),
-				likes: parseInt(req.body.topic_likes),
-				dislikes: parseInt(req.body.topic_dislikes)
+				author: req.body.author,
+				title: req.body.title,
+				content: req.body.body,
+				date: req.body.date,
+				parent: req.body.parent
 			};
 
-			crp.util.addTopic(topicData, true, (err, result) => {
+			crp.util.addTopic(topicData, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -219,9 +264,7 @@ module.exports = (crp, callback) => {
 					author: crp.db.objectID(req.body.topic_author),
 					title: req.body.topic_title,
 					content: req.body.topic_body,
-					parent: crp.db.objectID(req.body.topic_parent),
-					likes: parseInt(req.body.topic_likes),
-					dislikes: parseInt(req.body.topic_dislikes)
+					parent: crp.db.objectID(req.body.topic_parent)
 				};
 
 				crp.util.setTopicData(topic._id, topicData, (err, result) => {
@@ -239,15 +282,13 @@ module.exports = (crp, callback) => {
 			if (!user || user.role < 3) return res.send('notAllowed');
 
 			var replyData = {
-				author: crp.db.objectID(req.body.reply_author),
-				content: req.body.reply_body,
-				date: Date.parse(req.body.reply_date),
-				parent: req.body.reply_parent,
-				likes: parseInt(req.body.reply_likes),
-				dislikes: parseInt(req.body.reply_dislikes)
+				author: req.body.author,
+				content: req.body.body,
+				date: req.body.date,
+				parent: req.body.parent
 			};
 
-			crp.util.addReply(replyData, true, (err, result) => {
+			crp.util.addReply(replyData, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -266,9 +307,7 @@ module.exports = (crp, callback) => {
 
 				var replyData = {
 					author: crp.db.objectID(req.body.reply_author),
-					content: req.body.reply_body,
-					likes: parseInt(req.body.reply_likes),
-					dislikes: parseInt(req.body.reply_dislikes)
+					content: req.body.reply_body
 				};
 
 				crp.util.setReplyData(reply._id, replyData, (err, result) => {

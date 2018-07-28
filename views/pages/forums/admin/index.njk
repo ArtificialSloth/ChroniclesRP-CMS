@@ -54,16 +54,6 @@
 
 				<br />
 
-				<label for="topic_likes">Likes:</label>
-				<input type="number" name="topic_likes" class="topic_likes" value="{{topic.likes}}" />
-
-				<br />
-
-				<label for="topic_dislikes">Dislikes:</label>
-				<input type="number" name="topic_dislikes" class="topic_dislikes" value="{{topic.dislikes}}" />
-
-				<br />
-
 				<label for="topic_body">Content:</label>
 				<textarea name="topic_body" class="topic_body tinymce">{{topic.content}}</textarea>
 
@@ -78,13 +68,13 @@
 		<fieldset class="new-post">
 			<legend>Add a New Topic</legend>
 			<form class="add-topic new-forum-post">
-				<label for="topic_title">Title:</label>
-				<input type="text" name="topic_title" class="topic_title" />
+				<label for="title">Title:</label>
+				<input type="text" name="title" />
 
 				<br />
 
-				<label for="topic_parent">Forum:</label>
-				<select name="topic_parent" class="topic_parent">
+				<label for="parent">Forum:</label>
+				<select name="parent">
 					{% for forum in forums %}
 						<option value="{{forum._id}}">{{forum.name}}</option>
 					{% endfor %}
@@ -92,8 +82,8 @@
 
 				<br />
 
-				<label for="topic_author">Author:</label>
-				<select name="topic_author" class="topic_author">
+				<label for="author">Author:</label>
+				<select name="author">
 					{% for u in users %}
 						<option value="{{u._id}}" {% if u._id.equals(user._id) %}selected{% endif %}>{{u.display_name}}</option>
 					{% endfor %}
@@ -101,23 +91,13 @@
 
 				<br />
 
-				<label for="topic_date">Post Date:</label>
-				<input type="text" name="topic_date" class="topic_date" />
+				<label for="date">Post Date:</label>
+				<input type="text" name="date" />
 
 				<br />
 
-				<label for="topic_likes">Likes:</label>
-				<input type="number" name="topic_likes" class="topic_likes" value="0" />
-
-				<br />
-
-				<label for="topic_dislikes">Dislikes:</label>
-				<input type="number" name="topic_dislikes" class="topic_dislikes" value="0" />
-
-				<br />
-
-				<label for="topic_body">Content:</label>
-				<textarea name="topic_body" class="topic_body tinymce"></textarea>
+				<label for="body">Content:</label>
+				<textarea name="body" class="tinymce"></textarea>
 
 				<input type="submit" value="Add Topic" />
 			</form>
@@ -148,16 +128,6 @@
 
 				<br />
 
-				<label for="reply_likes">Likes:</label>
-				<input type="number" name="reply_likes" class="reply_likes" value="{{reply.likes}}" />
-
-				<br />
-
-				<label for="reply_dislikes">Dislikes:</label>
-				<input type="number" name="reply_dislikes" class="reply_dislikes" value="{{reply.dislikes}}" />
-
-				<br />
-
 				<label for="reply_body">Content:</label>
 				<textarea name="reply_body" class="reply_body tinymce">{{reply.content}}</textarea>
 
@@ -172,8 +142,8 @@
 		<fieldset class="new-post">
 			<legend>Add a New Reply</legend>
 			<form class="add-reply new-forum-post">
-				<label for="reply_parent">Topic:</label>
-				<select name="reply_parent" class="reply_parent">
+				<label for="parent">Topic:</label>
+				<select name="parent">
 					{% for topic in topics %}
 						<option value="{{topic._id}}">{{topic.title}}</option>
 					{% endfor %}
@@ -181,8 +151,8 @@
 
 				<br />
 
-				<label for="reply_author">Author:</label>
-				<select name="reply_author" class="reply_author">
+				<label for="author">Author:</label>
+				<select name="author">
 					{% for u in users %}
 						<option value="{{u._id}}" {% if u._id.equals(user._id) %}selected{% endif %}>{{u.display_name}}</option>
 					{% endfor %}
@@ -190,23 +160,13 @@
 
 				<br />
 
-				<label for="reply_date">Post Date:</label>
-				<input type="text" name="reply_date" class="reply_date" />
+				<label for="date">Post Date:</label>
+				<input type="text" name="date" />
 
 				<br />
 
-				<label for="reply_likes">Likes:</label>
-				<input type="number" name="reply_likes" class="reply_likes" value="0" />
-
-				<br />
-
-				<label for="reply_dislikes">Dislikes:</label>
-				<input type="number" name="reply_dislikes" class="reply_dislikes" value="0" />
-
-				<br />
-
-				<label for="reply_body">Content:</label>
-				<textarea name="reply_body" class="reply_body tinymce"></textarea>
+				<label for="body">Content:</label>
+				<textarea name="body" class="tinymce"></textarea>
 				<script>crpTinyMCE()</script>
 
 				<input type="submit" value="Add Reply" />

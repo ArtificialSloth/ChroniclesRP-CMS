@@ -99,9 +99,9 @@
 				<fieldset class="new-post">
 					<legend>Reply to: {{topic.title}}</legend>
 					<form>
-						<textarea name="reply" class="reply tinymce"></textarea>
+						<textarea name="reply" class="tinymce"></textarea>
 
-						<input type="hidden" name="parent" class="parent" value="{{topic._id}}" />
+						<input type="hidden" name="parent" value="{{topic._id}}" />
 						<input type="submit" value="Post" />
 						<span class="input-error"></span>
 					</form>

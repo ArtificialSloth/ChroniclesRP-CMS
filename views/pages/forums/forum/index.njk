@@ -60,21 +60,21 @@
 				<fieldset class="new-post">
 					<legend>Create New Topic in {{forum.name}}</legend>
 					<form>
-						<label for="topic_title">Topic Title (Max: 80)</label>
-						<input type="text" name="topic_title" class="topic_title" maxlength="80" />
+						<label for="title">Topic Title (Max: 80)</label>
+						<input type="text" name="title" maxlength="80" />
 
-						<textarea name="topic_body" class="topic_body tinymce"></textarea>
+						<textarea name="body" class="tinymce"></textarea>
 						<script>crpTinyMCE()</script>
 
 						{% if user.role >= 2 %}
-							<label for="topic_type">Topic Type:</label>
-							<select name="topic_type" class="topic_type">
+							<label for="type">Topic Type:</label>
+							<select name="type">
 								<option value="normal" selected>Normal</option>
 								<option value="sticky">Sticky</option>
 							</select>
 						{% endif %}
 
-						<input type="hidden" name="topic_parent" class="topic_parent" value="{{forum._id}}" />
+						<input type="hidden" name="parent" value="{{forum._id}}" />
 						<input type="submit" value="Post" />
 						<span class="topic-error"></span>
 					</form>

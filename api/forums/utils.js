@@ -200,9 +200,7 @@ module.exports = (crp, callback) => {
 				type: topic.type,
 				content: data.content || topic.content,
 				date: topic.date,
-				parent: data.parent || topic.parent,
-				likes: (typeof data.likes == 'number') ? data.likes : topic.likes,
-				dislikes: (typeof data.dislikes == 'number') ? data.dislikes : topic.dislikes
+				parent: data.parent || topic.parent
 			};
 
 			if (newTopic.title.length < 4 || newTopic.title.length > 80) return cb('titleLength');
@@ -215,54 +213,43 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addTopic = (data, admin, cb) => {
+	crp.util.addTopic = (data, cb) => {
 		var topic = {
 			author: data.author,
 			title: data.title,
 			type: data.type || 'normal',
 			content: data.content,
-			date: data.date || Date.now(),
-			parent: data.parent,
-			likes: data.likes || 0,
-			dislikes: data.dislikes || 0
+			date: (data.date) ? Date.parse(data.date.replace('at ', '')) : Date.now(),
+			parent: data.parent
 		};
 
 		crp.util.getUserData(topic.author, (err, user) => {
 			if (err) return cb(err);
-			if (!user || user.role <= 0) return cb('generic');
+			if (!user) return cb('noUser');
+
+			topic.author = user._id;
 
 			if (!topic.title || topic.title.length < 4) return cb('titleShort');
-			if (topic.title.length > 80) return cb(null, 'titleLong');
+			if (topic.title.length > 80) return cb('titleLong');
 			if (!topic.content || topic.content.length < 4) return cb('bodyLength');
 
 			crp.util.getForumData(topic.parent, (err, forum) => {
 				if (err) return cb(err);
-				if (!forum) return cb('generic');
+				if (!forum) return cb('noForum');
 
-				crp.util.getCategoryData(forum.category, (err, category) => {
+				topic.parent = forum._id;
+
+				topic = crp.util.sanitizeObject(topic);
+				crp.db.insertOne('topics', topic, (err, result) => {
 					if (err) return cb(err);
-					if (!category) return cb('generic');
-					if (category.role && !admin && user.role < category.role) return cb('notAllowed');
 
-					crp.util.getChapterData(category.chapter, (err, chapter) => {
-						if (err) return cb(err);
-						if (chapter && !admin && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
-
-						topic.parent = forum._id;
-
-						topic = crp.util.sanitizeObject(topic);
-						crp.db.insertOne('topics', topic, (err, result) => {
-							if (err) return cb(err);
-
-							crp.pages.push({
-								slug: '/forums/' + forum.slug + '/' + result.insertedId.toString(),
-								path: '/forums/topic/index.njk',
-								context: {topicid: result.insertedId}
-							});
-
-							cb(null, topic);
-						});
+					crp.pages.push({
+						slug: `/forums/${forum.slug}/${result.insertedId}`,
+						path: '/forums/topic/index.njk',
+						context: {topicid: result.insertedId}
 					});
+
+					cb(null, topic);
 				});
 			});
 		});
@@ -296,9 +283,7 @@ module.exports = (crp, callback) => {
 				author: data.author || reply.author,
 				content: data.content || reply.content,
 				date: reply.date,
-				parent: reply.parent,
-				likes: (typeof data.likes == 'number') ? data.likes : reply.likes,
-				dislikes: (typeof data.dislikes == 'number') ? data.dislikes : reply.dislikes
+				parent: reply.parent
 			};
 
 			if (data.content.length < 4) return cb('bodyLength');
@@ -310,45 +295,31 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addReply = (data, admin, cb) => {
+	crp.util.addReply = (data, cb) => {
 		var reply = {
 			author: data.author,
 			content: data.content,
-			date: data.date || Date.now(),
-			parent: crp.db.objectID(data.parent),
-			likes: data.likes || 0,
-			dislikes: data.dislikes || 0
+			date: (data.date) ? Date.parse(data.date.replace('at ', '')) : Date.now(),
+			parent: data.parent
 		};
 
 		crp.util.getUserData(reply.author, (err, user) => {
 			if (err) return cb(err);
-			if (!user || user.role <= 0) return cb('generic');;
+			if (!user) return cb('noUser');;
+
+			reply.author = user._id;
 
 			if (!reply.content || reply.content.length < 4) return cb('bodyLength');
 
 			crp.util.getTopicData(reply.parent, (err, topic) => {
 				if (err) return cb(err);
-				if (!topic) return cb('generic');
+				if (!topic) return cb('noTopic');
 
-				crp.util.getForumData(topic.parent, (err, forum) => {
-					if (err) return cb(err);
-					if (!forum) return cb('generic');
+				reply.parent = topic._id;
 
-					crp.util.getCategoryData(forum.category, (err, category) => {
-						if (err) return cb(err);
-						if (!category) return cb('generic');
-						if (category.role && !admin && user.role < category.role) return cb('notAllowed');
-
-						crp.util.getChapterData(category.chapter, (err, chapter) => {
-							if (err) return cb(err);
-							if (chapter && !admin && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return cb('notAllowed');
-
-							reply = crp.util.sanitizeObject(reply);
-							crp.db.insertOne('replies', reply, (err, result) => {
-								cb(err, reply)
-							});
-						});
-					});
+				reply = crp.util.sanitizeObject(reply);
+				crp.db.insertOne('replies', reply, (err, result) => {
+					cb(err, reply)
 				});
 			});
 		});
