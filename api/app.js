@@ -4,7 +4,12 @@ module.exports = (crp, callback) => {
 
 	crp.proxy = require('redbird')({
 		port: 80,
-		bunyan: false
+		bunyan: false,
+		ssl: {
+			port: 443,
+			key: process.env.KEY,
+			cert: process.env.CERT
+		}
 	});
 
 	crp.nunjucks = require('nunjucks');
@@ -94,8 +99,8 @@ module.exports = (crp, callback) => {
 		noCache: true
 	}));
 
-	crp.proxy.register(process.env.DOMAIN, '127.0.0.1:' + (process.env.PORT || 3000));
-	crp.proxy.register('127.0.0.1', '127.0.0.1:' + (process.env.PORT || 3000));
+	crp.proxy.register(process.env.DOMAIN, '127.0.0.1:' + (process.env.PORT || 3000), {ssl: crp.ssl});
+	crp.proxy.register('127.0.0.1', '127.0.0.1:' + (process.env.PORT || 3000), {ssl: crp.ssl});
 	crp.express.ready = (cb) => {
 		crp.util.requireFiles('/app.js', (err) => {
 			if (err) return cb(err);

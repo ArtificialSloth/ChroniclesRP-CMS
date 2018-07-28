@@ -9,6 +9,7 @@ async.waterfall([
 			fs: require('fs'),
 			cmd: require('child_process').exec,
 			moment: require('moment-timezone'),
+			ssl: (process.env.NODE_ENV == 'production'),
 			browserRefresh: process.env.BROWSER_REFRESH_URL,
 			redis: require('redis').createClient(process.env.REDIS_URL)
 		});

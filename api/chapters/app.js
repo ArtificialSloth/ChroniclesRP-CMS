@@ -204,7 +204,7 @@ module.exports = (crp, callback) => {
 
 	crp.util.getChapters({}, (err, chapters) => {
 		for (var i in chapters) {
-			crp.proxy.register(chapters[i].slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+			crp.proxy.register(chapters[i].slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080', {ssl: crp.ssl});
 		}
 
 		callback();
