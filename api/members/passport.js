@@ -35,8 +35,8 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.auth.passport.use(new crp.auth.strategy({
-			usernameField: 'user_login',
-			passwordField: 'user_pass'
+			usernameField: 'login',
+			passwordField: 'pass'
 		},
 		(username, password, done) => {
 			crp.util.getUsers({login: username}, (err, users) => {

@@ -1,17 +1,17 @@
 <script>
 	$('.login-form').submit((e) => {
 		e.preventDefault();
-		$('.login-form .user_login').removeClass('input-error');
-		$('.login-form .user_pass').removeClass('input-error');
+		$(e.target).find('input[type=text]').removeClass('input-error');
+		$(e.target).find('input[type=password]').removeClass('input-error');
 
-		if ($('.login-form .user_login').val() == '') {
-			$('.login-form .user_login').addClass('input-error');
-			loginShowError('Username field cannot be empty!');
+		if ($(e.target).find('input[type=text]').val() == '') {
+			$(e.target).find('input[type=text]').addClass('input-error');
+			loginShowError(e.target, 'Username field cannot be empty!');
 			return;
 		}
-		if ($('.login-form .user_pass').val().length < 6) {
-			$('.login-form .user_pass').addClass('input-error');
-			loginShowError('Passwords must be at least 6 characters!');
+		if ($(e.target).find('input[type=password]').val().length < 6) {
+			$(e.target).find('input[type=password]').addClass('input-error');
+			loginShowError(e.target, 'Passwords must be at least 6 characters!');
 			return;
 		}
 
@@ -20,21 +20,21 @@
 			if (response == 'valid') {
 				location.reload();
 			} else if (response == 'tooMany') {
-				loginShowError('Too many failed login attempts. Please wait 5 minutes then try again.');
+				loginShowError(e.target, 'Too many failed login attempts. Please wait 5 minutes then try again.');
 			} else if (response == 'locked') {
-				loginShowError('Your account has been locked.');
+				loginShowError(e.target, 'Your account has been locked.');
 			} else {
-				loginShowError('Incorrect username or password');
+				loginShowError(e.target, 'Incorrect username or password');
 			}
 		});
 	});
 
-	function loginShowError(msg) {
-		$('#login').addClass('error');
-		$('#login .error-message').html(msg);
-		$('#login .error-message').addClass('wiggle');
+	function loginShowError(form, msg) {
+		$(form).addClass('error');
+		$(form).find('.error-message').html(msg);
+		$(form).find('.error-message').addClass('wiggle');
 		setTimeout(() => {
-			$('#login .error-message').removeClass('wiggle');
+			$(form).find('.error-message').removeClass('wiggle');
 		}, 500)
 	}
 </script>
