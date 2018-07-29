@@ -88,6 +88,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.use(crp.express.static('public'));
+	crp.express.app.use(require('body-parser').json());
 	crp.express.app.use(require('body-parser').urlencoded({
 		extended: false
 	}));
@@ -135,6 +136,16 @@ module.exports = (crp, callback) => {
 				});
 			});
 
+			crp.express.app.post('/api/github', (req, res) => {
+				if (!req.headers['user-agent'].includes('GitHub-Hookshot')) return res.sendStatus(401)
+
+				var hmac = crp.auth.crypto.createHmac('sha1', process.env.GITHUB_SECRET);
+				var signature = 'sha1=' + hmac.update(JSON.stringify(req.body), 'utf-8').digest('hex');
+				if (!crp.auth.crypto.timingSafeEqual(Buffer.from(req.headers['x-hub-signature']), Buffer.from(signature))) return res.sendStatus(401);
+
+				return res.sendStatus(200);
+			});
+
 			crp.express.app.post('/api/admin/edit-site', (req, res) => {
 				var site = {
 					name: req.body.site_name,
@@ -144,7 +155,7 @@ module.exports = (crp, callback) => {
 
 				crp.util.editSite(site, (err, result) => {
 					res.send(result);
-				})
+				});
 			});
 
 			cb();
