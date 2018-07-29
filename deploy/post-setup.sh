@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /var/www/crp
+cd /var/www/crp/source
 
 apt-get update && apt-get upgrade -y
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
@@ -11,8 +11,8 @@ sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini
 systemctl reload php7.0-fpm
 
 rm -R /var/www/html
-mv deploy/nginx/default /etc/nginx/sites-available/default
-mv deploy/nginx/php /etc/nginx/sites-available/php
+cp deploy/nginx/default /etc/nginx/sites-available/default
+cp deploy/nginx/php /etc/nginx/sites-available/php
 ln -s /etc/nginx/sites-available/php /etc/nginx/sites-enabled/php
 systemctl reload nginx
 
