@@ -13,7 +13,7 @@
 			{% for member in leaders %}
 				{% set member = crp.util.findObjectInArray(users, '_id', member._id.toString()) %}
 				<ul>
-					<li><a onclick="crpGetPage('/members/{{member.nicename}}')"><img class="profile-pic" src="{{member.img.profile or '/img/members/profile.png'}}" /></a></li>
+					<li><a onclick="crpGetPage('/members/{{member.nicename}}')"><img class="profile-pic" src="{{crp.util.getUserProfilePic(member)}}" /></a></li>
 					<li>
 						<h1><a onclick="crpGetPage('/members/{{member.nicename}}')">{{member.display_name}}</a></h1>
 						{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
@@ -33,7 +33,7 @@
 			{% for member in members %}
 				{% set member = crp.util.findObjectInArray(users, '_id', member._id.toString()) %}
 				<ul>
-					<li><a onclick="crpGetPage('/members/{{member.nicename}}')"><img class="profile-pic" src="{{member.img.profile or '/img/members/profile.png'}}" /></a></li>
+					<li><a onclick="crpGetPage('/members/{{member.nicename}}')"><img class="profile-pic" src="{{crp.util.getUserProfilePic(member)}}" /></a></li>
 					<li>
 						<h1><a onclick="crpGetPage('/members/{{member.nicename}}')">{{member.display_name}}</a></h1>
 						{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
@@ -55,7 +55,7 @@
 					{% set member = crp.util.getChapterMember(chapter, user._id) %}
 					{% if not member or member.role == 0 %}
 						<ul>
-							<li><a onclick="crpGetPage('/members/{{user.nicename}}')"><img class="profile-pic" src="{{user.img.profile or '/img/members/profile.png'}}" /></a></li>
+							<li><a onclick="crpGetPage('/members/{{user.nicename}}')"><img class="profile-pic" src="{{crp.util.getUserProfilePic(user)}}" /></a></li>
 							<li>
 								<h1><a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a></h1>
 								<span>

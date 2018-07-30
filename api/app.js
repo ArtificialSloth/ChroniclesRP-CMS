@@ -73,7 +73,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.upload = require('multer')({
-		dest: crp.PUBLICDIR + '/uploads',
+		dest: crp.ROOT + '/uploads',
 		limits: {
 			fileSize: 2 * 1024 * 1024
 		},

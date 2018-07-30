@@ -98,7 +98,12 @@ module.exports = (crp, callback) => {
 					secondary: '#53377F'
 				},
 				img: {
-					bg: '/img/bg.jpg'
+					bg: crp.storage.getUrl('img/bg.jpg'),
+					ico: crp.storage.getUrl('img/ico_b.png'),
+					cover: crp.storage.getUrl('img/cover.png'),
+					donate: crp.storage.getUrl('img/donate.png'),
+					header: crp.storage.getUrl('img/header_w.png'),
+					discord: crp.storage.getUrl('img/discord.png')
 				}
 			}
 		};
@@ -137,38 +142,6 @@ module.exports = (crp, callback) => {
 				cb(null, {path: path, context: context});
 			});
 		}
-	};
-
-	crp.util.replaceFile = (oldFile, newFile, newPath) => {
-		crp.fs.unlink(oldFile, (err) => {
-			if (err && err.code != 'ENOENT') return console.error(err);
-
-			crp.fs.rename(newFile, newPath, (err) => {
-				if (err) return console.error(err);
-			});
-		});
-	};
-
-	crp.util.rmdir = (path, cb) => {
-		crp.fs.readdir(path, (err, files) => {
-			if (err) return cb(err);
-
-			crp.async.each(files, (file, callback) => {
-				crp.fs.stat(`${path}/${file}`, (err, stats) => {
-					if (err) return callback(err);
-
-					if (stats.isDirectory()) {
-						return crp.util.rmdir(`${path}/${file}`, callback);
-					}
-
-					crp.fs.unlink(`${path}/${file}`, callback);
-				});
-			}, (err) => {
-				if (err) return callback(err);
-
-				crp.fs.rmdir(path, cb);
-			});
-		});
 	};
 
 	crp.util.editSite = (data, cb) => {

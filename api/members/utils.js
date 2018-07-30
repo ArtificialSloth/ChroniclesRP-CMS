@@ -117,47 +117,74 @@ module.exports = (crp, callback) => {
 					newUser.gender = data.gender;
 				}
 
-				if (data.img && data.img.profile) {
-					var path = `/img/members/${newUser._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+				crp.async.parallel([
+					(callback) => {
+						if (!data.img || !data.img.profile) return callback();
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
-					newUser.img.profile = path;
-				}
+						crp.storage.delete(user.img.profile, (err) => {
+							if (err) return callback(err);
 
-				if (data.img && data.img.cover) {
-					var path = `/img/members/${newUser._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+							crp.storage.upload(data.img.profile[0].path, `img/members/${newUser._id}/${data.img.profile[0].originalname}`, (err, file) => {
+								if (err) return callback(err);
 
-					crp.util.replaceFile(crp.PUBLICDIR + user.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
-					newUser.img.cover = path;
-				}
+								crp.fs.unlink(data.img.profile[0].path, (err) => {
+									if (err) return callback(err);
 
-				if (data.old_pass && data.new_pass) {
-					crp.auth.bcrypt.compare(data.old_pass, user.pass, (err, isValid) => {
-						if (err) return cb(err);
-						if (!isValid) return cb(null, 'passMismatch');
-						if (data.new_pass.length < 6) return cb(null, 'passLength');
-						if (data.new_pass != data.confirm_new_pass) return cb(null, 'newPassMismatch');
-
-						crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
-							if (err) return cb(err);
-
-							newUser.pass = hash;
-							newUser = crp.util.newUserObject(newUser);
-							newUser = crp.util.sanitizeObject(newUser);
-
-							crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
-								cb(err, newUser);
+									newUser.img.profile = file.name;
+									callback();
+								});
 							});
 						});
-					});
-				} else {
-					newUser = crp.util.newUserObject(newUser);
-					newUser = crp.util.sanitizeObject(newUser);
+					},
+					(callback) => {
+						if (!data.img || !data.img.cover) return callback();
 
-					crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
-						cb(err, newUser);
-					});
-				}
+						crp.storage.delete(user.img.cover, (err) => {
+							if (err) return callback(err);
+
+							crp.storage.upload(data.img.cover[0].path, `img/members/${newUser._id}/${data.img.cover[0].originalname}`, (err, file) => {
+								if (err) return callback(err);
+
+								crp.fs.unlink(data.img.cover[0].path, (err) => {
+									if (err) return callback(err);
+
+									newUser.img.cover = file.name;
+									callback();
+								});
+							});
+						});
+					}
+				], (err, results) => {
+					if (err) return cb(err);
+
+					if (data.old_pass && data.new_pass) {
+						crp.auth.bcrypt.compare(data.old_pass, user.pass, (err, isValid) => {
+							if (err) return cb(err);
+							if (!isValid) return cb(null, 'passMismatch');
+							if (data.new_pass.length < 6) return cb(null, 'passLength');
+							if (data.new_pass != data.confirm_new_pass) return cb(null, 'newPassMismatch');
+
+							crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
+								if (err) return cb(err);
+
+								newUser.pass = hash;
+								newUser = crp.util.newUserObject(newUser);
+								newUser = crp.util.sanitizeObject(newUser);
+
+								crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
+									cb(err, newUser);
+								});
+							});
+						});
+					} else {
+						newUser = crp.util.newUserObject(newUser);
+						newUser = crp.util.sanitizeObject(newUser);
+
+						crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
+							cb(err, newUser);
+						});
+					}
+				});
 			});
 		});
 	};
@@ -253,7 +280,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb();
 
-			crp.fs.rmdir(`${crp.PUBLICDIR}/img/members/${user._id}`, (err) => {
+			crp.storage.rmdir(`img/members/${user._id}/`, (err) => {
 				if (err) return cb(err);
 
 				crp.db.deleteOne('users', {_id: user._id}, cb);
@@ -278,6 +305,18 @@ module.exports = (crp, callback) => {
 			default:
 				return 'Guest';
 		}
+	};
+
+	crp.util.getUserProfilePic = (user) => {
+		if (!user) return;
+
+		return crp.storage.getUrl(user.img.profile) || crp.storage.getUrl('members/profile.png');
+	};
+
+	crp.util.getUserCoverPic = (user) => {
+		if (!user) return;
+
+		return crp.storage.getUrl(user.img.cover) || crp.storage.getUrl('cover.png');
 	};
 
 	crp.util.addProfilePage = (user) => {

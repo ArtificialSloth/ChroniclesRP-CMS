@@ -12,7 +12,7 @@
 			{% lookup 'forums', {_id: activity.parent}, 'parent' %}
 			<li>
 				<ul>
-					<li><img class="profile-pic" src="{{profile.img.profile or '/img/members/profile.png'}}" /></li>
+					<li><img class="profile-pic" src="{{crp.util.getUserProfilePic(profile)}}" /></li>
 					<li>
 						<a onclick="crpGetPage('/members/{{profile.nicename}}')">{{profile.display_name}}</a>
 						started topic
@@ -35,7 +35,7 @@
 				{% lookup 'forums', {_id: parent.parent}, 'forum' %}
 				<li>
 					<ul>
-						<li><img class="profile-pic" src="{{profile.img.profile or '/img/members/profile.png'}}" /></li>
+						<li><img class="profile-pic" src="{{crp.util.getUserProfilePic(profile)}}" /></li>
 						<li>
 							<a onclick="crpGetPage('/members/{{profile.nicename}}')">{{profile.display_name}}</a>
 							replied to

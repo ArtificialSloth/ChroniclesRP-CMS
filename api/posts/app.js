@@ -65,11 +65,14 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');
 
-			var path = `/img/posts/${req.files.img[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
-			crp.fs.rename(req.files.img[0].path, crp.PUBLICDIR + path, (err) => {
-				if (err) return res.send(err);
+			crp.storage.upload(req.files.img[0].path, `posts/${req.files.img[0].originalname}`, (err, file) => {
+				if (err) res.send(err);
 
-				res.send(path);
+				crp.fs.unlink(req.files.img[0].path, (err) => {
+					if (err) res.send(err);
+
+					res.send(crp.storage.getUrl(file));
+				});
 			});
 		});
 	});

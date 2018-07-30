@@ -41,23 +41,50 @@ module.exports = (crp, callback) => {
 					if (newChapter.tagline.length > 140) return cb('badTagline');
 					if (newChapter.discord.length > 19) return cb('badDiscord');
 
-					if (data.img && data.img.profile) {
-						var path = `/img/chapters/${newChapter._id}/${data.img.profile[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+					crp.async.parallel([
+						(callback) => {
+							if (!data.img || !data.img.profile) return callback();
 
-						crp.util.replaceFile(crp.PUBLICDIR + chapter.img.profile, data.img.profile[0].path, crp.PUBLICDIR + path);
-						newChapter.img.profile = path;
-					}
+							crp.storage.delete(chapter.img.profile, (err) => {
+								if (err) return callback(err);
 
-					if (data.img && data.img.cover) {
-						var path = `/img/chapters/${newChapter._id}/${data.img.cover[0].originalname.toLowerCase().replace(/[^a-z0-9.]+/g, '-')}`;
+								crp.storage.upload(data.img.profile[0].path, `img/chapters/${newChapter._id}/${data.img.profile[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
 
-						crp.util.replaceFile(crp.PUBLICDIR + chapter.img.cover, data.img.cover[0].path, crp.PUBLICDIR + path);
-						newChapter.img.cover = path;
-					}
+									crp.fs.unlink(data.img.profile[0].path, (err) => {
+										if (err) return callback(err);
 
-					newChapter = crp.util.sanitizeObject(newChapter);
-					crp.db.replaceOne('chapters', {_id: chapter._id}, newChapter, (err, result) => {
-						cb(err, newChapter);
+										newChapter.img.profile = file.name;
+										callback();
+									});
+								});
+							});
+						},
+						(callback) => {
+							if (!data.img || !data.img.cover) return callback();
+
+							crp.storage.delete(chapter.img.cover, (err) => {
+								if (err) return callback(err);
+
+								crp.storage.upload(data.img.cover[0].path, `img/chapters/${newChapter._id}/${data.img.cover[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
+
+									crp.fs.unlink(data.img.cover[0].path, (err) => {
+										if (err) return callback(err);
+
+										newChapter.img.cover = file.name;
+										callback();
+									});
+								});
+							});
+						}
+					], (err, results) => {
+						if (err) return cb(err);
+
+						newChapter = crp.util.sanitizeObject(newChapter);
+						crp.db.replaceOne('chapters', {_id: chapter._id}, newChapter, (err, result) => {
+							cb(err, newChapter);
+						});
 					});
 				});
 			});
@@ -150,7 +177,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.rmdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
+			crp.storage.rmdir(`img/chapters/${chapter._id}/`, (err) => {
 				if (err) return cb(err);
 
 				switch (chapter.type) {
@@ -323,6 +350,18 @@ module.exports = (crp, callback) => {
 		}
 
 		return result;
+	};
+
+	crp.util.getChapterProfilePic = (chapter) => {
+		if (!chapter) return;
+
+		return crp.storage.getUrl(chapter.img.profile) || crp.storage.getUrl('members/profile.png');
+	};
+
+	crp.util.getChapterCoverPic = (chapter) => {
+		if (!chapter) return;
+
+		return crp.storage.getUrl(chapter.img.cover) || crp.storage.getUrl('cover.png');
 	};
 
 	crp.util.deployPHP = (sname, cb) => {

@@ -12,6 +12,7 @@
 		"start": "node chroniclesrp.js"
 	},
 	"dependencies": {
+		"@google-cloud/storage": "^1.7.0",
 		"@sendgrid/inbound-mail-parser": "^6.1.4",
 		"@sendgrid/mail": "^6.1.4",
 		"async": "^2.6.0",
@@ -22,6 +23,7 @@
 		"express-limiter": "^1.6.1",
 		"express-session": "^1.15.6",
 		"helmet": "^3.9.0",
+		"hoek": "^5.0.3",
 		"moment-timezone": "^0.5.14",
 		"mongo-sanitize": "^1.0.0",
 		"mongodb": "^2.2.33",
@@ -31,7 +33,8 @@
 		"passport-local": "^1.0.0",
 		"recaptcha2": "^1.3.2",
 		"redbird": "^0.7.0",
+		"request": "^2.87.0",
 		"targz": "^1.0.1",
-		"hoek": "^4.2.1"
+		"tunnel-agent": "^0.6.0"
 	}
 }

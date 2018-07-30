@@ -11,7 +11,7 @@
 
 			<li class="chapter">
 				<ul>
-					<li><img src="{{chapter.img.profile or '/img/chapters/profile.png'}}" /></li>
+					<li><img src="{{crp.util.getChapterProfilePic(chapter)}}" /></li>
 					<li>
 						{{crp.util.getChapterLink(chapter) | safe}}
 						<p>{{chapter.tagline}}</p>
