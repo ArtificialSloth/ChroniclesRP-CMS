@@ -35,8 +35,24 @@ async.waterfall([
 	crp.express.ready((err) => {
 		if (err) return console.error(err);
 
-		crp.express.app.listen(process.env.PORT || 3000, () => {
+		crp.server = crp.express.app.listen(process.env.PORT || 3000, () => {
 			if (process.send) process.send('online');
+
+			process.on('SIGINT', () => {
+				crp.server.close((err) => {
+					if (err) console.error(err);
+
+					crp.db.client.close(false, () => {
+						crp.redis.quit();
+
+						process.exit(err ? 1 : 0);
+					});
+				});
+
+				setTimeout(() => {
+					process.exit(1);
+				}, 1000 * 10)
+			});
 
 			console.log('\nThe Chronicles RP is up and running!');
 		});

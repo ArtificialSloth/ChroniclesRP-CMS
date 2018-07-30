@@ -2,7 +2,7 @@ chroniclesrp.sh
 chroniclesrp.bat
 ecosystem.config.js
 /node_modules
-/public/uploads
+/public/uploads/*
 /public/img/posts/*
 /public/img/members/*
 /public/img/chapters/*

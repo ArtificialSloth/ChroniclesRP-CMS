@@ -8,6 +8,7 @@ module.exports = (crp, callback) => {
 		crp.db = {
 			mongodb: db,
 			prefix: 'CRP_',
+			client: mongoClient,
 			sanitize: require('mongo-sanitize')
 		};
 

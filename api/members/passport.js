@@ -16,6 +16,7 @@ module.exports = (crp, callback) => {
 		secret: process.env.SESSION_SECRET,
 		resave: false,
 		saveUninitialized: false,
+		cookie: {secure: crp.env},
 		store: new crp.auth.redisStore({client: crp.redis})
 	}));
 	crp.express.app.use(crp.auth.passport.initialize());
