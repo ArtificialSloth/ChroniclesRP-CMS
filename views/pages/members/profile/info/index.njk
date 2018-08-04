@@ -2,6 +2,6 @@
 	<label class="fill">About</label>
 	<div class="standard-input fill">
 		{% lookup 'users', {_id: userid}, 'user' %}
-		{{user.about | safe}}
+		{{profile.about | safe}}
 	</div>
 </div>

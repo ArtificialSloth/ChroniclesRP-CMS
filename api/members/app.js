@@ -161,14 +161,13 @@ module.exports = (crp, callback) => {
 	crp.express.app.post('/api/admin/remove-user', (req, res) => {
 		crp.util.getUserData(req.user, (err, user) => {
 			if (err) return res.send(err);
+			if (user.role < 3) return res.send('notAllowed');
 
-			if (user.role >= 3) {
-				crp.util.removeUser(crp.db.objectID(req.body.userid), (err, result) => {
-					if (err) return res.send(err);
+			crp.util.removeUser(req.body.userid, (err, result) => {
+				if (err) return res.send(err);
 
-					res.send(result);
-				});
-			}
+				res.send(result);
+			});
 		});
 	});
 

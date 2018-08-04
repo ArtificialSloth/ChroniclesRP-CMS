@@ -153,37 +153,33 @@ module.exports = (crp, callback) => {
 								});
 							});
 						});
-					}
-				], (err, results) => {
-					if (err) return cb(err);
+					},
+					(callback) => {
+						if (!data.old_pass || data.new_pass) return callback();
 
-					if (data.old_pass && data.new_pass) {
 						crp.auth.bcrypt.compare(data.old_pass, user.pass, (err, isValid) => {
-							if (err) return cb(err);
-							if (!isValid) return cb(null, 'passMismatch');
-							if (data.new_pass.length < 6) return cb(null, 'passLength');
-							if (data.new_pass != data.confirm_new_pass) return cb(null, 'newPassMismatch');
+							if (err) return callback(err);
+							if (!isValid) return callback('passMismatch');
+							if (data.new_pass.length < 6) return callback('passLength');
+							if (data.new_pass != data.confirm_new_pass) return callback('newPassMismatch');
 
 							crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
-								if (err) return cb(err);
+								if (err) return callback(err);
 
 								newUser.pass = hash;
-								newUser = crp.util.newUserObject(newUser);
-								newUser = crp.util.sanitizeObject(newUser);
-
-								crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
-									cb(err, newUser);
-								});
+								callback();
 							});
 						});
-					} else {
-						newUser = crp.util.newUserObject(newUser);
-						newUser = crp.util.sanitizeObject(newUser);
-
-						crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
-							cb(err, newUser);
-						});
 					}
+				], (err) => {
+					if (err) return cb(err);
+
+					newUser = crp.util.newUserObject(newUser);
+					newUser = crp.util.sanitizeObject(newUser);
+
+					crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
+						cb(err, newUser);
+					});
 				});
 			});
 		});
@@ -247,10 +243,9 @@ module.exports = (crp, callback) => {
 					crp.db.insertOne('users', user, (err, result) => {
 						if (err) return cb(err);
 
-						crp.fs.mkdir(`${crp.PUBLICDIR}/img/members/${result.insertedId}`, (err) => {
+						crp.util.addProfilePage(user, (err) => {
 							if (err) return cb(err);
 
-							crp.util.addProfilePage(user);
 							cb(null, user);
 						});
 					});
@@ -264,10 +259,9 @@ module.exports = (crp, callback) => {
 				crp.db.insertOne('users', user, (err, result) => {
 					if (err) return cb(err);
 
-					crp.fs.mkdir(`${crp.PUBLICDIR}/img/members/${result.insertedId}`, (err) => {
+					crp.util.addProfilePage(user, (err) => {
 						if (err) return cb(err);
 
-						crp.util.addProfilePage(user);
 						cb(null, user);
 					});
 				});
@@ -280,10 +274,14 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb();
 
-			crp.storage.rmdir(`img/members/${user._id}/`, (err) => {
+			crp.db.deleteOne('users', {_id: user._id}, (err, result) => {
 				if (err) return cb(err);
 
-				crp.db.deleteOne('users', {_id: user._id}, cb);
+				crp.util.removeProfilePage(user, (err) => {
+					if (err) return cb(err);
+
+					cb(null, user);
+				});
 			});
 		});
 	};
@@ -310,63 +308,75 @@ module.exports = (crp, callback) => {
 	crp.util.getUserProfilePic = (user) => {
 		if (!user) return;
 
-		return crp.storage.getUrl(user.img.profile) || crp.storage.getUrl('members/profile.png');
+		return crp.storage.getUrl(user.img.profile) || crp.storage.getUrl('img/members/profile.png');
 	};
 
 	crp.util.getUserCoverPic = (user) => {
 		if (!user) return;
 
-		return crp.storage.getUrl(user.img.cover) || crp.storage.getUrl('cover.png');
+		return crp.storage.getUrl(user.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
-	crp.util.addProfilePage = (user) => {
+	crp.util.addProfilePage = (user, cb) => {
+		if (!user || !user._id) return cb('noUser');
+
 		var profilePages = [
-			{page: '/info'},
-			{page: '/friends'},
-			{page: '/chapters'},
-			{page: '/messages'},
-			{page: '/account', context: {timezones: crp.moment.tz.names()}},
-			{page: '/settings'}
+			{slug: 'info'},
+			{slug: 'friends'},
+			{slug: 'chapters'},
+			{slug: 'messages'},
+			{slug: 'account', context: {timezones: crp.moment.tz.names()}},
+			{slug: 'settings'}
 		];
 
-		crp.pages.push({
+		crp.pages.addPage({
 			slug: '/members/' + user.nicename,
 			path: '/members/profile/index.njk',
 			subPage: '/members/profile/activity/index.njk',
 			context: {
 				profileid: user._id
 			}
-		});
+		}, (err, result) => {
+			if (err) return cb(err);
 
-		for (var i in profilePages) {
-			crp.pages.push({
-				slug: '/members/' + user.nicename + profilePages[i].page,
-				path: '/members/profile/index.njk',
-				subPage: '/members/profile' + profilePages[i].page + '/index.njk',
-				context: Object.assign({
-					profileid: user._id
-				}, profilePages[i].context)
-			});
-		}
+			crp.async.each(profilePages, (page, callback) => {
+				crp.pages.addPage({
+					slug: `/members/${user.nicename}/${page.slug}`,
+					path: '/members/profile/index.njk',
+					subPage: `/members/profile/${page.slug}/index.njk`,
+					context: Object.assign({
+						profileid: user._id
+					}, page.context)
+				}, (err, result) => {
+					if (err) return callback(err);
+
+					callback();
+				});
+			}, cb);
+		});
 	};
 
-	crp.util.removeProfilePage = (user) => {
+	crp.util.removeProfilePage = (user, cb) => {
 		var profilePages = [
-			'/info',
-			'/friends',
-			'/chapters',
-			'/messages',
-			'/account',
-			'/settings'
+			'info',
+			'friends',
+			'chapters',
+			'messages',
+			'account',
+			'settings'
 		];
 
-		var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/members/' + user.nicename));
-		if (index > -1) crp.pages.splice(index, 1);
+		crp.pages.removePage({slug: `/members/${user.nicename}`}, (err, result) => {
+			if (err) return cb(err);
 
-		for (var i in profilePages) {
-			index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/members/' + user.nicename + profilePages[i]));
-			if (index > -1) crp.pages.splice(index, 1);
-		}
+			crp.async.each(profilePages, (page, callback) => {
+				crp.pages.removePage({slug: `/members/${user.nicename}/${page}`}, (err, result) => {
+					if (err) return callback(err);
+
+					callback();
+				});
+			}, cb);
+		});
 	};
 
 	callback();

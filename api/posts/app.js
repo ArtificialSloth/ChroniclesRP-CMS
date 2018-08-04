@@ -65,7 +65,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');
 
-			crp.storage.upload(req.files.img[0].path, `posts/${req.files.img[0].originalname}`, (err, file) => {
+			crp.storage.upload(req.files.img[0].path, `img/posts/${req.files.img[0].originalname}`, (err, file) => {
 				if (err) res.send(err);
 
 				crp.fs.unlink(req.files.img[0].path, (err) => {

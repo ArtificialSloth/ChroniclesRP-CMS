@@ -110,16 +110,15 @@ module.exports = (crp, callback) => {
 					crp.db.replaceOne('forums', newForum, (err, result) => {
 						if (err) return cb(err);
 
-						var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', '/forums/' + forum.slug));
-						if (index > -1) crp.pages.splice(index, 1);
-
-						crp.pages.push({
+						crp.pages.setPageData({slug: `/forums/${forum.slug}`}, {
 							slug: '/forums/' + newForum.slug,
 							path: '/forums/forum/index.njk',
 							context: {forumid: newForum._id}
-						});
+						}, (err, result) => {
+							if (err) return cb(err);
 
-						cb(null, newForum);
+							cb(null, newForum);
+						});
 					});
 				});
 			});
@@ -150,13 +149,15 @@ module.exports = (crp, callback) => {
 				crp.db.insertOne('forums', forum, (err, result) => {
 					if (err) return cb(err);
 
-					crp.pages.push({
+					crp.pages.addPage({
 						slug: '/forums/' + forum.slug,
 						path: '/forums/forum/index.njk',
 						context: {forumid: result.insertedId}
-					});
+					}, (err, page) => {
+						if (err) return cb(err);
 
-					cb(null, result);
+						cb(null, result);
+					});
 				});
 			});
 		});
@@ -180,8 +181,11 @@ module.exports = (crp, callback) => {
 					crp.db.deleteOne('forums', {_id: forum._id}, (err, result) => {
 						if (err) return cb(err);
 
-						crp.pages.splice(crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'context', {forumid: forum._id})), 1);
-						cb(null, result);
+						crp.pages.removePage({context: {forumid: forum._id}}, (err, result) => {
+							if (err) return cb(err);
+
+							cb(null, result);
+						});
 					});
 				});
 			});
@@ -243,13 +247,15 @@ module.exports = (crp, callback) => {
 				crp.db.insertOne('topics', topic, (err, result) => {
 					if (err) return cb(err);
 
-					crp.pages.push({
+					crp.pages.addPage({
 						slug: `/forums/${forum.slug}/${result.insertedId}`,
 						path: '/forums/topic/index.njk',
 						context: {topicid: result.insertedId}
-					});
+					}, (err, page) => {
+						if (err) return cb(err);
 
-					cb(null, topic);
+						cb(null, topic);
+					});
 				});
 			});
 		});
@@ -266,8 +272,11 @@ module.exports = (crp, callback) => {
 				crp.db.deleteOne('topics', {_id: topic._id}, (err, result) => {
 					if (err) return cb(err);
 
-					crp.pages.splice(crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'context', {topicid: topic._id})), 1);
-					return cb(null, result);
+					crp.pages.removePage({context: {topicid: topic._id}}, (err, result) => {
+						if (err) return cb(err);
+
+						cb(null, result);
+					});
 				});
 			});
 		});

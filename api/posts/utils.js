@@ -28,7 +28,13 @@ module.exports = (crp, callback) => {
 			newPost = crp.util.sanitizeObject(newPost);
 
 			crp.db.replaceOne('posts', {_id: post._id}, newPost, (err, result) => {
-				cb(err, newPost);
+				if (err) return cb(err);
+
+				crp.pages.setPageData({slug: post.slug}, {slug: newPost.slug}, (err, result) => {
+					if (err) return cb(err);
+
+					cb(null, newPost);
+				});
 			});
 		});
 	};
@@ -49,7 +55,17 @@ module.exports = (crp, callback) => {
 		post = crp.util.sanitizeObject(post);
 
 		crp.db.insertOne('posts', post, (err, result) => {
-			cb(err, post);
+			if (err) return cb(err);
+
+			crp.pages.addPage({
+				slug: post.slug,
+				path: '/posts/index.njk',
+				context: {postid: result.insertedId}
+			}, (err, page) => {
+				if (err) return cb(err);
+
+				cb(null, post);
+			});
 		});
 	};
 
@@ -57,7 +73,11 @@ module.exports = (crp, callback) => {
 		crp.util.getPostData(postid, (err, post) => {
 			if (err) return cb(err);
 
-			crp.db.deleteOne('posts', {_id: post._id}, cb);
+			crp.db.deleteOne('posts', {_id: post._id}, (err, result) => {
+				if (err) return cb(err);
+
+				crp.pages.removePage({slug: post.slug}, cb);
+			});
 		});
 	};
 

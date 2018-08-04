@@ -24,6 +24,9 @@ async.waterfall([
 		require('./api/database/db.js')(crp, callback);
 	},
 	(crp, callback) => {
+		require('./api/database/pages.js')(crp, callback);
+	},
+	(crp, callback) => {
 		require('./api/storage/storage.js')(crp, callback);
 	},
 	(crp, callback) => {

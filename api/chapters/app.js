@@ -58,7 +58,7 @@ module.exports = (crp, callback) => {
 
 				var member = crp.util.getChapterMember(chapter, user._id);
 				if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-				crp.util.removeChapter(req.body.chapterid, req.user, (err, result) => {
+				crp.util.removeChapter(req.body.chapterid, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);

@@ -44,9 +44,6 @@ module.exports = (crp, callback) => {
 			}
 		};
 
-		crp.pages = [];
-		crp.util.requireFiles('/pages.js', (err) => {
-			callback(err, crp);
-		});
+		callback(null, crp);
 	});
 };

@@ -84,64 +84,33 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.processPage = (path, req, cb) => {
-		var context = {
-			crp: crp,
-			userid: req.user,
-			css: {
-				colors: {
-					font: '#EDEDED',
-					link: '#8558CB',
-					bg: '#141414',
-					bodyBg: '#1D1D1D',
-					header: '#323232',
-					primary: '#242424',
-					secondary: '#53377F'
-				},
-				img: {
-					bg: crp.storage.getUrl('img/bg.jpg'),
-					ico: crp.storage.getUrl('img/ico_b.png'),
-					cover: crp.storage.getUrl('img/cover.png'),
-					donate: crp.storage.getUrl('img/donate.png'),
-					header: crp.storage.getUrl('img/header_w.png'),
-					discord: crp.storage.getUrl('img/discord.png')
-				}
-			}
-		};
-		var page = crp.util.findObjectInArray(crp.pages, 'slug', path);
+		crp.db.findOne('site', {}, (err, site) => {
+			if (err) return cb(err);
+			if (!site) return cb(null, {path: '/404/index.njk', context: context});
 
-		if (page) {
-			crp.util.getUserData(req.user, (err, user) => {
+			var context = {
+				crp: crp,
+				css: site.css,
+				userid: req.user
+			};
+
+			crp.pages.getPages({slug: path}, (err, pages) => {
 				if (err) return cb(err);
+				if (!pages[0]) return cb(null, {path: '/404/index.njk', context: context});
 
-				var canView = true;
-				if (page.role && user.role < page.role) canView = false;
+				crp.util.getUserData(req.user, (err, user) => {
+					if (err) return cb(err);
+					if ((!user && pages[0].role) || (user && pages[0].role && user.role < pages[0].role) || (user && pages[0].role && user.role < 3)) return cb(null, {path: '/404/index.njk', context: context});
 
-				if (canView || user.role >= 3) {
-					path = page.path;
-					if (page.subPage) context.subPage = page.subPage;
-					if (page.context) context = Object.assign(context, page.context);
-				} else {
-					path = '/404/index.njk';
-				}
+					path = pages[0].path;
+					if (pages[0].subPage) context.subPage = pages[0].subPage;
+					if (pages[0].context) context = Object.assign(context, pages[0].context);
 
-				context.path = path;
-				cb(null, {path: path, context: context});
+					context.path = path;
+					cb(null, {path: path, context: context});
+				});
 			});
-		} else {
-			crp.util.getPosts({slug: path}, (err, posts) => {
-				if (err) return cb(err);
-
-				if (posts[0]) {
-					path = '/posts/index.njk';
-					context.postid = posts[0]._id;
-				} else {
-					path = '/404/index.njk';
-				}
-
-				context.path = path;
-				cb(null, {path: path, context: context});
-			});
-		}
+		});
 	};
 
 	crp.util.editSite = (data, cb) => {
@@ -151,7 +120,8 @@ module.exports = (crp, callback) => {
 			var newSite = {
 				name: data.name || site.name,
 				tagline: data.tagline || site.tagline,
-				mail_template: data.mail_template || site.mail_template
+				mail_template: data.mail_template || site.mail_template,
+				css: site.css
 			};
 
 			newSite = crp.util.sanitizeObject(newSite);

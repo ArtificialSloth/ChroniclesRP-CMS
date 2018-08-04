@@ -135,36 +135,43 @@ module.exports = (crp, callback) => {
 						if (err) return cb(err);
 
 						crp.db.findOne('chapters', {_id: result.insertedId}, (err, chapter) => {
-							crp.fs.mkdir(`${crp.PUBLICDIR}/img/chapters/${chapter._id}`, (err) => {
-								if (err) return cb(err);
+							if (err) return cb(err);
 
-								switch (chapter.type) {
-									case 'hosted':
-										crp.util.deployChapter(data.cms, chapter, (err) => {
+							switch (chapter.type) {
+								case 'hosted':
+									crp.util.deployChapter(data.cms, chapter, (err) => {
+										if (err) return cb(err);
+
+										crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+										crp.util.addChapterPage(chapter, (err) => {
 											if (err) return cb(err);
 
-											crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
-											crp.util.addChapterPage(chapter);
 											cb(null, chapter);
 										});
-										break;
-									case 'group':
-										crp.util.addCategory({name: chapter.name, chapter: chapter._id}, (err, result) => {
+									});
+									break;
+								case 'group':
+									crp.util.addCategory({name: chapter.name, chapter: chapter._id}, (err, result) => {
+										if (err) return cb(err);
+
+										crp.util.addForum({name: chapter.name, desc: chapter.tagline, category: result.insertedId}, (err, result) => {
 											if (err) return cb(err);
 
-											crp.util.addForum({name: chapter.name, desc: chapter.tagline, category: result.insertedId}, (err, result) => {
+											crp.util.addChapterPage(chapter, (err) => {
 												if (err) return cb(err);
 
-												crp.util.addChapterPage(chapter);
 												cb(null, chapter);
 											});
 										});
-										break;
-									default:
-										crp.util.addChapterPage(chapter);
+									});
+									break;
+								default:
+									crp.util.addChapterPage(chapter, (err) => {
+										if (err) return cb(err);
+
 										cb(null, chapter);
-								}
-							});
+									});
+							}
 						});
 					});
 				});
@@ -188,15 +195,18 @@ module.exports = (crp, callback) => {
 							crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
 								if (err) return cb(err);
 
-								crp.util.removeChapterPage(chapter);
-								cb(null, result);
+								crp.util.removeChapterPage(chapter, (err) => {
+									if (err) return cb(err);
+
+									cb(null, result);
+								});
 							});
 						});
 						break;
 					case 'group':
 						crp.util.getCategories({chapter: chapter._id}, (err, categories) => {
 							if (err) return cb(err);
-							if (!categories) return cb('noCategories');
+							if (!categories[0]) return cb('noCategories');
 
 							crp.util.removeCategory(categories[0]._id, (err, result) => {
 								if (err) return cb(err);
@@ -204,8 +214,11 @@ module.exports = (crp, callback) => {
 								crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
 									if (err) return cb(err);
 
-									crp.util.removeChapterPage(chapter);
-									cb(null, result);
+									crp.util.removeChapterPage(chapter, (err) => {
+										if (err) return cb(err);
+
+										cb(null, result);
+									});
 								});
 							});
 						});
@@ -214,8 +227,11 @@ module.exports = (crp, callback) => {
 						crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
 							if (err) return cb(err);
 
-							crp.util.removeChapterPage(chapter);
-							cb(null, result);
+							crp.util.removeChapterPage(chapter, (err) => {
+								if (err) return cb(err);
+
+								cb(null, result);
+							});
 						});
 				}
 			});
@@ -279,48 +295,81 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addChapterPage = (chapter) => {
-		crp.pages.push({
+	crp.util.addChapterPage = (chapter, cb) => {
+		crp.pages.addPage({
 			slug: `/chapters/${chapter.nicename}/edit`,
 			path: '/chapters/view/index.njk',
 			subPage: '/chapters/view/edit/index.njk',
 			context: {chapterid: chapter._id}
+		}, (err, result) => {
+			if (err) return callback(err);
+			if (chapter.type != 'group') return cb();
+
+			crp.async.parallel([
+				(callback) => {
+					crp.pages.addPage({
+						slug: `/chapters/${chapter.nicename}`,
+						path: '/chapters/view/index.njk',
+						subPage: '/chapters/view/about/index.njk',
+						context: {chapterid: chapter._id}
+					}, (err, result) => {
+						if (err) return callback(err);
+
+						callback();
+					});
+				},
+				(callback) => {
+					crp.pages.addPage({
+						slug: `/chapters/${chapter.nicename}/forums`,
+						path: '/chapters/view/index.njk',
+						subPage: '/chapters/view/forums/index.njk',
+						context: {chapterid: chapter._id}
+					}, (err, result) => {
+						if (err) return callback(err);
+
+						callback();
+					});
+				},
+				(callback) => {
+					crp.pages.addPage({
+						slug: `/chapters/${chapter.nicename}/members`,
+						path: '/chapters/view/index.njk',
+						subPage: '/chapters/view/members/index.njk',
+						context: {chapterid: chapter._id}
+					}, (err, result) => {
+						if (err) return callback(err);
+
+						callback();
+					});
+				}
+			], cb);
 		});
-
-		if (chapter.type == 'group') {
-			crp.pages.push({
-				slug: `/chapters/${chapter.nicename}`,
-				path: '/chapters/view/index.njk',
-				subPage: '/chapters/view/about/index.njk',
-				context: {chapterid: chapter._id}
-			});
-
-			crp.pages.push({
-				slug: `/chapters/${chapter.nicename}/forums`,
-				path: '/chapters/view/index.njk',
-				subPage: '/chapters/view/forums/index.njk',
-				context: {chapterid: chapter._id}
-			});
-
-			crp.pages.push({
-				slug: `/chapters/${chapter.nicename}/members`,
-				path: '/chapters/view/index.njk',
-				subPage: '/chapters/view/members/index.njk',
-				context: {chapterid: chapter._id}
-			});
-		}
 	};
 
-	crp.util.removeChapterPage = (chapter) => {
-		var chapterPages = ['edit', 'forums'];
+	crp.util.removeChapterPage = (chapter, cb) => {
+		var chapterPages = ['edit', 'forums', 'members'];
 
-		var index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', `/chapters/${chapter.nicename}`));
-		if (index > -1) crp.pages.splice(index, 1);
+		crp.pages.getPage({slug: `/chapters/${chapter.nicename}`}, (err, page) => {
+			if (err) return cb(err);
+			if (!page) return cb('noPage');
 
-		for (var i in chapterPages) {
-			index = crp.pages.indexOf(crp.util.findObjectInArray(crp.pages, 'slug', `/chapters/${chapter.nicename}/${chapterPages[i]}`));
-			if (index > -1) crp.pages.splice(index, 1);
-		}
+			crp.pages.removePage(page._id, (err, result) => {
+				if (err) return cb(err);
+
+				crp.async.each(chapterPages, (page, callback) => {
+					crp.pages.getPage({slug: `/chapters/${chapter.nicename}/${page}`}, (err, page) => {
+						if (err) return callback(err);
+						if (!page) return callback('noPage');
+
+						crp.pages.removePage(page._id, (err, result) => {
+							if (err) return callback(err);
+
+							callback();
+						});
+					});
+				}, cb);
+			});
+		});
 	};
 
 	crp.util.getChapterLink = (chapter) => {
@@ -355,13 +404,13 @@ module.exports = (crp, callback) => {
 	crp.util.getChapterProfilePic = (chapter) => {
 		if (!chapter) return;
 
-		return crp.storage.getUrl(chapter.img.profile) || crp.storage.getUrl('members/profile.png');
+		return crp.storage.getUrl(chapter.img.profile) || crp.storage.getUrl('img/members/profile.png');
 	};
 
 	crp.util.getChapterCoverPic = (chapter) => {
 		if (!chapter) return;
 
-		return crp.storage.getUrl(chapter.img.cover) || crp.storage.getUrl('cover.png');
+		return crp.storage.getUrl(chapter.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
 	crp.util.deployPHP = (sname, cb) => {
