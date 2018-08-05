@@ -44,7 +44,7 @@
 		<label for="profile_pic">Chapter Image</label>
 		<div class="standard-input">
 			{% if chapter.img.profile %}
-				<img class="profile-pic" src="{{chapter.img.profile}}" width="150px" height="150px" />
+				<img class="profile-pic" src="{{crp.storage.getUrl(chapter.img.profile)}}" width="150px" height="150px" />
 				<br />
 			{% endif %}
 			<input type="file" name="profile_pic" />
@@ -54,7 +54,7 @@
 		<label for="cover_pic">Cover Image</label>
 		<div class="standard-input">
 			{% if chapter.img.cover %}
-				<img class="cover-pic" src="{{chapter.img.cover}}" height="150px" />
+				<img class="cover-pic" src="{{crp.storage.getUrl(chapter.img.cover)}}" height="150px" />
 				<br />
 			{% endif %}
 			<input type="file" name="cover_pic" />
