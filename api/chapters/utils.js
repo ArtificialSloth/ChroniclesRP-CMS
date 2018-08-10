@@ -433,7 +433,6 @@ module.exports = (crp, callback) => {
 
 			crp.cmd('wget http://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz && tar xzvf /var/www/latest.tar.gz -C /var/www', (err, stdout, stderr) => {
 				if (err) return cb(err);
-				if (stderr) return cb(stderr);
 
 				crp.fs.unlink('/var/www/latest.tar.gz');
 				crp.fs.rename('/var/www/wordpress', '/var/www/' + chapter.slug, (err) => {
