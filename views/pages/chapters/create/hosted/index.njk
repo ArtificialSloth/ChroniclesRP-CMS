@@ -5,34 +5,34 @@
 		<div class="option">
 			<input type="radio" name="cms" value="wordpress" />
 			<label for="cms" onclick="labelClick(this)">
-				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/WordPress_blue_logo.svg/1200px-WordPress_blue_logo.svg.png" />
+				<img src="{{crp.storage.getUrl(site.css.img.wordpress)}}" />
 				<h1>Wordpress</h1>
 				<a href="https://wordpress.org/" target="_blank">[More Info]</a>
 			</label>
 		</div>
 
-		<div class="option">
-			<input type="radio" name="cms" value="drupal" />
+		<div class="option disabled">
+			<input type="radio" name="cms" value="drupal" disabled />
 			<label for="cms" onclick="labelClick(this)">
-				<img src="http://adilserv.com/wp-content/uploads/2017/03/druplicon_sphism_2015_1.png" />
+				<img src="{{crp.storage.getUrl(site.css.img.drupal)}}" />
 				<h1>Drupal</h1>
 				<a href="https://www.drupal.org/" target="_blank">[More Info]</a>
 			</label>
 		</div>
 
-		<div class="option">
-			<input type="radio" name="cms" value="joomla" />
+		<div class="option disabled">
+			<input type="radio" name="cms" value="joomla" disabled />
 			<label for="cms" onclick="labelClick(this)">
-				<img src="https://docs.joomla.org/images/0/02/Joomla-flat-logo-en.png" />
+				<img src="{{crp.storage.getUrl(site.css.img.joomla)}}" />
 				<h1>Joomla</h1>
 				<a href="https://www.joomla.org/" target="_blank">[More Info]</a>
 			</label>
 		</div>
 
-		<div class="option">
-			<input type="radio" name="cms" value="phpbb" />
+		<div class="option disabled">
+			<input type="radio" name="cms" value="phpbb" disabled />
 			<label for="cms" onclick="labelClick(this)">
-				<img src="https://www.phpbb.com/assets/images/images/logos/blue/125x125.png" />
+				<img src="{{crp.storage.getUrl(site.css.img.phpBB)}}" />
 				<h1>phpBB</h1>
 				<a href="https://www.phpbb.com/" target="_blank">[More Info]</a>
 			</label>
