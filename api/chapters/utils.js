@@ -383,48 +383,30 @@ module.exports = (crp, callback) => {
 		return crp.storage.getUrl(chapter.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
-	crp.util.deployPHP = (sname, cb) => {
-		crp.fs.readFile(crp.ROOT + '/deploy/php-fpm/pool.conf', 'utf8', (err, data) => {
-			if (err) return cb(err);
-
-			var pool = crp.util.parseString(data, [['SNAME', sname]]);
-			crp.fs.writeFile(`/etc/php/7.0/fpm/pool.d/${sname}.conf`, pool, (err) => {
-				if (err) return cb(err);
-
-				crp.cmd('systemctl reload php7.0-fpm', cb);
-			});
-		});
-	};
-
 	crp.util.deployWordpress = (chapter, cb) => {
-		crp.util.deployPHP(chapter.slug, (err, stdout, stderr) => {
+		crp.cmd('wget http://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz && tar xzvf /var/www/latest.tar.gz -C /var/www', (err, stdout, stderr) => {
 			if (err) return cb(err);
-			if (stderr) return cb(stderr);
 
-			crp.cmd('wget http://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz && tar xzvf /var/www/latest.tar.gz -C /var/www', (err, stdout, stderr) => {
+			crp.fs.unlink('/var/www/latest.tar.gz');
+			crp.fs.rename('/var/www/wordpress', '/var/www/' + chapter.slug, (err) => {
 				if (err) return cb(err);
 
-				crp.fs.unlink('/var/www/latest.tar.gz');
-				crp.fs.rename('/var/www/wordpress', '/var/www/' + chapter.slug, (err) => {
+				crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
 					if (err) return cb(err);
 
-					crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
+					crp.auth.crypto.randomBytes(32, (err, buff) => {
 						if (err) return cb(err);
 
-						crp.auth.crypto.randomBytes(32, (err, buff) => {
+						var pass = buff.toString('hex')
+						var config = crp.util.parseString(data, [
+							['SNAME', chapter.slug],
+							['GENPASS', pass]
+						]);
+						crp.fs.writeFile(`/var/www/${chapter.slug}/wp-config.php`, config, (err) => {
 							if (err) return cb(err);
 
-							var pass = buff.toString('hex')
-							var config = crp.util.parseString(data, [
-								['SNAME', chapter.slug],
-								['GENPASS', pass]
-							]);
-							crp.fs.writeFile(`/var/www/${chapter.slug}/wp-config.php`, config, (err) => {
-								if (err) return cb(err);
-
-								crp.cmd(`useradd ${chapter.slug} && chown ${chapter.slug}:${chapter.slug} -R /var/www/${chapter.slug}`, (err, stdout, stderr) => {
-									crp.cmd(`mysql -e "CREATE DATABASE ${chapter.slug}" && mysql -e "GRANT ALL PRIVILEGES ON ${chapter.slug}.* TO '${chapter.slug}'@'localhost' IDENTIFIED BY '${pass}'"`, cb);
-								});
+							crp.cmd(`useradd ${chapter.slug} && chown ${chapter.slug}:${chapter.slug} -R /var/www/${chapter.slug}`, (err, stdout, stderr) => {
+								crp.cmd(`mysql -e "CREATE DATABASE ${chapter.slug}" && mysql -e "GRANT ALL PRIVILEGES ON ${chapter.slug}.* TO '${chapter.slug}'@'localhost' IDENTIFIED BY '${pass}'"`, cb);
 							});
 						});
 					});
@@ -448,9 +430,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (stderr) return cb(stderr);
 
-			crp.fs.unlink(`/etc/php/7.0/fpm/pool.d/${chapter.slug}.conf`, (err) => {
-				crp.cmd(`mysql -e "DROP DATABASE ${chapter.slug}" && userdel ${chapter.slug}`, cb);
-			});
+			crp.cmd(`mysql -e "DROP DATABASE ${chapter.slug}" && userdel ${chapter.slug}`, cb);
 		});
 	};
 
