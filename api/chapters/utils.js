@@ -142,7 +142,7 @@ module.exports = (crp, callback) => {
 									crp.util.deployChapter(data.cms, chapter, (err) => {
 										if (err) return cb(err);
 
-										crp.proxy.register(chapter.slug + '.' + (process.env.DOMAIN || 'chroniclesrp.com'), '127.0.0.1:8080');
+										crp.proxy.register(`${chapter.slug}.${process.env.DOMAIN}`, '127.0.0.1:8080', {ssl: crp.ssl});
 										crp.util.addChapterPage(chapter, (err) => {
 											if (err) return cb(err);
 
@@ -192,10 +192,10 @@ module.exports = (crp, callback) => {
 						crp.util.disbandChapter(chapter, (err) => {
 							if (err) return cb(err);
 
-							crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
+							crp.util.removeChapterPage(chapter, (err) => {
 								if (err) return cb(err);
 
-								crp.util.removeChapterPage(chapter, (err) => {
+								crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
 									if (err) return cb(err);
 
 									cb(null, result);
@@ -211,10 +211,10 @@ module.exports = (crp, callback) => {
 							crp.util.removeCategory(categories[0]._id, (err, result) => {
 								if (err) return cb(err);
 
-								crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
+								crp.util.removeChapterPage(chapter, (err) => {
 									if (err) return cb(err);
 
-									crp.util.removeChapterPage(chapter, (err) => {
+									crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
 										if (err) return cb(err);
 
 										cb(null, result);
@@ -224,15 +224,15 @@ module.exports = (crp, callback) => {
 						});
 						break;
 					default:
+					crp.util.removeChapterPage(chapter, (err) => {
+						if (err) return cb(err);
+
 						crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
 							if (err) return cb(err);
 
-							crp.util.removeChapterPage(chapter, (err) => {
-								if (err) return cb(err);
-
-								cb(null, result);
-							});
+							cb(null, result);
 						});
+					});
 				}
 			});
 		});
@@ -349,26 +349,16 @@ module.exports = (crp, callback) => {
 	crp.util.removeChapterPage = (chapter, cb) => {
 		var chapterPages = ['edit', 'forums', 'members'];
 
-		crp.pages.getPage({slug: `/chapters/${chapter.nicename}`}, (err, page) => {
+		crp.pages.removePage({slug: `/chapters/${chapter.nicename}`}, (err, result) => {
 			if (err) return cb(err);
-			if (!page) return cb('noPage');
 
-			crp.pages.removePage(page._id, (err, result) => {
-				if (err) return cb(err);
+			crp.async.each(chapterPages, (page, callback) => {
+				crp.pages.removePage({slug: `/chapters/${chapter.nicename}/${page}`}, (err, result) => {
+					if (err) return callback(err);
 
-				crp.async.each(chapterPages, (page, callback) => {
-					crp.pages.getPage({slug: `/chapters/${chapter.nicename}/${page}`}, (err, page) => {
-						if (err) return callback(err);
-						if (!page) return callback('noPage');
-
-						crp.pages.removePage(page._id, (err, result) => {
-							if (err) return callback(err);
-
-							callback();
-						});
-					});
-				}, cb);
-			});
+					callback();
+				});
+			}, cb);
 		});
 	};
 
@@ -452,7 +442,7 @@ module.exports = (crp, callback) => {
 							crp.fs.writeFile(`/var/www/${chapter.slug}/wp-config.php`, config, (err) => {
 								if (err) return cb(err);
 
-								crp.cmd(`useradd ${chapter.slug} && chown -R /var/www/${chapter.slug}`, (err, stdout, stderr) => {
+								crp.cmd(`useradd ${chapter.slug} && chown ${chapter.slug}:${chapter.slug} -R /var/www/${chapter.slug}`, (err, stdout, stderr) => {
 									crp.cmd(`mysql -e "CREATE DATABASE ${chapter.slug}" && mysql -e "GRANT ALL PRIVILEGES ON ${chapter.slug}.* TO '${chapter.slug}'@'localhost' IDENTIFIED BY '${pass}'"`, cb);
 								});
 							});
@@ -474,8 +464,9 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.disbandChapter = (chapter, cb) => {
-		crp.fs.rmdir('/var/www/' + chapter.slug, (err) => {
+		crp.cmd('rm -R /var/www/' + chapter.slug, (err, stderr, stdout) => {
 			if (err) return cb(err);
+			if (stderr) return cb(stderr);
 
 			crp.fs.unlink(`/etc/php/7.0/fpm/pool.d/${chapter.slug}.conf`, (err) => {
 				crp.cmd(`mysql -e "DROP DATABASE ${chapter.slug}" && userdel ${chapter.slug}`, cb);
