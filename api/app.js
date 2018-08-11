@@ -2,15 +2,8 @@ module.exports = (crp, callback) => {
 	crp.express = require('express');
 	crp.express.app = crp.express();
 
-	crp.proxy = require('redbird')({
-		port: 80,
-		bunyan: false,
-		ssl: {
-			port: 443,
-			key: process.env.KEY,
-			cert: process.env.CERT
-		}
-	});
+	crp.http = require('http');
+	crp.https = require('https');
 
 	crp.nunjucks = require('nunjucks');
 	crp.nunjucks.configure('views', {
@@ -100,11 +93,18 @@ module.exports = (crp, callback) => {
 		noCache: true
 	}));
 
-	crp.proxy.register(process.env.DOMAIN, '127.0.0.1:' + (process.env.PORT || 3000), {ssl: crp.ssl});
-	crp.proxy.register('127.0.0.1', '127.0.0.1:' + (process.env.PORT || 3000), {ssl: crp.ssl});
 	crp.express.ready = (cb) => {
 		crp.util.requireFiles('/app.js', (err) => {
 			if (err) return cb(err);
+
+			if (process.env.NODE_ENV = 'production') {
+				crp.express.app.use((req, res, next) => {
+					if (req.secure) return next();
+
+    				res.redirect('https://' + req.headers.host + req.url);
+					res.end();
+				});
+			}
 
 			crp.express.app.get('/*', (req, res) => {
 				crp.util.processPage(req.url, req, (err, page) => {
@@ -143,8 +143,10 @@ module.exports = (crp, callback) => {
 				var signature = 'sha1=' + hmac.update(JSON.stringify(req.body), 'utf-8').digest('hex');
 				if (!crp.auth.crypto.timingSafeEqual(Buffer.from(req.headers['x-hub-signature']), Buffer.from(signature))) return res.sendStatus(401);
 
+				res.sendStatus(200);
 				crp.cmd('pm2 pull CRP', (err, stderr, stdout) => {
-					res.sendStatus(200);
+					if (err) console.error(err);
+					if (stderr) console.error(err);
 				});
 			});
 

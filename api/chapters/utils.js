@@ -139,10 +139,9 @@ module.exports = (crp, callback) => {
 
 							switch (chapter.type) {
 								case 'hosted':
-									crp.util.deployChapter(data.cms, chapter, (err) => {
+									crp.util.deployChapter(data.cms, chapter.slug, (err) => {
 										if (err) return cb(err);
 
-										crp.proxy.register(`${chapter.slug}.${process.env.DOMAIN}`, '127.0.0.1:8080', {ssl: crp.ssl});
 										crp.util.addChapterPage(chapter, (err) => {
 											if (err) return cb(err);
 
@@ -189,7 +188,7 @@ module.exports = (crp, callback) => {
 
 				switch (chapter.type) {
 					case 'hosted':
-						crp.util.disbandChapter(chapter, (err) => {
+						crp.util.disbandChapter(chapter.slug, (err) => {
 							if (err) return cb(err);
 
 							crp.util.removeChapterPage(chapter, (err) => {
@@ -347,7 +346,7 @@ module.exports = (crp, callback) => {
 
 		switch (chapter.type) {
 			case 'hosted':
-				return `<a href="//${chapter.slug}.${process.env.DOMAIN || 'chroniclesrp.com'}">${chapter.name}</a>`;
+				return `<a href="//${chapter.slug}.chroniclesrp.com">${chapter.name}</a>`;
 				break;
 			case 'url':
 				return `<a href="//${chapter.slug}">${chapter.name}</a>`;
@@ -383,54 +382,32 @@ module.exports = (crp, callback) => {
 		return crp.storage.getUrl(chapter.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
-	crp.util.deployWordpress = (chapter, cb) => {
-		crp.cmd('wget http://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz && tar xzvf /var/www/latest.tar.gz -C /var/www', (err, stdout, stderr) => {
+	crp.util.deployChapter = (cms, sname, cb) => {
+		crp.request({
+			url: `${process.env.DEPLOY_URL}/${cms}`,
+			method: 'POST',
+			json: true,
+			body: {sname: sname}
+		}, (err, res, body) => {
 			if (err) return cb(err);
+			if (res.statusCode != 200) return cb(res.statusCode);
 
-			crp.fs.unlink('/var/www/latest.tar.gz');
-			crp.fs.rename('/var/www/wordpress', '/var/www/' + chapter.slug, (err) => {
-				if (err) return cb(err);
-
-				crp.fs.readFile(crp.ROOT + '/deploy/wordpress/wp-config.php', 'utf8', (err, data) => {
-					if (err) return cb(err);
-
-					crp.auth.crypto.randomBytes(32, (err, buff) => {
-						if (err) return cb(err);
-
-						var pass = buff.toString('hex')
-						var config = crp.util.parseString(data, [
-							['SNAME', chapter.slug],
-							['GENPASS', pass]
-						]);
-						crp.fs.writeFile(`/var/www/${chapter.slug}/wp-config.php`, config, (err) => {
-							if (err) return cb(err);
-
-							crp.cmd(`useradd ${chapter.slug} && chown ${chapter.slug}:${chapter.slug} -R /var/www/${chapter.slug}`, (err, stdout, stderr) => {
-								crp.cmd(`mysql -e "CREATE DATABASE ${chapter.slug}" && mysql -e "GRANT ALL PRIVILEGES ON ${chapter.slug}.* TO '${chapter.slug}'@'localhost' IDENTIFIED BY '${pass}'"`, cb);
-							});
-						});
-					});
-				});
-			});
+			cb();
 		});
 	};
+	crp.util.deployChapter('wordpress', 'test', console.error);
 
-	crp.util.deployChapter = (cms, chapter, cb) => {
-		switch (cms) {
-			case 'wordpress':
-				crp.util.deployWordpress(chapter, cb);
-				break;
-			default:
-				cb();
-		}
-	};
-
-	crp.util.disbandChapter = (chapter, cb) => {
-		crp.cmd('rm -R /var/www/' + chapter.slug, (err, stderr, stdout) => {
+	crp.util.disbandChapter = (sname, cb) => {
+		crp.request({
+			url: `${process.env.DEPLOY_URL}/disband`,
+			method: 'POST',
+			json: true,
+			body: {sname: sname}
+		}, (err, res, body) => {
 			if (err) return cb(err);
-			if (stderr) return cb(stderr);
+			if (res.statusCode != 200) return cb(res.statusCode);
 
-			crp.cmd(`mysql -e "DROP DATABASE ${chapter.slug}" && userdel ${chapter.slug}`, cb);
+			cb();
 		});
 	};
 
