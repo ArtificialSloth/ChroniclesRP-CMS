@@ -302,47 +302,27 @@ module.exports = (crp, callback) => {
 			subPage: '/chapters/view/edit/index.njk',
 			context: {chapterid: chapter._id}
 		}, (err, result) => {
-			if (err) return callback(err);
+			if (err) return cb(err);
 			if (chapter.type != 'group') return cb();
 
-			crp.async.parallel([
-				(callback) => {
-					crp.pages.addPage({
-						slug: `/chapters/${chapter.nicename}`,
-						path: '/chapters/view/index.njk',
-						subPage: '/chapters/view/about/index.njk',
-						context: {chapterid: chapter._id}
-					}, (err, result) => {
-						if (err) return callback(err);
+			crp.pages.addPage({
+				slug: `/chapters/${chapter.nicename}`,
+				path: '/chapters/view/index.njk',
+				subPage: '/chapters/view/about/index.njk',
+				context: {chapterid: chapter._id}
+			}, (err, result) => {
+				if (err) return cb(err);
 
-						callback();
-					});
-				},
-				(callback) => {
+				var chapterPages = ['forums', 'members'];
+				crp.async.each(chapterPages, (page, callback) => {
 					crp.pages.addPage({
-						slug: `/chapters/${chapter.nicename}/forums`,
+						slug: `/chapters/${chapter.nicename}/${page}`,
 						path: '/chapters/view/index.njk',
-						subPage: '/chapters/view/forums/index.njk',
+						subPage: `/chapters/view/${page}/index.njk`,
 						context: {chapterid: chapter._id}
-					}, (err, result) => {
-						if (err) return callback(err);
-
-						callback();
-					});
-				},
-				(callback) => {
-					crp.pages.addPage({
-						slug: `/chapters/${chapter.nicename}/members`,
-						path: '/chapters/view/index.njk',
-						subPage: '/chapters/view/members/index.njk',
-						context: {chapterid: chapter._id}
-					}, (err, result) => {
-						if (err) return callback(err);
-
-						callback();
-					});
-				}
-			], cb);
+					}, callback);
+				}, cb);
+			});
 		});
 	};
 
@@ -350,11 +330,11 @@ module.exports = (crp, callback) => {
 		var chapterPages = ['edit', 'forums', 'members'];
 
 		crp.pages.removePage({slug: `/chapters/${chapter.nicename}`}, (err, result) => {
-			if (err) return cb(err);
+			if (err && err != 'noPage') return cb(err);
 
 			crp.async.each(chapterPages, (page, callback) => {
 				crp.pages.removePage({slug: `/chapters/${chapter.nicename}/${page}`}, (err, result) => {
-					if (err) return callback(err);
+					if (err && err != 'noPage') return callback(err);
 
 					callback();
 				});
