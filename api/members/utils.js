@@ -211,7 +211,7 @@ module.exports = (crp, callback) => {
 			login: data.login,
 			pass: data.pass,
 			email: data.email,
-			register_date: data.register_date
+			register_date: Date.parse(data.register_date) || Date.now()
 		};
 
 		if (admin) {
@@ -220,23 +220,39 @@ module.exports = (crp, callback) => {
 			user.activation_code = crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase();
 		}
 
-		crp.util.getUsers({login: user.login}, (err, result) => {
+		crp.util.getUsers({login: user.login}, (err, users) => {
 			if (err) return cb(err);
+			if (users.length > 0) return cb('loginTaken');
 
-			if (user.login.length < 4) return cb(null, 'loginLength');
-			if (result.length > 0) return cb(null, 'loginTaken');
-			if (!crp.util.validateEmail(user.email)) return cb(null, 'emailInvalid');
+			crp.util.getUsers({email: user.email}, (err, users) => {
+				if (err) return cb(err);
+				if (users.length > 0) return cb('emailTaken');
 
-			if (user.register_date) {
-				user.register_date = Date.parse(user.register_date);
-			}
+				if (user.login.length < 4) return cb('loginLength');
+				if (!crp.util.validateEmail(user.email)) return cb('emailInvalid');
 
-			if (user.pass.length < 6) return cb(null, 'passLength');
-			if (!data.encrypted) {
-				crp.auth.bcrypt.hash(user.pass, 10, (err, hash) => {
-					if (err) return cb(err);
+				if (user.pass.length < 6) return cb('passLength');
+				if (!data.encrypted) {
+					crp.auth.bcrypt.hash(user.pass, 10, (err, hash) => {
+						if (err) return cb(err);
 
-					user.pass = hash;
+						user.pass = hash;
+						user = crp.util.newUserObject(user);
+						user = crp.util.sanitizeObject(user);
+
+						crp.db.insertOne('users', user, (err, result) => {
+							if (err) return cb(err);
+
+							crp.util.addProfilePage(user, (err) => {
+								if (err) return cb(err);
+
+								cb(null, user);
+							});
+						});
+
+					});
+				} else {
+					user.pass = user.pass.replace('$2y$', '$2a$');
 					user = crp.util.newUserObject(user);
 					user = crp.util.sanitizeObject(user);
 
@@ -249,23 +265,8 @@ module.exports = (crp, callback) => {
 							cb(null, user);
 						});
 					});
-
-				});
-			} else {
-				user.pass = user.pass.replace('$2y$', '$2a$');
-				user = crp.util.newUserObject(user);
-				user = crp.util.sanitizeObject(user);
-
-				crp.db.insertOne('users', user, (err, result) => {
-					if (err) return cb(err);
-
-					crp.util.addProfilePage(user, (err) => {
-						if (err) return cb(err);
-
-						cb(null, user);
-					});
-				});
-			}
+				}
+			});
 		});
 	};
 
