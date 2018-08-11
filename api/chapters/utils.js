@@ -374,7 +374,7 @@ module.exports = (crp, callback) => {
 	crp.util.getChapterProfilePic = (chapter) => {
 		if (!chapter) return;
 
-		return crp.storage.getUrl(chapter.img.profile) || crp.storage.getUrl('img/members/profile.png');
+		return crp.storage.getUrl(chapter.img.profile) || crp.storage.getUrl('img/chapters/profile.png');
 	};
 
 	crp.util.getChapterCoverPic = (chapter) => {
