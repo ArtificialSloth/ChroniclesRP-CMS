@@ -395,7 +395,6 @@ module.exports = (crp, callback) => {
 			cb();
 		});
 	};
-	crp.util.deployChapter('wordpress', 'test', console.error);
 
 	crp.util.disbandChapter = (sname, cb) => {
 		crp.request({
