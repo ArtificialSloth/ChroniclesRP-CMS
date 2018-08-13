@@ -97,7 +97,7 @@ module.exports = (crp, callback) => {
 		crp.util.requireFiles('/app.js', (err) => {
 			if (err) return cb(err);
 
-			if (process.env.NODE_ENV = 'production') {
+			if (crp.prod) {
 				crp.express.app.use((req, res, next) => {
 					if (req.secure) return next();
 

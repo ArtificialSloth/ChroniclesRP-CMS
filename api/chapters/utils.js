@@ -131,6 +131,7 @@ module.exports = (crp, callback) => {
 
 					if (chapter.tagline.length > 140) return cb('badTagline');
 
+					chapter = crp.util.sanitizeObject(chapter);
 					crp.db.insertOne('chapters', chapter, (err, result) => {
 						if (err) return cb(err);
 
@@ -140,7 +141,7 @@ module.exports = (crp, callback) => {
 							switch (chapter.type) {
 								case 'hosted':
 									crp.util.deployChapter(data.cms, chapter.slug, (err) => {
-										if (err) return cb(err);
+										if (err) return cb(err.toString());
 
 										crp.util.addChapterPage(chapter, (err) => {
 											if (err) return cb(err);
@@ -223,15 +224,15 @@ module.exports = (crp, callback) => {
 						});
 						break;
 					default:
-					crp.util.removeChapterPage(chapter, (err) => {
-						if (err) return cb(err);
-
-						crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
+						crp.util.removeChapterPage(chapter, (err) => {
 							if (err) return cb(err);
 
-							cb(null, result);
+							crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
+								if (err) return cb(err);
+
+								cb(null, result);
+							});
 						});
-					});
 				}
 			});
 		});

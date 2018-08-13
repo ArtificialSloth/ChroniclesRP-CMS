@@ -7,6 +7,7 @@ async.waterfall([
 			async: async,
 			fs: require('fs'),
 			cmd: require('child_process').exec,
+			prod: (process.env.NODE_ENV == 'production'),
 			moment: require('moment-timezone'),
 			request: require('request'),
 			browserRefresh: process.env.BROWSER_REFRESH_URL,
@@ -70,7 +71,7 @@ async.waterfall([
 				});
 
 				httpServer.listen((process.env.PORT || 80), () => {
-					if (process.env.NODE_ENV == 'production') {
+					if (crp.prod) {
 						httpsServer.listen(443, () => {
 							if (process.send) process.send('online');
 							console.log('\nThe Chronicles RP is up and running!');

@@ -17,6 +17,9 @@
 	</head>
 	<body>
 		{% block body %}{% endblock %}
-		<script src="{{crp.browserRefresh}}"></script>
+
+		{% if not crp.prod %}
+			<script src="{{crp.browserRefresh}}"></script>
+		{% endif %}
 	</body>
 </html>
