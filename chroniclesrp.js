@@ -50,26 +50,6 @@ async.waterfall([
 				var httpServer = crp.http.createServer(crp.express.app);
 				var httpsServer = crp.https.createServer({key: key, cert: cert}, crp.express.app);
 
-				process.on('SIGINT', () => {
-					httpServer.close((err) => {
-						if (err) console.error(err);
-
-						httpsServer.close((err) => {
-							if (err) console.error(err);
-
-							crp.db.client.close(false, () => {
-								crp.redis.quit();
-
-								process.exit(err ? 1 : 0);
-							});
-						});
-					});
-
-					setTimeout(() => {
-						process.exit(1);
-					}, 1000 * 10)
-				});
-
 				httpServer.listen((process.env.PORT || 80), () => {
 					if (crp.prod) {
 						httpsServer.listen(443, () => {
