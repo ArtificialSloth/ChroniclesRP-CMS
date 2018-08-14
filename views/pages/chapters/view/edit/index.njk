@@ -4,12 +4,12 @@
 
 {% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
 	<form class="chapter-edit-form standard-form">
-		<label for="name">Chapter Name</label>
+<!--		<label for="name">Chapter Name</label>
 		<div class="standard-input">
 			<input type="text" name="name" value="{{chapter.name}}" />
 			<span class="input-error"></span>
 		</div>
-
+-->
 		<label for="game">Game</label>
 		<div class="standard-input">
 			{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
@@ -61,12 +61,14 @@
 			<span class="input-error"></span>
 		</div>
 
-		<label for="desc" class="fill">Chapter Description</label>
-		<div class="standard-input fill">
-			<textarea name="desc" class="tinymce">{{chapter.desc}}</textarea>
-			<script>crpTinyMCE()</script>
-			<span class="input-error"></span>
-		</div>
+		{% if chapter.type == 'group' %}
+			<label for="desc" class="fill">Chapter Description</label>
+			<div class="standard-input fill">
+				<textarea name="desc" class="tinymce">{{chapter.desc}}</textarea>
+				<script>crpTinyMCE()</script>
+				<span class="input-error"></span>
+			</div>
+		{% endif %}
 
 		<input type="hidden" name="chapterid" value="{{chapter._id}}" />
 		<input type="submit" value="Save" />

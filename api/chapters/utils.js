@@ -296,34 +296,44 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.addChapterPage = (chapter, cb) => {
-		crp.pages.addPage({
-			slug: `/chapters/${chapter.nicename}/edit`,
-			path: '/chapters/view/index.njk',
-			subPage: '/chapters/view/edit/index.njk',
-			context: {chapterid: chapter._id}
-		}, (err, result) => {
-			if (err) return cb(err);
-			if (chapter.type != 'group') return cb();
+		crp.async.parallel([
+			(callback) => {
+				if (chapter.type != 'group') return callback();
 
-			crp.pages.addPage({
-				slug: `/chapters/${chapter.nicename}`,
-				path: '/chapters/view/index.njk',
-				subPage: '/chapters/view/about/index.njk',
-				context: {chapterid: chapter._id}
-			}, (err, result) => {
-				if (err) return cb(err);
+				crp.pages.addPage({
+					slug: `/chapters/${chapter.nicename}`,
+					path: '/chapters/view/index.njk',
+					subPage: `/chapters/view/about/index.njk`,
+					context: {chapterid: chapter._id}
+				}, callback);
+			},
+			(callback) => {
+				if (chapter.type != 'group') return callback();
 
-				var chapterPages = ['forums', 'members'];
-				crp.async.each(chapterPages, (page, callback) => {
-					crp.pages.addPage({
-						slug: `/chapters/${chapter.nicename}/${page}`,
-						path: '/chapters/view/index.njk',
-						subPage: `/chapters/view/${page}/index.njk`,
-						context: {chapterid: chapter._id}
-					}, callback);
-				}, cb);
-			});
-		});
+				crp.pages.addPage({
+					slug: `/chapters/${chapter.nicename}/forums`,
+					path: '/chapters/view/index.njk',
+					subPage: `/chapters/view/forums/index.njk`,
+					context: {chapterid: chapter._id}
+				}, callback);
+			},
+			(callback) => {
+				crp.pages.addPage({
+					slug: `/chapters/${chapter.nicename}/members`,
+					path: '/chapters/view/index.njk',
+					subPage: `/chapters/view/members/index.njk`,
+					context: {chapterid: chapter._id}
+				}, callback);
+			},
+			(callback) => {
+				crp.pages.addPage({
+					slug: `/chapters/${chapter.nicename}/edit`,
+					path: '/chapters/view/index.njk',
+					subPage: `/chapters/view/edit/index.njk`,
+					context: {chapterid: chapter._id}
+				}, callback);
+			}
+		], cb);
 	};
 
 	crp.util.removeChapterPage = (chapter, cb) => {

@@ -57,6 +57,7 @@ module.exports = (crp, callback) => {
 					crp.util.mail(result.email, subject, msg);
 					crp.util.adminNotify('New User: ' + result.display_name, 'Username: ' + result.login + '<br>Email: ' + result.email);
 
+					result.pass = null;
 					res.send(result);
 				});
 			});
@@ -76,6 +77,7 @@ module.exports = (crp, callback) => {
 						crp.util.removeUserData(user._id, ['activation_code'], (err, result) => {
 							if (err) return res.send(err);
 
+							result.pass = null;
 							res.send(result);
 						});
 					});
@@ -85,6 +87,7 @@ module.exports = (crp, callback) => {
 						crp.util.removeUserData(user._id, ['new_email', 'activation_code'], (err, result) => {
 							if (err) return res.send(err);
 
+							result.pass = null;
 							res.send(result);
 						});
 					});
@@ -129,6 +132,7 @@ module.exports = (crp, callback) => {
 				crp.util.setUserData(req.body.user_id, userData, (user.role >= 3), (err, result) => {
 					if (err) return res.send(err);
 
+					result.pass = null;
 					res.send(result);
 				});
 			}
@@ -152,6 +156,7 @@ module.exports = (crp, callback) => {
 				crp.util.addUser(userData, true, (err, result) => {
 					if (err) return res.send(err);
 
+					result.pass = null;
 					res.send(result);
 				});
 			}
@@ -166,6 +171,7 @@ module.exports = (crp, callback) => {
 			crp.util.removeUser(req.body.userid, (err, result) => {
 				if (err) return res.send(err);
 
+				result.pass = null;
 				res.send(result);
 			});
 		});

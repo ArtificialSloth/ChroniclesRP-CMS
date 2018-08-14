@@ -31,6 +31,15 @@ module.exports = (crp, callback) => {
 		return result;
 	};
 
+	crp.util.sortObjectArrayAlphabetical = (array, key, order) => {
+		var result = array.sort((a, b) => {
+			return a[key].toUpperCase().localeCompare(b[key].toUpperCase());
+		});
+
+		if (order == -1) result = result.reverse();
+		return result;
+	};
+
 	crp.util.sanitizeObject = (object) => {
 		for (var k in object) {
 			if (typeof object[k] == 'object') {
