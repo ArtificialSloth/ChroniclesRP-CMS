@@ -1,13 +1,16 @@
 <style>
 	.chapters .sub-header {
 		background-color:{{css.colors.header}};
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
 		min-height:2.375em;
 	}
 
 	.chapters .sub-header li {
-		border-right:1px solid {{css.colors.bg}};
-		padding:10px;
+		border-right:0.0625em solid {{css.colors.bg}}; /* 1/16 */
+		padding:0.625em; /* 10/16 */
+		-webkit-transition:all 0.2s ease-in-out;
 		transition:all 0.2s ease-in-out;
 	}
 
@@ -22,28 +25,34 @@
 	}
 
 	.chapters .content .chapter {
-		border-bottom:1px solid #EAEAEA;
-		padding:15px 0;
+		border-bottom:0.0625em solid #EAEAEA; /* 1/16 */
+		padding:0.9375em 0; /* 15/16 */
 	}
 
 	.chapters .content .chapter ul {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
+		-ms-flex-wrap:wrap;
 		flex-wrap:wrap;
+		-webkit-box-pack:left;
+		-ms-flex-pack:left;
 		justify-content:left;
 	}
 
 	.chapters .content .chapter ul li:first-child {
-		margin-right:10px;
+		margin-right:0.625em; /* 10/16 */
 	}
 
 	.chapters .content .chapter ul li:last-child {
+		-ms-flex-preferred-size:100%;
 		flex-basis:100%;
-		margin-top:10px;
+		margin-top:0.625em; /* 10/16 */
 	}
 
 	.chapters .content .chapter ul li img {
-		height:50px;
-		width:50px;
+		height:3.125em; /* 50/16 */
+		width:3.125em; /* 50/16 */
 	}
 
 	.chapters .content .chapter ul li span {
@@ -52,7 +61,7 @@
 
 	.chapters .content .chapter ul li p {
 		color:#767676;
-		font-size:12px;
-		margin-top:10px;
+		font-size:0.75em; /* 12/16 */
+		margin-top:0.8333333333333334em; /* 10/12 */
 	}
 </style>

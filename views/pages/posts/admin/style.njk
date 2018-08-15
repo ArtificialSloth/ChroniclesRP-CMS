@@ -1,5 +1,7 @@
 <style>
 	.posts-menu {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
 	}
 
@@ -9,6 +11,7 @@
 		list-style-type:none;
 		padding:0.375em 1.25em; /* 6/16 */ /* 20/16 */
 		margin-left:0.0625em; /* 1/16 */
+		-webkit-transition:all 0.2s ease-in-out;
 		transition:all 0.2s ease-in-out;
 	}
 
@@ -34,12 +37,18 @@
 	}
 
 	.posts-content ul {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
+		-webkit-box-pack:space-evenly;
+		-ms-flex-pack:space-evenly;
 		justify-content:space-evenly;
 	}
 
 	.posts-content ul li {
 		background-color:{{css.colors.primary}};
+		-webkit-box-flex:1;
+		-ms-flex:1;
 		flex:1;
 		list-style-type:none;
 		margin-top:0.0625em; /* 1/16 */
@@ -74,7 +83,11 @@
 	}
 
 	.posts-content form .submit {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
+		-webkit-box-pack:end;
+		-ms-flex-pack:end;
 		justify-content:flex-end;
 		margin-top:0.5em; /* 8/16 */
 	}

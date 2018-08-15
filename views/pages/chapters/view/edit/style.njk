@@ -1,6 +1,9 @@
 <style>
 	.chapter .standard-form {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
+		-ms-flex-wrap:wrap;
 		flex-wrap:wrap;
 	}
 
@@ -15,6 +18,7 @@
 
 	.chapter .standard-form label.fill,
 	.chapter .standard-form .standard-input.fill {
+		-ms-flex-preferred-size:100%;
 		flex-basis:100%;
 	}
 

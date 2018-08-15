@@ -15,7 +15,7 @@ module.exports = (crp, callback) => {
 
 			var newPage = {
 				slug: data.slug || page.slug,
-				path: data.path || page.slug,
+				path: data.path || page.path,
 				role: data.role || page.role || null,
 				subPage: data.subPage || page.subPage || null,
 				context: data.context || page.context || null

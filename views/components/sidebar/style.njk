@@ -18,6 +18,8 @@
 	}
 
 	.sidebar div.login-widget ul {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
 	}
 
@@ -26,7 +28,7 @@
 	}
 
 	.sidebar div.login-widget ul li:first-child {
-		padding-right:10px;
+		padding-right:0.625em; /* 10/16 */
 	}
 
 	.sidebar div.login-widget ul li a {
@@ -46,6 +48,7 @@
 	.sidebar div.login-widget .login-form {
 		background-color:transparent;
 		position:static;
+		-webkit-transform:translate(0, 0);
 		transform:translate(0, 0);
 		width:auto;
 	}

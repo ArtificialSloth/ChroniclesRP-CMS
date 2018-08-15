@@ -1,15 +1,20 @@
 <style>
 	.add-chapter .cms .radio {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
+		-ms-flex-wrap:wrap;
 		flex-wrap:wrap;
 	}
 
 	.add-chapter .cms .option {
-		flex-basis:calc(25% - 1px);
-		margin:0 1px 1px 0;
+		-ms-flex-preferred-size:calc(25% - 0.0625em);
+		flex-basis:calc(25% - 0.0625em); /* 1/16 */
+		margin:0 0.0625em 0.0625em 0; /* 1/16 */ /* 1/16 */
 	}
 
 	.add-chapter .cms .option:nth-child(4n) {
+		-ms-flex-preferred-size:25%;
 		flex-basis:25%;
 		margin-right:0;
 	}
@@ -21,7 +26,8 @@
 	.add-chapter .cms label {
 		background-color:{{css.colors.primary}};
 		display:block;
-		padding:15px;
+		padding:0.9375em; /* 15/16 */
+		-webkit-transition:all 0.2s ease-in-out;
 		transition:all 0.2s ease-in-out;
 	}
 
@@ -31,19 +37,19 @@
 
 	.add-chapter .cms label img {
 		display:block;
-		height:100px;
+		height:6.25em; /* 100/16 */
 		margin:auto;
-		max-width:100px;
+		max-width:6.25em; /* 100/16 */
 	}
 
 	.add-chapter .cms label h1 {
-		margin-top:10px;
+		margin-top:0.625em; /* 10/16 */
 		text-align:center;
 	}
 
 	.add-chapter .cms label a {
 		display:block;
-		margin-top:5px;
+		margin-top:0.3125em; /* 5/16 */
 		text-align:center;
 	}
 </style>

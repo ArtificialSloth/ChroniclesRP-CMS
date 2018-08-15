@@ -132,7 +132,7 @@
 
 	.content-main blockquote {
 		background-color:{{css.colors.primary}};
-		border:1px dotted #999;
+		border:0.07142857142857142em dotted #999; /* 1/14 */
 		font-style:italic;
 		margin:2.142857142857143em 0; /* 30/14 */
 		padding:0.7142857142857143em; /* 10/14 */
@@ -221,13 +221,13 @@
 
 	.multistep .header {
 		background-color:{{css.colors.header}};
-		margin-bottom:1px;
-		padding:8px 20px;
+		margin-bottom:0.0625em; /* 1/16 */
+		padding:0.5em 1.25em; /* 8/16 */ /* 20/16 */
 	}
 
 	.multistep .steps {
 		display:flex;
-		left:0px;
+		left:0em; /* 0/16 */
 		position:relative;
 		transition:left 0.5s ease-in-out;
 	}
@@ -250,7 +250,7 @@
 	.multistep .nav .next,
 	.multistep .nav .submit {
 		display:inline-block;
-		padding:6px 20px;
+		padding:0.375em 1.25em; /* 6/16 */ /* 20/16 */
 		transition:all 0.2s ease-in-out;
 	}
 
@@ -267,17 +267,17 @@
 	}
 
 	.multistep .nav .previous {
-		border-right:1px solid {{css.colors.bg}};
+		border-right:0.0625em solid {{css.colors.bg}}; /* 1/16 */
 	}
 
 	.multistep .nav .next,
 	.multistep .nav .submit {
-		border-left:1px solid {{css.colors.bg}};
+		border-left:0.0625em solid {{css.colors.bg}}; /* 1/16 */
 		float:right;
 	}
 
 	.multistep .nav .submit {
-		padding:8px 20px;
+		padding:0.5em 1.25em; /* 8/16 */ /* 20/16 */
 	}
 
 	.multistep .nav .error {

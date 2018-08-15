@@ -1,6 +1,9 @@
 <style>
 	.profile .standard-form {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
+		-ms-flex-wrap:wrap;
 		flex-wrap:wrap;
 	}
 
@@ -12,6 +15,7 @@
 
 	.profile .standard-form label.fill,
 	.profile .standard-form .standard-input.fill {
+		-ms-flex-preferred-size:100%;
 		flex-basis:100%;
 	}
 
@@ -35,6 +39,8 @@
 	}
 
 	.profile-header .header-meta {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
 		padding-left:1em; /* 16/16 */
 		margin-top:-10.375em; /* 166/16 */
@@ -67,22 +73,30 @@
 	}
 
 	.profile-content {
+		display:-webkit-box;
+		display:-ms-flexbox;
 		display:flex;
+		-ms-flex-wrap:wrap;
 		flex-wrap:wrap;
+		-webkit-box-pack:left;
+		-ms-flex-pack:left;
 		justify-content:left;
 	}
 
 	.profile-content .top-bar {
 		background-color:{{css.colors.primary}};
+		-ms-flex-preferred-size:100%;
 		flex-basis:100%;
 		height:2.375em; /* 38/16 */
 	}
 
 	.profile-content .containor {
+		-ms-flex-preferred-size:75%;
 		flex-basis:75%;
 	}
 
 	.profile-content .nav {
+		-ms-flex-preferred-size:25%;
 		flex-basis:25%;
 	}
 
