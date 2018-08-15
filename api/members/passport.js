@@ -40,7 +40,7 @@ module.exports = (crp, callback) => {
 			passwordField: 'pass'
 		},
 		(username, password, done) => {
-			crp.util.getUsers({login: username}, (err, users) => {
+			crp.util.getUsers({login: username.toLowerCase()}, (err, users) => {
 				if (err) return done(err);
 				if (!users[0]) return done(null, false, {message: 'Incorrect username.'});
 

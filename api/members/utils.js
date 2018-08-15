@@ -61,7 +61,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb(null, 'noUser');
 
-			crp.util.getUsers({login: data.login}, (err, users) => {
+			crp.util.getUsers({login: data.login.toLowerCase()}, (err, users) => {
 				if (err) return cb(err);
 
 				var newUser = user;
@@ -79,7 +79,7 @@ module.exports = (crp, callback) => {
 					if (data.login < 4) return cb(null, 'loginLength');
 					if (users.length > 0) return cb(null, 'loginTaken');
 
-					newUser.login = data.login;
+					newUser.login = data.login.toLowerCase();
 					newUser.nicename = crp.util.urlSafe(newUser.login);
 				}
 
@@ -87,9 +87,9 @@ module.exports = (crp, callback) => {
 					if (!crp.util.validateEmail(data.email)) return cb(null, 'emailInvalid');
 
 					if (admin) {
-						newUser.email = data.email;
+						newUser.email = data.email.toLowerCase();
 					} else {
-						newUser.new_email = data.email;
+						newUser.new_email = data.email.toLowerCase();
 						newUser.activation_code = crp.util.emailConfirmCode(newUser._id);
 
 						var subject = 'Confirm your new email address';
@@ -209,9 +209,9 @@ module.exports = (crp, callback) => {
 
 	crp.util.addUser = (data, admin, cb) => {
 		var user = {
-			login: data.login,
+			login: data.login.toLowerCase(),
 			pass: data.pass,
-			email: data.email,
+			email: data.email.toLowerCase(),
 			register_date: Date.parse(data.register_date) || Date.now()
 		};
 
