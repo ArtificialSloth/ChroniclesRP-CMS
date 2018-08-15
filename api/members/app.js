@@ -4,19 +4,20 @@ module.exports = (crp, callback) => {
 			if (err) return next(err);
 			if (!crp.auth.failedLogins[req.ip]) crp.auth.failedLogins[req.ip] = {count: 0, timeout: null};
 			if (crp.auth.failedLogins[req.ip].count >= 5) {
-				if (!crp.auth.failedLogins[req.ip].timeout) {
-					crp.auth.failedLogins[req.ip].timeout = setTimeout(() => {
-						crp.auth.failedLogins[req.ip] = {count: 0, timeout: null};
-					}, 5 * 60 * 1000);
-				}
-
 				return res.send('tooMany');
 			}
 
 			if (!user) {
+				if (crp.auth.failedLogins[req.ip].timeout) clearTimeout(crp.auth.failedLogins[req.ip].timeout);
+
 				crp.auth.failedLogins[req.ip].count += 1;
+				crp.auth.failedLogins[req.ip].timeout = setTimeout(() => {
+					crp.auth.failedLogins[req.ip] = {count: 0, timeout: null};
+				}, 5 * 60 * 1000);
+
 				return res.send('invalid');
 			}
+			crp.auth.failedLogins[req.ip].count = 0;
 
 			req.session.cookie.maxAge = 24 * 60 * 60 * 1000;
 			if (req.body.remember_me) {

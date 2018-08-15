@@ -155,11 +155,12 @@ module.exports = (crp, callback) => {
 						});
 					},
 					(callback) => {
-						if (!data.old_pass || data.new_pass) return callback();
+						if (!data.old_pass || !data.new_pass || !data.confirm_new_pass) return callback();
 
 						crp.auth.bcrypt.compare(data.old_pass, user.pass, (err, isValid) => {
 							if (err) return callback(err);
 							if (!isValid) return callback('passMismatch');
+
 							if (data.new_pass.length < 6) return callback('passLength');
 							if (data.new_pass != data.confirm_new_pass) return callback('newPassMismatch');
 
