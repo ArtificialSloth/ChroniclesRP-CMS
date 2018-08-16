@@ -61,7 +61,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 			if (!user) return cb(null, 'noUser');
 
-			crp.util.getUsers({login: data.login.toLowerCase()}, (err, users) => {
+			crp.util.getUsers({login: (data.login ? data.login.toLowerCase() : null)}, (err, users) => {
 				if (err) return cb(err);
 
 				var newUser = user;

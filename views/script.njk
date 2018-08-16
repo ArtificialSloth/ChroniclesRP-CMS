@@ -146,4 +146,35 @@
 			crpGetPage(page);
 		}
 	};
+
+	var requirements = [
+		'cookies',
+		'inputtypes',
+		'cssanimations',
+		'borderradius',
+		'csscalc',
+		'checked',
+		'displaytable',
+		'flexbox',
+		'cssgradients',
+		'lastchild',
+		'nthchild',
+		'opacity',
+		'rgba',
+		'csstransforms',
+		'csstransitions',
+		'cssvmaxunit',
+		'cssvminunit',
+		'oninput',
+		'fileinput',
+		'xhrresponsetype',
+		'xhr2'
+	];
+
+	for (var i in requirements) {
+		if (!Modernizr[requirements[i]]) {
+			window.alert(`Your browser doesn't support ${requirements[i]}. Some parts of this site may not behave as expected.`);
+			break;
+		}
+	}
 </script>
