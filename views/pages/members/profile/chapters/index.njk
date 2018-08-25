@@ -5,15 +5,15 @@
 <ul class="chapters">
 	{% set chapterCount = 0 %}
 	{% for chapter in chapters %}
-		{% if crp.util.getChapterMember(chapter, profile._id).role > 0 %}
+		{% if crp.chapters.getMember(chapter, profile._id).role > 0 %}
 			{% set chapterCount = chapterCount + 1 %}
 			{% lookup 'games', {_id: chapter.game}, 'game' %}
 
 			<li class="chapter">
 				<ul>
-					<li><img src="{{crp.util.getChapterProfilePic(chapter)}}" /></li>
+					<li><img src="{{crp.chapters.getProfilePic(chapter)}}" /></li>
 					<li>
-						{{crp.util.getChapterLink(chapter) | safe}}
+						{{crp.chapters.getLink(chapter) | safe}}
 						<p>{{chapter.tagline}}</p>
 					</li>
 					<li>Game: <a onclick="crpGetPage('/chapters/{{game.slug}}')">{{game.name}}</a></li>

@@ -24,16 +24,16 @@ async.waterfall([
 		require('./api/database/db.js')(crp, callback);
 	},
 	(crp, callback) => {
-		require('./api/database/pages.js')(crp, callback);
-	},
-	(crp, callback) => {
-		require('./api/storage/storage.js')(crp, callback);
-	},
-	(crp, callback) => {
-		require('./api/mail/mail.js')(crp, callback);
-	},
-	(crp, callback) => {
-		require('./api/members/passport.js')(crp, callback);
+		require('./api/auth/auth.js')(crp);
+		require('./api/mail/mail.js')(crp);
+		require('./api/pages/pages.js')(crp);
+		require('./api/posts/posts.js')(crp);
+		require('./api/forums/forums.js')(crp);
+		require('./api/members/members.js')(crp);
+		require('./api/storage/storage.js')(crp);
+		require('./api/chapters/chapters.js')(crp);
+
+		callback(null, crp);
 	}
 ], (err, crp) => {
 	if (err) return console.error(err);

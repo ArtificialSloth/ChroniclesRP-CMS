@@ -3,12 +3,12 @@
 	{% lookup 'users', {_id: userid}, 'user' %}
 	{% lookup 'chapters', {_id: chapterid}, 'chapter' %}
 
-	<div class="header" style="background-image:url('{{crp.util.getChapterCoverPic(chapter)}}')">
+	<div class="header" style="background-image:url('{{crp.chapters.getCoverPic(chapter)}}')">
 		<div class="meta">
-			<img src="{{crp.util.getChapterProfilePic(chapter)}}" />
+			<img src="{{crp.chapters.getProfilePic(chapter)}}" />
 			<h1>{{chapter.name}}</h1>
 			<p>{{chapter.tagline}}</p>
-			{% if crp.util.getChapterMember(chapter, user._id).role > 0 %}
+			{% if crp.chapters.getMember(chapter, user._id).role > 0 %}
 				<p><a onclick="leaveChapter('{{chapter._id}}')">Leave Chapter</a></p>
 			{% elseif chapter.open %}
 				<p><a onclick="joinChapter('{{chapter._id}}')">Join Chapter</a></p>
@@ -24,7 +24,7 @@
 
 		<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}/members', '.chapter .content', true)">Members</li>
 
-		{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or  user.role >= 3 %}
+		{% if crp.chapters.getMember(chapter, user._id).role >= 2 or  user.role >= 3 %}
 			<li onclick="crpGetSubPage('/chapters/{{chapter.nicename}}/edit', '.chapter .content', true)">Manage</li>
 		{% endif %}
 	</ul>

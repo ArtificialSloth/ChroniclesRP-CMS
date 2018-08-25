@@ -23,14 +23,14 @@
 		{% if not filter or game._id.equals(filter) %}
 			<li class="chapter">
 				<ul>
-					<li><img src="{{crp.util.getChapterProfilePic(chapter)}}" /></li>
+					<li><img src="{{crp.chapters.getProfilePic(chapter)}}" /></li>
 					<li>
-						{{crp.util.getChapterLink(chapter) | safe}}
+						{{crp.chapters.getLink(chapter) | safe}}
 						<p>{{chapter.tagline}}</p>
 					</li>
 					<li>
 						Game: <a onclick="crpGetSubPage('/chapters/{{game.slug}}', '.chapters', true)">{{game.name}}</a>
-						{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+						{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
 							<span><a onclick="crpGetPage('/chapters/{{chapter.nicename}}/edit')">Edit</a> | <a onclick="removeChapter('{{chapter._id}}')">Delete</a></span>
 						{% endif %}
 					</li>

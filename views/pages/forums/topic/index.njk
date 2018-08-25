@@ -19,7 +19,7 @@
 			<span>{{topic.title}}</span>
 		</p>
 
-		{% set member = crp.util.getChapterMember(chapter, user._id) %}
+		{% set member = crp.chapters.getMember(chapter, user._id) %}
 		{% if (not chapter or (member and member.role >= 1)) and not category.role or category.role == user.role or user.role >= 3 %}
 			<li class="header">
 				<ul>
@@ -38,9 +38,9 @@
 			<li class="body">
 				<ul>
 					<li>
-						<img src="{{crp.util.getUserProfilePic(author)}}" width="80" height="80" />
+						<img src="{{crp.members.getProfilePic(author)}}" width="80" height="80" />
 						<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-						<div class="role">{{crp.util.parseRole(author.role)}}</div>
+						<div class="role">{{crp.members.parseRole(author.role)}}</div>
 					</li>
 					<li>{{topic.content | safe}}</li>
 					<li>
@@ -73,9 +73,9 @@
 					<ul>
 						<li>
 
-							<img src="{{crp.util.getUserProfilePic(author)}}" width="80" height="80" />
+							<img src="{{crp.members.getProfilePic(author)}}" width="80" height="80" />
 							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
-							<div class="role">{{crp.util.parseRole(author.role)}}</div>
+							<div class="role">{{crp.members.parseRole(author.role)}}</div>
 						</li>
 						<li>{{reply.content | safe}}</li>
 						<li>

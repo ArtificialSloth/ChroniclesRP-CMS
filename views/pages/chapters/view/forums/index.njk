@@ -33,7 +33,7 @@
 								No Topics
 							{% endif %}
 
-							{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+							{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
 								<a class="meta" onclick="chaptersDeleteForum('{{forum._id}}')">Delete</a>
 							{% endif %}
 						</li>
@@ -41,7 +41,7 @@
 				</li>
 			{% endfor %}
 
-			{% if crp.util.getChapterMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+			{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
 				<fieldset class="new-post">
 					<legend>New Forum</legend>
 					<form>

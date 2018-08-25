@@ -46,7 +46,7 @@ module.exports = (crp, callback) => {
 				email: req.body.user_email
 			};
 
-			crp.util.addUser(userData, false, (err, result) => {
+			crp.members.add(userData, false, (err, result) => {
 				if (err) return res.send(err);
 				if (!result._id) return res.send(result);
 
@@ -55,8 +55,8 @@ module.exports = (crp, callback) => {
 
 					var subject = 'Welcome to the Chronicles ' + result.login + '!';
 					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code. <div style="font-size:20px; text-align:center">' + result.activation_code + '</div>';
-					crp.util.mail(result.email, subject, msg);
-					crp.util.adminNotify('New User: ' + result.display_name, 'Username: ' + result.login + '<br>Email: ' + result.email);
+					crp.mail.send(result.email, subject, msg);
+					crp.mail.adminNotify('New User: ' + result.display_name, 'Username: ' + result.login + '<br>Email: ' + result.email);
 
 					result.pass = null;
 					res.send(result);
@@ -68,14 +68,14 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/activate', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 
 			if (user && user.activation_code == req.body.code) {
 				if (user.role == 0) {
-					crp.util.setUserData(user._id, {role: 1}, true, (err, result) => {
+					crp.members.set(user._id, {role: 1}, true, (err, result) => {
 						if (err) return res.send(err);
-						crp.util.removeUserData(user._id, ['activation_code'], (err, result) => {
+						crp.members.removeData(user._id, ['activation_code'], (err, result) => {
 							if (err) return res.send(err);
 
 							result.pass = null;
@@ -83,9 +83,9 @@ module.exports = (crp, callback) => {
 						});
 					});
 				} else {
-					crp.util.setUserData(user._id, {email: user.new_email}, true, (err, result) => {
+					crp.members.set(user._id, {email: user.new_email}, true, (err, result) => {
 						if (err) return res.send(err);
-						crp.util.removeUserData(user._id, ['new_email', 'activation_code'], (err, result) => {
+						crp.members.removeData(user._id, ['new_email', 'activation_code'], (err, result) => {
 							if (err) return res.send(err);
 
 							result.pass = null;
@@ -104,7 +104,7 @@ module.exports = (crp, callback) => {
 		{name: 'cover_pic', maxCount: 1}
 	]);
 	crp.express.app.post('/api/admin/edit-user', editUser, (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 
 			if (req.body.user_id == user._id || user.role >= 3) {
@@ -130,7 +130,7 @@ module.exports = (crp, callback) => {
 					if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
 				}
 
-				crp.util.setUserData(req.body.user_id, userData, (user.role >= 3), (err, result) => {
+				crp.members.set(req.body.user_id, userData, (user.role >= 3), (err, result) => {
 					if (err) return res.send(err);
 
 					result.pass = null;
@@ -141,7 +141,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/add-user', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 
 			if (user.role >= 3) {
@@ -154,7 +154,7 @@ module.exports = (crp, callback) => {
 					role: 1
 				};
 
-				crp.util.addUser(userData, true, (err, result) => {
+				crp.members.add(userData, true, (err, result) => {
 					if (err) return res.send(err);
 
 					result.pass = null;
@@ -165,11 +165,11 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/remove-user', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');
 
-			crp.util.removeUser(req.body.userid, (err, result) => {
+			crp.members.remove(req.body.userid, (err, result) => {
 				if (err) return res.send(err);
 
 				result.pass = null;

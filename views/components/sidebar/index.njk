@@ -7,7 +7,7 @@
 
 		{% if user %}
 			<ul>
-				<li><img src="{{crp.util.getUserProfilePic(user)}}" /></li>
+				<li><img src="{{crp.members.getProfilePic(user)}}" /></li>
 				<li>
 					<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
 					<a href="/logout">Logout</a>

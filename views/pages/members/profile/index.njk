@@ -3,9 +3,9 @@
 	{% lookup 'users', {_id: profileid}, 'profile' %}
 
 	<div class="profile-header">
-		<div class="header-cover-image" style="background-image:url('{{crp.util.getUserCoverPic(profile)}}')"></div>
+		<div class="header-cover-image" style="background-image:url('{{crp.members.getCoverPic(profile)}}')"></div>
 		<div class="header-meta">
-			<img class="profile-pic" src="{{crp.util.getUserProfilePic(profile)}}" />
+			<img class="profile-pic" src="{{crp.members.getProfilePic(profile)}}" />
 			<div class="profile-details">
 				<a class="profile-name" onclick="crpGetPage('/members/{{profile.nicename}}')">{{profile.display_name}}</a>
 				<span class="profile-tagline">{{profile.tagline}}</span>
@@ -30,7 +30,7 @@
 				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/messages', '.profile-content .containor', true)">
 					Messages
 					{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
-					{% set chapters = crp.util.getChapterInvites(chapters, profile._id) %}
+					{% set chapters = crp.chapters.getInvites(chapters, profile._id) %}
 					{% if chapters.length > 0 %}
 						<span class="count">{{chapters.length}}</span>
 					{% endif %}

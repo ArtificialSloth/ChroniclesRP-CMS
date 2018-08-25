@@ -1,45 +1,47 @@
-module.exports = (crp, callback) => {
-	crp.util.getCategories = (filter, cb) => {
+module.exports = (crp) => {
+	crp.forums = {};
+
+	crp.forums.getCategories = (filter, cb) => {
 		crp.db.find('categories', filter, {}, cb);
 	};
 
-	crp.util.getCategoryData = (categoryid, cb) => {
+	crp.forums.getCategoryData = (categoryid, cb) => {
 		if (typeof categoryid != 'object') categoryid = crp.db.objectID(categoryid);
 		crp.db.findOne('categories', {_id: categoryid}, cb);
 	};
 
-	crp.util.getForums = (filter, cb) => {
+	crp.forums.getForums = (filter, cb) => {
 		crp.db.find('forums', filter, {}, cb);
 	};
 
-	crp.util.getForumData = (forumid, cb) => {
+	crp.forums.getForumData = (forumid, cb) => {
 		if (typeof forumid != 'object') forumid = crp.db.objectID(forumid);
 		crp.db.findOne('forums', {_id: forumid}, cb);
 	};
 
-	crp.util.getTopics = (filter, cb) => {
+	crp.forums.getTopics = (filter, cb) => {
 		crp.db.find('topics', filter, {}, cb);
 	};
 
-	crp.util.getTopicData = (topicid, cb) => {
+	crp.forums.getTopicData = (topicid, cb) => {
 		if (typeof topicid != 'object') topicid = crp.db.objectID(topicid);
 		crp.db.findOne('topics', {_id: topicid}, cb);
 	};
 
-	crp.util.getReplies = (filter, cb) => {
+	crp.forums.getReplies = (filter, cb) => {
 		crp.db.find('replies', filter, {}, cb);
 	};
 
-	crp.util.getReplyData = (replyid, cb) => {
+	crp.forums.getReplyData = (replyid, cb) => {
 		if (typeof replyid != 'object') replyid = crp.db.objectID(replyid);
 		crp.db.findOne('replies', {_id: replyid}, cb);
 	};
 
-	crp.util.addCategory = (data, cb) => {
-		crp.util.getCategories({}, (err, categories) => {
+	crp.forums.addCategory = (data, cb) => {
+		crp.forums.getCategories({}, (err, categories) => {
 			if (err) return cb(err);
 
-			crp.util.getChapterData(data.chapter, (err, chapter) => {
+			crp.chapters.get(data.chapter, (err, chapter) => {
 				if (err) return cb(err);
 
 				var category = {
@@ -61,17 +63,17 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeCategory = (categoryid, cb) => {
-		crp.util.getCategoryData(categoryid, (err, category) => {
+	crp.forums.removeCategory = (categoryid, cb) => {
+		crp.forums.getCategoryData(categoryid, (err, category) => {
 			if (err) return cb(err);
 
-			crp.util.getForums({category: category._id}, (err, forums) => {
+			crp.forums.getForums({category: category._id}, (err, forums) => {
 				if (err) return cb(err);
 
 				crp.async.each(forums, (forum, callback) => {
 					if (!forum) return callback();
 
-					crp.util.removeForum(forum._id, callback);
+					crp.forums.removeForum(forum._id, callback);
 				}, (err) => {
 					if (err) return cb(err);
 
@@ -81,8 +83,8 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.setForumData = (forumid, data, cb) => {
-		crp.util.getForumData(forumid, (err, forum) => {
+	crp.forums.setForumData = (forumid, data, cb) => {
+		crp.forums.getForumData(forumid, (err, forum) => {
 			if (err) return cb(err);
 			if (!forum) return cb('noForum');
 
@@ -98,11 +100,11 @@ module.exports = (crp, callback) => {
 			if (forum.name.length < 4 || forum.name.length > 80) return cb('nameLength');
 			if (forum.desc.length > 140) return cb('descLength');
 
-			crp.util.getForums({slug: newForum.slug}, (err, forums) => {
+			crp.forums.getForums({slug: newForum.slug}, (err, forums) => {
 				if (err) return cb(err);
 				if (forums && newForum.slug != forum.slug) return cb('slugTaken');
 
-				crp.util.getCategoryData(newForum.category, (err, category) => {
+				crp.forums.getCategoryData(newForum.category, (err, category) => {
 					if (err) return cb(err);
 					if (!category) return cb('noCategory');
 
@@ -125,8 +127,8 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addForum = (data, cb) => {
-		crp.util.getForums({}, (err, forums) => {
+	crp.forums.addForum = (data, cb) => {
+		crp.forums.getForums({}, (err, forums) => {
 			if (err) return cb(err);
 
 			var forum = {
@@ -141,7 +143,7 @@ module.exports = (crp, callback) => {
 			if (crp.util.findObjectInArray(forums, 'slug', forum.slug)) return cb('slugTaken');
 			if (forum.desc.length > 140) return cb('descLength');
 
-			crp.util.getCategoryData(forum.category, (err, category) => {
+			crp.forums.getCategoryData(forum.category, (err, category) => {
 				if (err) return cb(err);
 				if (!category) return cb('noCategory');
 
@@ -163,18 +165,18 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeForum = (forumid, cb) => {
-		crp.util.getForumData(forumid, (err, forum) => {
+	crp.forums.removeForum = (forumid, cb) => {
+		crp.forums.getForumData(forumid, (err, forum) => {
 			if (err) return cb(err);
 			if (!forum) return cb('noForum');
 
-			crp.util.getTopics({parent: forum._id}, (err, topics) => {
+			crp.forums.getTopics({parent: forum._id}, (err, topics) => {
 				if (err) return cb(err);
 
 				crp.async.each(topics, (topic, callback) => {
 					if (!topic) return callback();
 
-					crp.util.removeTopic(topic._id, callback);
+					crp.forums.removeTopic(topic._id, callback);
 				}, (err) => {
 					if (err) return cb(err);
 
@@ -192,8 +194,8 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.setTopicData = (topicid, data, cb) => {
-		crp.util.getTopicData(topicid, (err, topic) => {
+	crp.forums.setTopicData = (topicid, data, cb) => {
+		crp.forums.getTopicData(topicid, (err, topic) => {
 			if (err) return cb(err);
 			if (!topic) return cb('noTopic');
 
@@ -217,7 +219,7 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addTopic = (data, cb) => {
+	crp.forums.addTopic = (data, cb) => {
 		var topic = {
 			author: data.author,
 			title: data.title,
@@ -227,7 +229,7 @@ module.exports = (crp, callback) => {
 			parent: data.parent
 		};
 
-		crp.util.getUserData(topic.author, (err, user) => {
+		crp.members.get(topic.author, (err, user) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');
 
@@ -237,7 +239,7 @@ module.exports = (crp, callback) => {
 			if (topic.title.length > 80) return cb('titleLong');
 			if (!topic.content || topic.content.length < 4) return cb('bodyLength');
 
-			crp.util.getForumData(topic.parent, (err, forum) => {
+			crp.forums.getForumData(topic.parent, (err, forum) => {
 				if (err) return cb(err);
 				if (!forum) return cb('noForum');
 
@@ -261,8 +263,8 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeTopic = (topicid, cb) => {
-		crp.util.getTopicData(topicid, (err, topic) => {
+	crp.forums.removeTopic = (topicid, cb) => {
+		crp.forums.getTopicData(topicid, (err, topic) => {
 			if (err) return cb(err);
 			if (!topic) return cb(null, 'noTopic');
 
@@ -282,8 +284,8 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.setReplyData = (replyid, data, cb) => {
-		crp.util.getReplyData(replyid, (err, reply) => {
+	crp.forums.setReplyData = (replyid, data, cb) => {
+		crp.forums.getReplyData(replyid, (err, reply) => {
 			if (err) return cb(err);
 			if (!reply) return cb('noReply');
 
@@ -304,7 +306,7 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addReply = (data, cb) => {
+	crp.forums.addReply = (data, cb) => {
 		var reply = {
 			author: data.author,
 			content: data.content,
@@ -312,7 +314,7 @@ module.exports = (crp, callback) => {
 			parent: data.parent
 		};
 
-		crp.util.getUserData(reply.author, (err, user) => {
+		crp.members.get(reply.author, (err, user) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');;
 
@@ -320,7 +322,7 @@ module.exports = (crp, callback) => {
 
 			if (!reply.content || reply.content.length < 4) return cb('bodyLength');
 
-			crp.util.getTopicData(reply.parent, (err, topic) => {
+			crp.forums.getTopicData(reply.parent, (err, topic) => {
 				if (err) return cb(err);
 				if (!topic) return cb('noTopic');
 
@@ -334,14 +336,12 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeReply = (replyid, cb) => {
-		crp.util.getReplyData(replyid, (err, reply) => {
+	crp.forums.removeReply = (replyid, cb) => {
+		crp.forums.getReplyData(replyid, (err, reply) => {
 			if (err) return cb(err);
 			if (!reply) return cb(null, 'noReply');
 
 			crp.db.deleteOne('replies', {_id: reply._id}, cb);
 		});
 	};
-
-	callback();
 };

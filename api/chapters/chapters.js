@@ -1,15 +1,17 @@
-module.exports = (crp, callback) => {
-	crp.util.getChapters = (filter, cb) => {
+module.exports = (crp) => {
+	crp.chapters = {};
+
+	crp.chapters.find = (filter, cb) => {
 		crp.db.find('chapters', filter, {}, cb);
 	};
 
-	crp.util.getChapterData = (chapterid, cb) => {
+	crp.chapters.get = (chapterid, cb) => {
 		if (typeof chapterid != 'object') chapterid = crp.db.objectID(chapterid);
 		crp.db.findOne('chapters', {_id: chapterid}, cb);
 	};
 
-	crp.util.setChapterData = (chapterid, data, cb) => {
-		crp.util.getChapterData(chapterid, (err, chapter) => {
+	crp.chapters.set = (chapterid, data, cb) => {
+		crp.chapters.get(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
@@ -32,7 +34,7 @@ module.exports = (crp, callback) => {
 					members: chapter.members || {}
 				};
 
-				crp.util.getChapters({name: newChapter.name}, (err, chapters) => {
+				crp.chapters.find({name: newChapter.name}, (err, chapters) => {
 					if (err) return cb(err);
 					if (chapters.length > 0 && newChapter.name != chapter.name) return cb('nameTaken');
 
@@ -91,12 +93,12 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.addChapter = (data, userid, cb) => {
-		crp.util.getUserData(userid, (err, user) => {
+	crp.chapters.add = (data, userid, cb) => {
+		crp.members.get(userid, (err, user) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');
 
-			crp.util.getChapters({}, (err, chapters) => {
+			crp.chapters.find({}, (err, chapters) => {
 				if (err) return cb(err);
 
 				crp.db.findOne('games', {_id: crp.db.objectID(data.game)}, (err, game) => {
@@ -140,10 +142,10 @@ module.exports = (crp, callback) => {
 
 							switch (chapter.type) {
 								case 'hosted':
-									crp.util.deployChapter(data.cms, chapter.slug, (err) => {
+									crp.chapters.deploy(data.cms, chapter.slug, (err) => {
 										if (err) return cb(err.toString());
 
-										crp.util.addChapterPage(chapter, (err) => {
+										crp.chapters.addPage(chapter, (err) => {
 											if (err) return cb(err);
 
 											cb(null, chapter);
@@ -151,13 +153,13 @@ module.exports = (crp, callback) => {
 									});
 									break;
 								case 'group':
-									crp.util.addCategory({name: chapter.name, chapter: chapter._id}, (err, result) => {
+									crp.forums.addCategory({name: chapter.name, chapter: chapter._id}, (err, result) => {
 										if (err) return cb(err);
 
-										crp.util.addForum({name: chapter.name, desc: chapter.tagline, category: result.insertedId}, (err, result) => {
+										crp.forums.addForum({name: chapter.name, desc: chapter.tagline, category: result.insertedId}, (err, result) => {
 											if (err) return cb(err);
 
-											crp.util.addChapterPage(chapter, (err) => {
+											crp.chapters.addPage(chapter, (err) => {
 												if (err) return cb(err);
 
 												cb(null, chapter);
@@ -166,7 +168,7 @@ module.exports = (crp, callback) => {
 									});
 									break;
 								default:
-									crp.util.addChapterPage(chapter, (err) => {
+									crp.chapters.addPage(chapter, (err) => {
 										if (err) return cb(err);
 
 										cb(null, chapter);
@@ -179,8 +181,8 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeChapter = (chapterid, cb) => {
-		crp.util.getChapterData(chapterid, (err, chapter) => {
+	crp.chapters.remove = (chapterid, cb) => {
+		crp.chapters.get(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
@@ -189,10 +191,10 @@ module.exports = (crp, callback) => {
 
 				switch (chapter.type) {
 					case 'hosted':
-						crp.util.disbandChapter(chapter.slug, (err) => {
+						crp.chapters.disband(chapter.slug, (err) => {
 							if (err) return cb(err);
 
-							crp.util.removeChapterPage(chapter, (err) => {
+							crp.chapters.removePage(chapter, (err) => {
 								if (err) return cb(err);
 
 								crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
@@ -204,14 +206,14 @@ module.exports = (crp, callback) => {
 						});
 						break;
 					case 'group':
-						crp.util.getCategories({chapter: chapter._id}, (err, categories) => {
+						crp.forums.getCategories({chapter: chapter._id}, (err, categories) => {
 							if (err) return cb(err);
 							if (!categories[0]) return cb('noCategories');
 
-							crp.util.removeCategory(categories[0]._id, (err, result) => {
+							crp.forums.removeCategory(categories[0]._id, (err, result) => {
 								if (err) return cb(err);
 
-								crp.util.removeChapterPage(chapter, (err) => {
+								crp.chapters.removePage(chapter, (err) => {
 									if (err) return cb(err);
 
 									crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
@@ -224,7 +226,7 @@ module.exports = (crp, callback) => {
 						});
 						break;
 					default:
-						crp.util.removeChapterPage(chapter, (err) => {
+						crp.chapters.removePage(chapter, (err) => {
 							if (err) return cb(err);
 
 							crp.db.deleteOne('chapters', {_id: chapter._id}, (err, result) => {
@@ -238,21 +240,21 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.getChapterMember = (chapter, userid) => {
+	crp.chapters.getMember = (chapter, userid) => {
 		if (!chapter || !userid) return;
 		return crp.util.findObjectInArray(chapter.members, '_id', userid.toString());
 	};
 
-	crp.util.addChapterMember = (chapterid, data, cb) => {
-		crp.util.getChapterData(chapterid, (err, chapter) => {
+	crp.chapters.addMember = (chapterid, data, cb) => {
+		crp.chapters.get(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.getUserData(data._id, (err, user) => {
+			crp.members.get(data._id, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 
-				if (crp.util.getChapterMember(chapter, user._id)) return cb('isMember');
+				if (crp.chapters.getMember(chapter, user._id)) return cb('isMember');
 
 				chapter.members.push({_id: user._id, role: parseInt(data.role) || 0});
 				crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
@@ -260,16 +262,16 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.removeChapterMember = (chapterid, userid, cb) => {
-		crp.util.getChapterData(chapterid, (err, chapter) => {
+	crp.chapters.removeMember = (chapterid, userid, cb) => {
+		crp.chapters.get(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.getUserData(userid, (err, user) => {
+			crp.members.get(userid, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if (!member) return cb('notMember');
 
 				chapter.members.splice(chapter.members.indexOf(member), 1);
@@ -278,24 +280,24 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.setChapterMemberRole = (chapterid, data, cb) => {
-		crp.util.getChapterData(chapterid, (err, chapter) => {
+	crp.chapters.setMemberRole = (chapterid, data, cb) => {
+		crp.chapters.get(chapterid, (err, chapter) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.util.getUserData(data.userid, (err, user) => {
+			crp.members.get(data.userid, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 				if (!data.role) return cb('noRole');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				chapter.members[chapter.members.indexOf(member)] = {_id: member._id, role: parseInt(data.role)};
 				crp.db.replaceOne('chapters', {_id: chapter._id}, chapter, cb);
 			});
 		});
 	};
 
-	crp.util.addChapterPage = (chapter, cb) => {
+	crp.chapters.addPage = (chapter, cb) => {
 		crp.async.parallel([
 			(callback) => {
 				if (chapter.type != 'group') return callback();
@@ -336,7 +338,7 @@ module.exports = (crp, callback) => {
 		], cb);
 	};
 
-	crp.util.removeChapterPage = (chapter, cb) => {
+	crp.chapters.removePage = (chapter, cb) => {
 		var chapterPages = ['edit', 'forums', 'members'];
 
 		crp.pages.removePage({slug: `/chapters/${chapter.nicename}`}, (err, result) => {
@@ -352,7 +354,7 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.getChapterLink = (chapter) => {
+	crp.chapters.getLink = (chapter) => {
 		if (!chapter) return;
 
 		switch (chapter.type) {
@@ -367,12 +369,12 @@ module.exports = (crp, callback) => {
 		}
 	};
 
-	crp.util.getChapterInvites = (chapters, userid) => {
+	crp.chapters.getInvites = (chapters, userid) => {
 		if (!chapters || !userid) return;
 
 		var result = [];
 		for (var i in chapters) {
-			var member = crp.util.getChapterMember(chapters[i], userid);
+			var member = crp.chapters.getMember(chapters[i], userid);
 			if (member && member.role == 0) {
 				result.push(chapters[i]);
 			}
@@ -381,19 +383,19 @@ module.exports = (crp, callback) => {
 		return result;
 	};
 
-	crp.util.getChapterProfilePic = (chapter) => {
+	crp.chapters.getProfilePic = (chapter) => {
 		if (!chapter) return;
 
 		return crp.storage.getUrl(chapter.img.profile) || crp.storage.getUrl('img/chapters/profile.png');
 	};
 
-	crp.util.getChapterCoverPic = (chapter) => {
+	crp.chapters.getCoverPic = (chapter) => {
 		if (!chapter) return;
 
 		return crp.storage.getUrl(chapter.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
-	crp.util.deployChapter = (cms, sname, cb) => {
+	crp.chapters.deploy = (cms, sname, cb) => {
 		crp.request({
 			url: `${process.env.DEPLOY_URL}/${cms}`,
 			method: 'POST',
@@ -407,7 +409,7 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.disbandChapter = (sname, cb) => {
+	crp.chapters.disband = (sname, cb) => {
 		crp.request({
 			url: `${process.env.DEPLOY_URL}/disband`,
 			method: 'POST',
@@ -420,6 +422,4 @@ module.exports = (crp, callback) => {
 			cb();
 		});
 	};
-
-	callback()
 };

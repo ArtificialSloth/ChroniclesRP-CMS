@@ -1,12 +1,12 @@
 module.exports = (crp, callback) => {
 	crp.express.app.post('/api/add-chapter', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
 				if (user.role < 2) return res.send('notAllowed');
-				crp.util.addChapter(req.body, user._id, (err, result) => {
+				crp.chapters.add(req.body, user._id, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -28,17 +28,17 @@ module.exports = (crp, callback) => {
 			if (req.files.cover_pic) req.body.img.cover = req.files.cover_pic;
 		}
 
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-				crp.util.setChapterData(req.body.chapterid, req.body, (err, result) => {
+				crp.chapters.set(req.body.chapterid, req.body, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -48,17 +48,17 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/remove-chapter', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-				crp.util.removeChapter(req.body.chapterid, (err, result) => {
+				crp.chapters.remove(req.body.chapterid, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -68,12 +68,12 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/join-chapter', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 			if (!chapter.open) return res.send('closed');
 
-			crp.util.addChapterMember(req.body.chapterid, {_id: req.user, role: 1}, (err, result) => {
+			crp.chapters.addMember(req.body.chapterid, {_id: req.user, role: 1}, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -82,7 +82,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/leave-chapter', (req, res) => {
-		crp.util.removeChapterMember(req.body.chapterid, req.user, (err, result) => {
+		crp.chapters.removeMember(req.body.chapterid, req.user, (err, result) => {
 			if (err) return res.send(err);
 
 			res.send(result);
@@ -90,17 +90,17 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/accept-chapter-invite', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if (!member || member.role != 0) return res.send('notAllowed');
-				crp.util.setChapterMemberRole(req.body.chapterid, {userid: req.user, role: 1}, (err, result) => {
+				crp.chapters.setMemberRole(req.body.chapterid, {userid: req.user, role: 1}, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -110,17 +110,17 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/promote-chapter-member', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.util.setChapterMemberRole(req.body.chapterid, {userid: req.body.userid, role: 2}, (err, result) => {
+				crp.chapters.setMemberRole(req.body.chapterid, {userid: req.body.userid, role: 2}, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -130,17 +130,17 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/demote-chapter-member', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.util.setChapterMemberRole(req.body.chapterid, {userid: req.body.userid, role: 1}, (err, result) => {
+				crp.chapters.setMemberRole(req.body.chapterid, {userid: req.body.userid, role: 1}, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -150,17 +150,17 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/invite-chapter-member', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.util.addChapterMember(req.body.chapterid, {_id: req.body.userid}, (err, result) => {
+				crp.chapters.addMember(req.body.chapterid, {_id: req.body.userid}, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -170,30 +170,30 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/get-chapter-invites', (req, res) => {
-		crp.util.getChapters({}, (err, chapters) => {
+		crp.chapters.find({}, (err, chapters) => {
 			if (err) return res.send(err);
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				res.send(crp.util.getChapterInvites(chapters, user._id));
+				res.send(crp.chapters.getInvites(chapters, user._id));
 			});
 		});;
 	});
 
 	crp.express.app.post('/api/remove-chapter-member', (req, res) => {
-		crp.util.getChapterData(req.body.chapterid, (err, chapter) => {
+		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.util.getChapterMember(chapter, user._id);
+				var member = crp.chapters.getMember(chapter, user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.util.removeChapterMember(req.body.chapterid, req.body.userid, (err, result) => {
+				crp.chapters.removeMember(req.body.chapterid, req.body.userid, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);

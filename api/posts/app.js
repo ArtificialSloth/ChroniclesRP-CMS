@@ -1,6 +1,6 @@
 module.exports = (crp, callback) => {
 	crp.express.app.post('/api/admin/add-post', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');
 
@@ -14,7 +14,7 @@ module.exports = (crp, callback) => {
 				date: req.body.date
 			};
 
-			crp.util.addPost(postData, (err, result) => {
+			crp.posts.add(postData, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -23,7 +23,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/edit-post', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');
 
@@ -36,7 +36,7 @@ module.exports = (crp, callback) => {
 				date: req.body.date
 			};
 
-			crp.util.setPostData(req.body.postid, postData, (err, result) => {
+			crp.posts.set(req.body.postid, postData, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -45,11 +45,11 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/remove-post', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');
 
-			crp.util.removePost(req.body.postid, (err, result) => {
+			crp.posts.remove(req.body.postid, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -61,7 +61,7 @@ module.exports = (crp, callback) => {
 		{name: 'img', maxCount: 1}
 	]);
 	crp.express.app.post('/api/admin/image-upload', imageUpload, (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');
 

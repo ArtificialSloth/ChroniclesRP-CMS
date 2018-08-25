@@ -107,7 +107,7 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 				if (!pages[0]) return cb(null, {path: '/404/index.njk', context: context});
 
-				crp.util.getUserData(req.user, (err, user) => {
+				crp.members.get(req.user, (err, user) => {
 					if (err) return cb(err);
 					if ((!user && pages[0].role) || (user && pages[0].role && user.role < pages[0].role) || (user && pages[0].role && user.role < 3)) return cb(null, {path: '/404/index.njk', context: context});
 
@@ -141,7 +141,5 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.requireFiles('/utils.js', (err) => {
-		callback(err, crp);
-	});
+	callback(null, crp);
 };

@@ -45,7 +45,7 @@
 		<label for="profile_pic">Profile Picture</label>
 		<div class="standard-input">
 			{% if user.img.profile %}
-				<img class="profile-pic" src="{{crp.util.getUserProfilePic(profile)}}" width="150px" height="150px" />
+				<img class="profile-pic" src="{{crp.members.getProfilePic(profile)}}" width="150px" height="150px" />
 			{% endif %}
 			<input type="file" name="profile_pic" class="profile_pic" />
 			<span class="input-error"></span>
@@ -54,7 +54,7 @@
 		<label for="cover_pic">Cover Image</label>
 		<div class="standard-input">
 			{% if user.img.cover %}
-				<img class="cover-pic" src="{{crp.util.getUserCoverPic(profile)}}" height="150px" />
+				<img class="cover-pic" src="{{crp.members.getCoverPic(profile)}}" height="150px" />
 			{% endif %}
 			<input type="file" name="cover_pic" class="cover_pic" />
 			<span class="input-error"></span>

@@ -3,7 +3,7 @@
 {% lookup 'users', {_id: profileid}, 'profile' %}
 {% lookup 'users', {_id: userid}, 'user' %}
 {% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
-{% set chapters = crp.util.getChapterInvites(chapters, profile._id) %}
+{% set chapters = crp.chapters.getInvites(chapters, profile._id) %}
 
 {% if profile._id.equals(user._id) %}
 	<ul class="invites">

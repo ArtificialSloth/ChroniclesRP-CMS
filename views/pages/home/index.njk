@@ -55,7 +55,7 @@
 				{% set count = 0 %}
 				{% query 'chapters', {}, {}, 'chapters' %}
 				{% for chapter in chapters %}
-					{% if crp.util.getChapterMember(chapter, user._id) and chapter.discord %}
+					{% if crp.chapters.getMember(chapter, user._id) and chapter.discord %}
 						{% set count = count + 1 %}
 						<iframe src="https://discordapp.com/widget?id={{chapter.discord}}&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
 					{% endif %}

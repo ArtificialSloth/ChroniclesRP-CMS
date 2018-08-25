@@ -16,7 +16,7 @@
 			<span>{{forum.name}}</span>
 		</p>
 
-		{% set member = crp.util.getChapterMember(chapter, user._id) %}
+		{% set member = crp.chapters.getMember(chapter, user._id) %}
 		{% if (not chapter or (member and member.role >= 1)) and not category.role or category.role == user.role or user.role >= 3 %}
 			{% if topics.length != 0 %}
 				<li class="header">

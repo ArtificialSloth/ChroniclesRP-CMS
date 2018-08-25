@@ -1,4 +1,4 @@
-module.exports = (crp, callback) => {
+module.exports = (crp) => {
 	crp.pages = {};
 
 	crp.pages.getPages = (filter, cb) => {
@@ -51,6 +51,4 @@ module.exports = (crp, callback) => {
 			crp.db.deleteOne('pages', {_id: page._id}, cb);
 		});
 	};
-
-	callback(null, crp);
 };

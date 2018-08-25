@@ -1,17 +1,17 @@
 module.exports = (crp, callback) => {
 	crp.express.app.post('/api/new-forum', (req, res) => {
-		crp.util.getCategoryData(req.body.category, (err, category) => {
+		crp.forums.getCategoryData(req.body.category, (err, category) => {
 			if (err) return res.send(err);
 			if (!category) return res.send('noCategory');
 
-			crp.util.getChapterData(category.chapter, (err, chapter) => {
+			crp.chapters.get(category.chapter, (err, chapter) => {
 				if (err) return res.send(err);
 
-				crp.util.getUserData(req.user, (err, user) => {
+				crp.members.get(req.user, (err, user) => {
 					if (err) return res.send(err);
 					if (!user) return res.send('noUser');
 
-					var member = crp.util.getChapterMember(chapter, user._id);
+					var member = crp.chapter.getMember(chapter, user._id);
 					if ((member && member.role >= 2) || user.role >= 3) {
 						var forumData = {
 							name: req.body.name,
@@ -19,7 +19,7 @@ module.exports = (crp, callback) => {
 							category: req.body.category
 						};
 
-						crp.util.addForum(forumData, (err, result) => {
+						crp.forums.addForum(forumData, (err, result) => {
 							if (err) return res.send(err);
 
 							res.send(result);
@@ -33,22 +33,22 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/new-topic', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 1) return res.send('notAllowed');
 
-			crp.util.getForumData(req.body.parent, (err, forum) => {
+			crp.forums.getForumData(req.body.parent, (err, forum) => {
 				if (err) return res.send(err);
 				if (!forum) return res.send('noForum');
 
-				crp.util.getCategoryData(forum.category, (err, category) => {
+				crp.forums.getCategoryData(forum.category, (err, category) => {
 					if (err) return res.send(err);
 					if (!category) return res.send('noCategory');
 					if (category.role && user.role < category.role && user.role < 3) return res.send('notAllowed');
 
-					crp.util.getChapterData(category.chapter, (err, chapter) => {
+					crp.chapters.get(category.chapter, (err, chapter) => {
 						if (err) return res.send(err);
-						if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
+						if (chapter && !crp.chapters.getMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
 
 						var topicData = {
 							author: req.user,
@@ -58,7 +58,7 @@ module.exports = (crp, callback) => {
 							parent: req.body.parent
 						};
 
-						crp.util.addTopic(topicData, (err, result) => {
+						crp.forums.addTopic(topicData, (err, result) => {
 							if (err) return res.send(err);
 
 							res.send(result);
@@ -70,26 +70,26 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/new-reply', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 1) return res.send('notAllowed');
 
-			crp.util.getTopicData(req.body.parent, (err, topic) => {
+			crp.forums.getTopicData(req.body.parent, (err, topic) => {
 				if (err) return res.send(err);
 				if (!topic) return res.send('noTopic');
 
-				crp.util.getForumData(topic.parent, (err, forum) => {
+				crp.forums.getForumData(topic.parent, (err, forum) => {
 					if (err) return res.send(err);
 					if (!forum) return res.send('noForum');
 
-					crp.util.getCategoryData(forum.category, (err, category) => {
+					crp.forums.getCategoryData(forum.category, (err, category) => {
 						if (err) return res.send(err);
 						if (!category) return res.send('noCategory');
 						if (category.role && user.role < category.role && user.role < 3) return res.send('notAllowed');
 
-						crp.util.getChapterData(category.chapter, (err, chapter) => {
+						crp.chapters.get(category.chapter, (err, chapter) => {
 							if (err) return res.send(err);
-							if (chapter && !crp.util.getChapterMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
+							if (chapter && !crp.chapters.getMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
 
 							var replyData = {
 								author: req.user,
@@ -97,7 +97,7 @@ module.exports = (crp, callback) => {
 								parent: req.body.parent
 							};
 
-							crp.util.addReply(replyData, (err, result) => {
+							crp.forums.addReply(replyData, (err, result) => {
 								if (err) return res.send(err);
 
 								res.send(result);
@@ -110,11 +110,11 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/edit-topic', (req, res) => {
-		crp.util.getTopicData(req.body.topicid, (err, topic) => {
+		crp.forums.getTopicData(req.body.topicid, (err, topic) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || (!topic.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
 
@@ -123,7 +123,7 @@ module.exports = (crp, callback) => {
 					content: req.body.body,
 				};
 
-				crp.util.setTopicData(topic._id, topicData, (err, result) => {
+				crp.forums.setTopicData(topic._id, topicData, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -133,11 +133,11 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/edit-reply', (req, res) => {
-		crp.util.getReplyData(req.body.replyid, (err, reply) => {
+		crp.forums.getReplyData(req.body.replyid, (err, reply) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || (!reply.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
 
@@ -145,7 +145,7 @@ module.exports = (crp, callback) => {
 					content: req.body.body,
 				};
 
-				crp.util.setReplyData(reply._id, replyData, (err, result) => {
+				crp.forums.setReplyData(reply._id, replyData, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -155,24 +155,24 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/remove-forum', (req, res) => {
-		crp.util.getForumData(req.body.forumid, (err, forum) => {
+		crp.forums.getForumData(req.body.forumid, (err, forum) => {
 			if (err) return res.send(err);
 			if (!forum) return res.send('noForum');
 
-			crp.util.getCategoryData(forum.category, (err, category) => {
+			crp.forums.getCategoryData(forum.category, (err, category) => {
 				if (err) return res.send(err);
 				if (!category) return res.send('noCategory');
 
-				crp.util.getChapterData(category.chapter, (err, chapter) => {
+				crp.chapters.get(category.chapter, (err, chapter) => {
 					if (err) return res.send(err);
 
-					crp.util.getUserData(req.user, (err, user) => {
+					crp.members.get(req.user, (err, user) => {
 						if (err) return res.send(err);
 						if (!user) return res.send('noUser');
 
-						var member = crp.util.getChapterMember(chapter, user._id);
+						var member = crp.chapters.getMember(chapter, user._id);
 						if ((member && member.role >= 2) || user.role >= 3) {
-							crp.util.removeForum(forum._id, (err, result) => {
+							crp.forums.removeForum(forum._id, (err, result) => {
 								if (err) return res.send(err);
 
 								res.send(result);
@@ -187,16 +187,16 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/remove-topic', (req, res) => {
-		crp.util.getTopicData(req.body.topicid, (err, topic) => {
+		crp.forums.getTopicData(req.body.topicid, (err, topic) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
 				if (topic.author.equals(user._id) || user.role >= 3) {
-					crp.util.removeTopic(topic._id, (err, result) => {
+					crp.forums.removeTopic(topic._id, (err, result) => {
 						if (err) return res.send(err);
 
 						res.send(result);
@@ -209,16 +209,16 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/remove-reply', (req, res) => {
-		crp.util.getReplyData(req.body.replyid, (err, reply) => {
+		crp.forums.getReplyData(req.body.replyid, (err, reply) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
 				if (reply.author.equals(user._id) || user.role >= 3) {
-					crp.util.removeReply(reply._id, (err, result) => {
+					crp.forums.removeReply(reply._id, (err, result) => {
 						if (err) return res.send(err);
 
 						res.send(result);
@@ -231,7 +231,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/new-topic', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -243,7 +243,7 @@ module.exports = (crp, callback) => {
 				parent: req.body.parent
 			};
 
-			crp.util.addTopic(topicData, (err, result) => {
+			crp.forums.addTopic(topicData, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -252,11 +252,11 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/edit-topic', (req, res) => {
-		crp.util.getTopicData(req.body.topic_id, (err, topic) => {
+		crp.forums.getTopicData(req.body.topic_id, (err, topic) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -267,7 +267,7 @@ module.exports = (crp, callback) => {
 					parent: crp.db.objectID(req.body.topic_parent)
 				};
 
-				crp.util.setTopicData(topic._id, topicData, (err, result) => {
+				crp.forums.setTopicData(topic._id, topicData, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);
@@ -277,7 +277,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/new-reply', (req, res) => {
-		crp.util.getUserData(req.user, (err, user) => {
+		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -288,7 +288,7 @@ module.exports = (crp, callback) => {
 				parent: req.body.parent
 			};
 
-			crp.util.addReply(replyData, (err, result) => {
+			crp.forums.addReply(replyData, (err, result) => {
 				if (err) return res.send(err);
 
 				res.send(result);
@@ -297,11 +297,11 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.app.post('/api/admin/edit-reply', (req, res) => {
-		crp.util.getReplyData(req.body.reply_id, (err, reply) => {
+		crp.forums.getReplyData(req.body.reply_id, (err, reply) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');
 
-			crp.util.getUserData(req.user, (err, user) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -310,7 +310,7 @@ module.exports = (crp, callback) => {
 					content: req.body.reply_body
 				};
 
-				crp.util.setReplyData(reply._id, replyData, (err, result) => {
+				crp.forums.setReplyData(reply._id, replyData, (err, result) => {
 					if (err) return res.send(err);
 
 					res.send(result);

@@ -1,4 +1,4 @@
-module.exports = (crp, callback) => {
+module.exports = (crp) => {
 	crp.storage = {};
 
 	var storage = new require('@google-cloud/storage')({projectId: process.env.GOOGLE_PROJECT_ID});
@@ -33,6 +33,4 @@ module.exports = (crp, callback) => {
 
 		return `https://storage.googleapis.com/${file.bucket.name}/${file.name}`;
 	};
-
-	callback(null, crp);
 };

@@ -36,7 +36,7 @@
 							<a onclick="crpGetPage('/chapters/{{game.slug}}')"><img src="{{game.icon}}" width="16px" height="16px" /> {{game.name}}</a>
 							{% for chapter in chapters %}
 								<ul class="sub-menu">
-									<li class="menu-item">{{crp.util.getChapterLink(chapter) | safe}}</li>
+									<li class="menu-item">{{crp.chapters.getLink(chapter) | safe}}</li>
 								</ul>
 							{% endfor %}
 						</li>
@@ -56,7 +56,7 @@
 				<a onclick="crpGetPage('/members/{{user.nicename}}')">
 					{{user.display_name}}
 					{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
-					{% set chapters = crp.util.getChapterInvites(chapters, user._id) %}
+					{% set chapters = crp.chapters.getInvites(chapters, user._id) %}
 					{% if chapters.length > 0 %}
 						<span onclick="crpGetPage('/members/{{user.nicename}}/messages')" class="count">{{chapters.length}}</span>
 					{% endif %}
