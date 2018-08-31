@@ -76,12 +76,12 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.requireFiles = (file, cb) => {
-		crp.fs.readdir(crp.ROOT + '/api/', (err, files) => {
+		crp.fs.readdir(crp.root + '/api/', (err, files) => {
 			if (err) return cb(err);
 
 			crp.async.each(files, (dir, callback) => {
 				try {
-					require(crp.ROOT + '/api/' + dir + file)(crp, callback);
+					require(crp.root + '/api/' + dir + file)(crp, callback);
 				} catch(err) {
 					if (err.code != 'MODULE_NOT_FOUND') return callback(err);
 					callback();

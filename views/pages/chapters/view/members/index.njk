@@ -33,7 +33,7 @@
 			{% for member in members %}
 				{% set member = crp.util.findObjectInArray(users, '_id', member._id.toString()) %}
 				<ul>
-					<li><a onclick="crpGetPage('/members/{{member.nicename}}')"><img class="profile-pic" src="{{crp.members.getUserProfilePic(member)}}" /></a></li>
+					<li><a onclick="crpGetPage('/members/{{member.nicename}}')"><img class="profile-pic" src="{{crp.members.getProfilePic(member)}}" /></a></li>
 					<li>
 						<h1><a onclick="crpGetPage('/members/{{member.nicename}}')">{{member.display_name}}</a></h1>
 						{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}

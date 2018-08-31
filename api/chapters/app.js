@@ -1,5 +1,5 @@
 module.exports = (crp, callback) => {
-	crp.express.app.post('/api/add-chapter', (req, res) => {
+	crp.app.post('/api/add-chapter', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
 			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
@@ -21,7 +21,7 @@ module.exports = (crp, callback) => {
 		{name: 'profile_pic', maxCount: 1},
 		{name: 'cover_pic', maxCount: 1}
 	]);
-	crp.express.app.post('/api/edit-chapter', editChapter, (req, res) => {
+	crp.app.post('/api/edit-chapter', editChapter, (req, res) => {
 		if (req.files) {
 			req.body.img = {};
 			if (req.files.profile_pic) req.body.img.profile = req.files.profile_pic;
@@ -47,7 +47,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/remove-chapter', (req, res) => {
+	crp.app.post('/api/remove-chapter', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
@@ -67,7 +67,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/join-chapter', (req, res) => {
+	crp.app.post('/api/join-chapter', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
@@ -81,7 +81,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/leave-chapter', (req, res) => {
+	crp.app.post('/api/leave-chapter', (req, res) => {
 		crp.chapters.removeMember(req.body.chapterid, req.user, (err, result) => {
 			if (err) return res.send(err);
 
@@ -89,7 +89,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/accept-chapter-invite', (req, res) => {
+	crp.app.post('/api/accept-chapter-invite', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
@@ -109,7 +109,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/promote-chapter-member', (req, res) => {
+	crp.app.post('/api/promote-chapter-member', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
@@ -129,7 +129,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/demote-chapter-member', (req, res) => {
+	crp.app.post('/api/demote-chapter-member', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
@@ -149,7 +149,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/invite-chapter-member', (req, res) => {
+	crp.app.post('/api/invite-chapter-member', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
@@ -169,7 +169,7 @@ module.exports = (crp, callback) => {
 		});;
 	});
 
-	crp.express.app.post('/api/get-chapter-invites', (req, res) => {
+	crp.app.post('/api/get-chapter-invites', (req, res) => {
 		crp.chapters.find({}, (err, chapters) => {
 			if (err) return res.send(err);
 
@@ -182,7 +182,7 @@ module.exports = (crp, callback) => {
 		});;
 	});
 
-	crp.express.app.post('/api/remove-chapter-member', (req, res) => {
+	crp.app.post('/api/remove-chapter-member', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');

@@ -1,5 +1,5 @@
 module.exports = (crp, callback) => {
-	crp.express.app.post('/api/new-forum', (req, res) => {
+	crp.app.post('/api/new-forum', (req, res) => {
 		crp.forums.getCategoryData(req.body.category, (err, category) => {
 			if (err) return res.send(err);
 			if (!category) return res.send('noCategory');
@@ -11,7 +11,7 @@ module.exports = (crp, callback) => {
 					if (err) return res.send(err);
 					if (!user) return res.send('noUser');
 
-					var member = crp.chapter.getMember(chapter, user._id);
+					var member = crp.chapters.getMember(chapter, user._id);
 					if ((member && member.role >= 2) || user.role >= 3) {
 						var forumData = {
 							name: req.body.name,
@@ -32,7 +32,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/new-topic', (req, res) => {
+	crp.app.post('/api/new-topic', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 1) return res.send('notAllowed');
@@ -69,7 +69,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/new-reply', (req, res) => {
+	crp.app.post('/api/new-reply', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 1) return res.send('notAllowed');
@@ -109,7 +109,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/edit-topic', (req, res) => {
+	crp.app.post('/api/edit-topic', (req, res) => {
 		crp.forums.getTopicData(req.body.topicid, (err, topic) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
@@ -132,7 +132,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/edit-reply', (req, res) => {
+	crp.app.post('/api/edit-reply', (req, res) => {
 		crp.forums.getReplyData(req.body.replyid, (err, reply) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');
@@ -154,7 +154,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/remove-forum', (req, res) => {
+	crp.app.post('/api/remove-forum', (req, res) => {
 		crp.forums.getForumData(req.body.forumid, (err, forum) => {
 			if (err) return res.send(err);
 			if (!forum) return res.send('noForum');
@@ -186,7 +186,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/remove-topic', (req, res) => {
+	crp.app.post('/api/remove-topic', (req, res) => {
 		crp.forums.getTopicData(req.body.topicid, (err, topic) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
@@ -208,7 +208,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/remove-reply', (req, res) => {
+	crp.app.post('/api/remove-reply', (req, res) => {
 		crp.forums.getReplyData(req.body.replyid, (err, reply) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');
@@ -230,7 +230,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/admin/new-topic', (req, res) => {
+	crp.app.post('/api/admin/new-topic', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
@@ -251,7 +251,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/admin/edit-topic', (req, res) => {
+	crp.app.post('/api/admin/edit-topic', (req, res) => {
 		crp.forums.getTopicData(req.body.topic_id, (err, topic) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
@@ -276,7 +276,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/admin/new-reply', (req, res) => {
+	crp.app.post('/api/admin/new-reply', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
@@ -296,7 +296,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/admin/edit-reply', (req, res) => {
+	crp.app.post('/api/admin/edit-reply', (req, res) => {
 		crp.forums.getReplyData(req.body.reply_id, (err, reply) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');

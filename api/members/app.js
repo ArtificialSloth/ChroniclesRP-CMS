@@ -1,5 +1,5 @@
 module.exports = (crp, callback) => {
-	crp.express.app.post('/login', (req, res, next) => {
+	crp.app.post('/login', (req, res, next) => {
 		crp.auth.passport.authenticate('local', (err, user) => {
 			if (err) return next(err);
 			if (!crp.auth.failedLogins[req.ip]) crp.auth.failedLogins[req.ip] = {count: 0, timeout: null};
@@ -33,12 +33,12 @@ module.exports = (crp, callback) => {
 		})(req, res, next);
 	});
 
-	crp.express.app.get('/logout', (req, res) => {
+	crp.app.get('/logout', (req, res) => {
 		req.logout();
 		res.redirect('/');
 	});
 
-	crp.express.app.post('/api/register', (req, res) => {
+	crp.app.post('/api/register', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
 			var userData = {
 				login: req.body.user_login,
@@ -67,7 +67,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/activate', (req, res) => {
+	crp.app.post('/api/activate', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 
@@ -103,7 +103,7 @@ module.exports = (crp, callback) => {
 		{name: 'profile_pic', maxCount: 1},
 		{name: 'cover_pic', maxCount: 1}
 	]);
-	crp.express.app.post('/api/admin/edit-user', editUser, (req, res) => {
+	crp.app.post('/api/admin/edit-user', editUser, (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 
@@ -140,7 +140,7 @@ module.exports = (crp, callback) => {
 		})
 	});
 
-	crp.express.app.post('/api/admin/add-user', (req, res) => {
+	crp.app.post('/api/admin/add-user', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 
@@ -164,7 +164,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.express.app.post('/api/admin/remove-user', (req, res) => {
+	crp.app.post('/api/admin/remove-user', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (user.role < 3) return res.send('notAllowed');

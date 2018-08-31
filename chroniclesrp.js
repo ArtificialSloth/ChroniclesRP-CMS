@@ -3,13 +3,13 @@ var async = require('async');
 async.waterfall([
 	(callback) => {
 		callback(null, {
-			ROOT: __dirname,
 			async: async,
+			root: __dirname,
 			fs: require('fs'),
+			request: require('request'),
+			moment: require('moment-timezone'),
 			cmd: require('child_process').exec,
 			prod: (process.env.NODE_ENV == 'production'),
-			moment: require('moment-timezone'),
-			request: require('request'),
 			browserRefresh: process.env.BROWSER_REFRESH_URL,
 			redis: require('redis').createClient(process.env.REDIS_URL)
 		});
@@ -22,6 +22,9 @@ async.waterfall([
 	},
 	(crp, callback) => {
 		require('./api/database/db.js')(crp, callback);
+	},
+	(crp, callback) => {
+		require('./api/discord/discord.js')(crp, callback);
 	},
 	(crp, callback) => {
 		require('./api/auth/auth.js')(crp);
@@ -47,8 +50,8 @@ async.waterfall([
 			crp.fs.readFile(process.env.CERT, (err, cert) => {
 				if (err) return console.error(err);
 
-				var httpServer = crp.http.createServer(crp.express.app);
-				var httpsServer = crp.https.createServer({key: key, cert: cert}, crp.express.app);
+				var httpServer = crp.http.createServer(crp.app);
+				var httpsServer = crp.https.createServer({key: key, cert: cert}, crp.app);
 
 				httpServer.listen((process.env.PORT || 80), () => {
 					if (crp.prod) {

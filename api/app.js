@@ -1,13 +1,13 @@
 module.exports = (crp, callback) => {
 	crp.express = require('express');
-	crp.express.app = crp.express();
+	crp.app = crp.express();
 
 	crp.http = require('http');
 	crp.https = require('https');
 
 	crp.nunjucks = require('nunjucks');
 	crp.nunjucks.configure('views', {
-		express: crp.express.app
+		express: crp.app
 	}).addExtension('query', new function() {
 		this.tags = ['query'];
 
@@ -46,7 +46,7 @@ module.exports = (crp, callback) => {
 		};
 	});
 
-	crp.express.limiter = require('express-limiter')(crp.express.app, crp.redis);
+	crp.express.limiter = require('express-limiter')(crp.app, crp.redis);
 	crp.express.limiter({
 		path: '*',
 		method: 'all',
@@ -66,7 +66,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.express.upload = require('multer')({
-		dest: crp.ROOT + '/uploads',
+		dest: crp.root + '/uploads',
 		limits: {
 			fileSize: 2 * 1024 * 1024
 		},
@@ -80,12 +80,12 @@ module.exports = (crp, callback) => {
 		}
 	});
 
-	crp.express.app.use(crp.express.static('public'));
-	crp.express.app.use(require('body-parser').json());
-	crp.express.app.use(require('body-parser').urlencoded({
+	crp.app.use(crp.express.static('public'));
+	crp.app.use(require('body-parser').json());
+	crp.app.use(require('body-parser').urlencoded({
 		extended: false
 	}));
-	crp.express.app.use(require('helmet')({
+	crp.app.use(require('helmet')({
 		expectCt: {
 			maxAge: 123
 		},
@@ -98,7 +98,7 @@ module.exports = (crp, callback) => {
 			if (err) return cb(err);
 
 			if (crp.prod) {
-				crp.express.app.use((req, res, next) => {
+				crp.app.use((req, res, next) => {
 					if (req.secure) return next();
 
     				res.redirect('https://' + req.headers.host + req.url);
@@ -106,7 +106,7 @@ module.exports = (crp, callback) => {
 				});
 			}
 
-			crp.express.app.get('/*', (req, res) => {
+			crp.app.get('/*', (req, res) => {
 				crp.util.processPage(req.url, req, (err, page) => {
 					crp.nunjucks.render('index.njk', page.context, (err, result) => {
 						if (err) return console.error(err);
@@ -116,7 +116,7 @@ module.exports = (crp, callback) => {
 				});
 			});
 
-			crp.express.app.post('/api/get-page', (req, res) => {
+			crp.app.post('/api/get-page', (req, res) => {
 				crp.util.processPage(req.body.page, req, (err, page) => {
 					crp.nunjucks.render('pages' + page.path, page.context, (err, result) => {
 						if (err) return console.error(err);
@@ -126,7 +126,7 @@ module.exports = (crp, callback) => {
 				});
 			});
 
-			crp.express.app.post('/api/get-subpage', (req, res) => {
+			crp.app.post('/api/get-subpage', (req, res) => {
 				crp.util.processPage(req.body.page, req, (err, page) => {
 					crp.nunjucks.render('pages' + page.context.subPage, page.context, (err, result) => {
 						if (err) return console.log(err);
@@ -136,7 +136,7 @@ module.exports = (crp, callback) => {
 				});
 			});
 
-			crp.express.app.post('/api/github', (req, res) => {
+			crp.app.post('/api/github', (req, res) => {
 				if (!req.headers['user-agent'].includes('GitHub-Hookshot')) return res.sendStatus(401)
 
 				var hmac = crp.auth.crypto.createHmac('sha1', process.env.GITHUB_SECRET);
@@ -150,7 +150,7 @@ module.exports = (crp, callback) => {
 				});
 			});
 
-			crp.express.app.post('/api/admin/edit-site', (req, res) => {
+			crp.app.post('/api/admin/edit-site', (req, res) => {
 				var site = {
 					name: req.body.site_name,
 					tagline: req.body.site_tagline,
