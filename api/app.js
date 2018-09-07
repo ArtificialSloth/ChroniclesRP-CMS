@@ -107,7 +107,7 @@ module.exports = (crp, callback) => {
 			}
 
 			crp.app.get('/*', (req, res) => {
-				crp.util.processPage(req.url, req, (err, page) => {
+				crp.pages.processPage(req.url, req.user, (err, page) => {
 					crp.nunjucks.render('index.njk', page.context, (err, result) => {
 						if (err) return console.error(err);
 
@@ -117,7 +117,7 @@ module.exports = (crp, callback) => {
 			});
 
 			crp.app.post('/api/get-page', (req, res) => {
-				crp.util.processPage(req.body.page, req, (err, page) => {
+				crp.pages.processPage(req.body.page, req.user, (err, page) => {
 					crp.nunjucks.render('pages' + page.path, page.context, (err, result) => {
 						if (err) return console.error(err);
 
@@ -127,7 +127,8 @@ module.exports = (crp, callback) => {
 			});
 
 			crp.app.post('/api/get-subpage', (req, res) => {
-				crp.util.processPage(req.body.page, req, (err, page) => {
+				crp.pages.processPage(req.body.page, req.user, (err, page) => {
+					if (!page.context.subPage) page.context.subPage = '/404/index.njk';
 					crp.nunjucks.render('pages' + page.context.subPage, page.context, (err, result) => {
 						if (err) return console.log(err);
 

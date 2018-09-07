@@ -9,8 +9,8 @@
 			<ul>
 				<li><img src="{{crp.members.getProfilePic(user)}}" /></li>
 				<li>
-					<a onclick="crpGetPage('/members/{{user.nicename}}')">{{user.display_name}}</a>
-					<a href="/logout">Logout</a>
+					<a href="/members/{{user.nicename}}">{{user.display_name}}</a>
+					<a class="redirect" href="/logout">Logout</a>
 				</li>
 			</ul>
 		{% else %}
@@ -45,9 +45,9 @@
 
 					{% if not category.role or user.role >= category.role %}
 						<li>
-							<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a>
+							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
 							by
-							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+							<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 							<br />
 							{{crp.moment(topic.date).fromNow()}}
 						</li>

@@ -7,16 +7,12 @@
 	var drag;
 	var pos;
 
-	$('.home .slider .slides .post ul').click((e) => {
-		e.stopPropagation();
-	});
-
 	$('.home .slider .slides .post ul').mousedown((e) => {
 		e.stopPropagation();
 	});
 
 	slider.click((e) => {
-		if (!anim) {
+		if (!anim && !$(e.target).is('ul') && $('.home .slider .slides .post ul').has(e.target).length == 0) {
 			if (e.clientX >= (slider.parent().offset().left + (width / 2))) {
 				sliderNext();
 			} else {

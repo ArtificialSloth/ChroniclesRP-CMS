@@ -24,12 +24,14 @@ async.waterfall([
 		require('./api/database/db.js')(crp, callback);
 	},
 	(crp, callback) => {
+		require('./api/pages/pages.js')(crp, callback);
+	},
+	(crp, callback) => {
 		require('./api/discord/discord.js')(crp, callback);
 	},
 	(crp, callback) => {
 		require('./api/auth/auth.js')(crp);
 		require('./api/mail/mail.js')(crp);
-		require('./api/pages/pages.js')(crp);
 		require('./api/posts/posts.js')(crp);
 		require('./api/forums/forums.js')(crp);
 		require('./api/members/members.js')(crp);

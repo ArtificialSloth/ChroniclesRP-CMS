@@ -21,14 +21,14 @@
 				<li class="forum">
 					<ul>
 						<li>
-							<a class="forum-name" onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
+							<a class="forum-name" href="/forums/{{forum.slug}}">{{forum.name}}</a>
 							<div class="forum-desc">{{forum.desc}}</div>
 						</li>
 						<li>{{topics.length}}</li>
 						<li>
 							{% if topics[0] %}
 								{% lookup 'users', {_id: topics[0].author}, 'author' %}
-								<a onclick="crpGetPage('/forums/{{forum.slug}}/{{topics[0]._id}}')">{{topics[0].title}}</a> by <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+								<a href="/forums/{{forum.slug}}/{{topics[0]._id}}">{{topics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 							{% else %}
 								No Topics
 							{% endif %}

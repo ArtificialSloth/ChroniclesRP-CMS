@@ -32,11 +32,7 @@ module.exports = (crp) => {
 			crp.db.replaceOne('posts', {_id: post._id}, newPost, (err, result) => {
 				if (err) return cb(err);
 
-				crp.pages.setPageData({slug: post.slug}, {slug: newPost.slug}, (err, result) => {
-					if (err) return cb(err);
-
-					cb(null, newPost);
-				});
+				cb(null, newPost);
 			});
 		});
 	};
@@ -59,15 +55,7 @@ module.exports = (crp) => {
 		crp.db.insertOne('posts', post, (err, result) => {
 			if (err) return cb(err);
 
-			crp.pages.addPage({
-				slug: post.slug,
-				path: '/posts/index.njk',
-				context: {postid: result.insertedId}
-			}, (err, page) => {
-				if (err) return cb(err);
-
-				cb(null, post);
-			});
+			cb(null, post);
 		});
 	};
 
@@ -75,11 +63,28 @@ module.exports = (crp) => {
 		crp.posts.get(postid, (err, post) => {
 			if (err) return cb(err);
 
-			crp.db.deleteOne('posts', {_id: post._id}, (err, result) => {
-				if (err) return cb(err);
-
-				crp.pages.removePage({slug: post.slug}, cb);
-			});
+			crp.db.deleteOne('posts', {_id: post._id}, cb);
 		});
 	};
+
+	crp.pages.add((slug, cb) => {
+		if (slug == '/admin/posts') return cb(null, {
+			path: '/admin/index.njk',
+			subPage: '/posts/admin/index.njk',
+			role: 3
+		});
+
+		crp.posts.find({}, (err, posts) => {
+			if (err) return cb(err);
+
+			for (var i in posts) {
+				if (slug == posts[i].slug) return cb(null, {
+					path: '/posts/index.njk',
+					context: {postid: posts[i]._id}
+				});
+			}
+
+			cb();
+		});
+	});
 };

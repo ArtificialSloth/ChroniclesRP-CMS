@@ -139,42 +139,63 @@
 		input.change();
 	}
 
-	window.onpopstate = (e) => {
-		if (e.state) {
-			var page = e.state.page;
+	$(() => {
+		window.onpopstate = (e) => {
+			if (e.state) {
+				var page = e.state.page;
 
-			crpGetPage(page);
+				crpGetPage(page);
+			}
+		};
+
+		$(document).on('click', 'a', (e) => {
+			var target = $(e.target).closest('a');
+			if (target.hasClass('redirect') || !target.prop('href')) return true;
+
+			var href = target.prop('href').replace(`${window.location.protocol}//${window.location.hostname}`, '');
+			if (target.hasClass('subpage')) {
+				crpGetSubPage(
+					href,
+					target.attr('container'),
+					target.attr('newurl')
+				);
+
+				return false;
+			}
+
+			crpGetPage(href);
+			return false;
+		});
+
+		var requirements = [
+			'cookies',
+			'inputtypes',
+			'cssanimations',
+			'borderradius',
+			'csscalc',
+			'checked',
+			'displaytable',
+			'flexbox',
+			'cssgradients',
+			'lastchild',
+			'nthchild',
+			'opacity',
+			'rgba',
+			'csstransforms',
+			'csstransitions',
+			'cssvmaxunit',
+			'cssvminunit',
+			'oninput',
+			'fileinput',
+			'xhrresponsetype',
+			'xhr2'
+		];
+
+		for (var i in requirements) {
+			if (!Modernizr[requirements[i]]) {
+				window.alert(`Your browser doesn't support ${requirements[i]}. Some parts of this site may not behave as expected.`);
+				break;
+			}
 		}
-	};
-
-	var requirements = [
-		'cookies',
-		'inputtypes',
-		'cssanimations',
-		'borderradius',
-		'csscalc',
-		'checked',
-		'displaytable',
-		'flexbox',
-		'cssgradients',
-		'lastchild',
-		'nthchild',
-		'opacity',
-		'rgba',
-		'csstransforms',
-		'csstransitions',
-		'cssvmaxunit',
-		'cssvminunit',
-		'oninput',
-		'fileinput',
-		'xhrresponsetype',
-		'xhr2'
-	];
-
-	for (var i in requirements) {
-		if (!Modernizr[requirements[i]]) {
-			window.alert(`Your browser doesn't support ${requirements[i]}. Some parts of this site may not behave as expected.`);
-			break;
-		}
-	}
+	});
 </script>

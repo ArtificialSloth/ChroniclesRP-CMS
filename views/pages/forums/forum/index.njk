@@ -9,9 +9,9 @@
 		{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
 
 		<p class="breadcrumbs">
-			<a onclick="crpGetPage('/')">Home</a>
+			<a href="/">Home</a>
 			<span>›</span>
-			<a onclick="crpGetPage('/forums')">Index</a>
+			<a href="/forums">Index</a>
 			<span>›</span>
 			<span>{{forum.name}}</span>
 		</p>
@@ -33,16 +33,16 @@
 					<li class="topic">
 						<ul>
 							<li>
-								<a class="topic-name" onclick="crpGetPage('/forums/{{forum.slug}}/{{topic._id}}')">{{topic.title}}</a>
+								<a class="topic-name" href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
 								<div class="topic-author">
-									Started By: <a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+									Started By: <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 								</div>
 							</li>
 							<li>{{replies.length}}</li>
 							<li>
 								{% if replies[0] %}
 									{% lookup 'users', {_id: replies[0].author}, 'author' %}
-									<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+									<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 									<br />
 									{{crp.moment(replies[0].date).fromNow()}}
 								{% else %}

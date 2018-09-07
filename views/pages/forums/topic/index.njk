@@ -10,11 +10,11 @@
 		{% lookup 'users', {_id: userid}, 'user' %}
 
 		<p class="breadcrumbs">
-			<a onclick="crpGetPage('/')">Home</a>
+			<a href="/">Home</a>
 			<span>›</span>
-			<a onclick="crpGetPage('/forums')">Index</a>
+			<a href="/forums">Index</a>
 			<span>›</span>
-			<a onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
+			<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
 			<span>›</span>
 			<span>{{topic.title}}</span>
 		</p>
@@ -39,7 +39,7 @@
 				<ul>
 					<li>
 						<img src="{{crp.members.getProfilePic(author)}}" width="80" height="80" />
-						<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+						<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 						<div class="role">{{crp.members.parseRole(author.role)}}</div>
 					</li>
 					<li>{{topic.content | safe}}</li>
@@ -74,7 +74,7 @@
 						<li>
 
 							<img src="{{crp.members.getProfilePic(author)}}" width="80" height="80" />
-							<a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a>
+							<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 							<div class="role">{{crp.members.parseRole(author.role)}}</div>
 						</li>
 						<li>{{reply.content | safe}}</li>

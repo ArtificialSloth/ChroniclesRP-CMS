@@ -92,36 +92,6 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.processPage = (path, req, cb) => {
-		crp.db.findOne('site', {}, (err, site) => {
-			if (err) return cb(err);
-			if (!site) return cb(null, {path: '/404/index.njk', context: context});
-
-			var context = {
-				crp: crp,
-				css: site.css,
-				userid: req.user
-			};
-
-			crp.pages.getPages({slug: path}, (err, pages) => {
-				if (err) return cb(err);
-				if (!pages[0]) return cb(null, {path: '/404/index.njk', context: context});
-
-				crp.members.get(req.user, (err, user) => {
-					if (err) return cb(err);
-					if ((!user && pages[0].role) || (user && pages[0].role && user.role < pages[0].role) || (user && pages[0].role && user.role < 3)) return cb(null, {path: '/404/index.njk', context: context});
-
-					path = pages[0].path;
-					if (pages[0].subPage) context.subPage = pages[0].subPage;
-					if (pages[0].context) context = Object.assign(context, pages[0].context);
-
-					context.path = path;
-					cb(null, {path: path, context: context});
-				});
-			});
-		});
-	};
-
 	crp.util.editSite = (data, cb) => {
 		crp.db.findOne('site', {}, (err, site) => {
 			if (err) return cb(err);

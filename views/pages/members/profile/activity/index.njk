@@ -14,17 +14,17 @@
 				<ul>
 					<li><img class="profile-pic" src="{{crp.members.getProfilePic(profile)}}" /></li>
 					<li>
-						<a onclick="crpGetPage('/members/{{profile.nicename}}')">{{profile.display_name}}</a>
+						<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
 						started topic
-						<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">{{activity.title}}</a>
+						<a href="/forums/{{parent.slug}}/{{activity._id}}">{{activity.title}}</a>
 						in
-						<a onclick="crpGetPage('/forums/{{parent.slug}}')">{{parent.name}}</a>
+						<a href="/forums/{{parent.slug}}">{{parent.name}}</a>
 						{{crp.moment(activity.date).fromNow()}}
 
 						<div>
 							{{activity.content | safe | striptags(true) | truncate}}
 							{% if activity.content.length > 255 %}
-								<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
+								<a href="/forums/{{parent.slug}}/{{activity._id}}">[Read More]</a>
 							{% endif %}
 						</div>
 					</li>
@@ -37,17 +37,17 @@
 					<ul>
 						<li><img class="profile-pic" src="{{crp.members.getProfilePic(profile)}}" /></li>
 						<li>
-							<a onclick="crpGetPage('/members/{{profile.nicename}}')">{{profile.display_name}}</a>
+							<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
 							replied to
-							<a onclick="crpGetPage('/forums/{{forum.slug}}/{{parent._id}}')">{{parent.title}}</a>
+							<a href="/forums/{{forum.slug}}/{{parent._id}}">{{parent.title}}</a>
 							in
-							<a onclick="crpGetPage('/forums/{{forum.slug}}')">{{forum.name}}</a>
+							<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
 							{{crp.moment(activity.date).fromNow()}}
 
 							<div>
 								{{activity.content | safe | striptags(true) | truncate}}
 								{% if activity.content.length > 255 %}
-									<a onclick="crpGetPage('/forums/{{parent.slug}}/{{activity._id}}')">[Read More]</a>
+									<a href="/forums/{{parent.slug}}/{{activity._id}}">[Read More]</a>
 								{% endif %}
 							</div>
 						</li>

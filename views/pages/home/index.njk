@@ -10,10 +10,10 @@
 			<div class="post" style="transform:translate(0); background-image:url({{posts[posts.length - 1].img}})">
 				<ul>
 					<li>News</li>
-					<li><a onclick="crpGetPage('{{posts[posts.length - 1].slug}}')">{{posts[posts.length - 1].title}}</a></li>
-					<li><a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[posts.length - 1].date)}}</li>
+					<li><a href="{{posts[posts.length - 1].slug}}">{{posts[posts.length - 1].title}}</a></li>
+					<li><a href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[posts.length - 1].date)}}</li>
 					<li>{{posts[posts.length - 1].content | safe | striptags(true) | truncate(150)}}</li>
-					<li><a onclick="crpGetPage('{{posts[posts.length - 1].slug}}')">Read More</a></li>
+					<li><a href="{{posts[posts.length - 1].slug}}">Read More</a></li>
 				</ul>
 			</div>
 
@@ -22,10 +22,10 @@
 				<div class="post" style="transform:translate({{posts.indexOf(post) + 1}}00%); background-image:url({{post.img}})">
 					<ul>
 						<li>News</li>
-						<li><a onclick="crpGetPage('{{post.slug}}')">{{post.title}}</a></li>
-						<li><a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</li>
+						<li><a href="{{post.slug}}">{{post.title}}</a></li>
+						<li><a href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</li>
 						<li>{{post.content | safe | striptags(true) | truncate(150)}}</li>
-						<li><a onclick="crpGetPage('{{post.slug}}')">Read More</a></li>
+						<li><a href="{{post.slug}}">Read More</a></li>
 					</ul>
 				</div>
 			{% endfor %}
@@ -34,10 +34,10 @@
 			<div class="post" style="transform:translate({{posts.length + 1}}00%); background-image:url({{posts[0].img}})">
 				<ul>
 					<li>News</li>
-					<li><a onclick="crpGetPage('{{posts[0].slug}}')">{{posts[0].title}}</a></li>
-					<li><a onclick="crpGetPage('/members/{{author.nicename}}')">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[0].date)}}</li>
+					<li><a href="{{posts[0].slug}}">{{posts[0].title}}</a></li>
+					<li><a href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[0].date)}}</li>
 					<li>{{posts[0].content | safe | striptags(true) | truncate(150)}}</li>
-					<li><a onclick="crpGetPage('{{posts[0].slug}}')">Read More</a></li>
+					<li><a href="{{posts[0].slug}}">Read More</a></li>
 				</ul>
 			</div>
 		</div>
@@ -45,7 +45,7 @@
 
 	<div class="sidebar left">
 		<div class="discord-widget">
-			<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
+			<a class="redirect" href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
 		</div>
 
 		{% if user %}
@@ -74,7 +74,7 @@
 
 		<div class="donate-widget">
 			<h3>Help Us</h3>
-			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
 				<input type="hidden" name="cmd" value="_s-xclick">
 				<input type="hidden" name="hosted_button_id" value="S7UPCZZ9UYXZ6">
 				<input type="image" src="{{crp.storage.getUrl(css.img.donate)}}" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
@@ -92,12 +92,12 @@
 				{% if post.img %}
 					<li><a><img src="{{post.img}}" /></a></li>
 				{% endif %}
-				<li class="title"><a onclick="crpGetPage('{{post.slug}}')">{{post.title}}</a></li>
+				<li class="title"><a href="{{post.slug}}">{{post.title}}</a></li>
 				<li class="date">{{crp.moment(post.date).fromNow()}}</li>
 				<li class="content">
 					{{post.content | safe | striptags(true) | truncate}}
 					{% if post.content.length > 255 %}
-						<a onclick="crpGetPage('{{post.slug}}')">[Read More]</a>
+						<a href="{{post.slug}}">[Read More]</a>
 					{% endif %}
 				</li>
 			</ul>

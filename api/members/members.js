@@ -246,11 +246,7 @@ module.exports = (crp) => {
 						crp.db.insertOne('users', user, (err, result) => {
 							if (err) return cb(err);
 
-							crp.members.addPage(user, (err) => {
-								if (err) return cb(err);
-
-								cb(null, user);
-							});
+							cb(null, user);
 						});
 
 					});
@@ -262,11 +258,7 @@ module.exports = (crp) => {
 					crp.db.insertOne('users', user, (err, result) => {
 						if (err) return cb(err);
 
-						crp.members.addPage(user, (err) => {
-							if (err) return cb(err);
-
-							cb(null, user);
-						});
+						cb(null, user);
 					});
 				}
 			});
@@ -281,11 +273,7 @@ module.exports = (crp) => {
 			crp.db.deleteOne('users', {_id: user._id}, (err, result) => {
 				if (err) return cb(err);
 
-				crp.members.removePage(user, (err) => {
-					if (err) return cb(err);
-
-					cb(null, user);
-				});
+				cb(null, user);
 			});
 		});
 	};
@@ -321,65 +309,48 @@ module.exports = (crp) => {
 		return crp.storage.getUrl(user.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
-	crp.members.addPage = (user, cb) => {
-		if (!user || !user._id) return cb('noUser');
+	crp.pages.add((slug, cb) => {
+		if (slug == '/register') return cb(null, {path: '/members/register/index.njk'});
+		if (slug == '/registered') return cb(null, {path: '/members/registered/index.njk'});
+		if (slug == '/admin/users') return cb(null, {
+			path: '/admin/index.njk',
+			subPage: '/members/admin/index.njk',
+			role: 3
+		});
 
-		var profilePages = [
-			{slug: 'info'},
-			{slug: 'friends'},
-			{slug: 'chapters'},
-			{slug: 'messages'},
-			{slug: 'account', context: {timezones: crp.moment.tz.names()}},
-			{slug: 'settings'}
-		];
-
-		crp.pages.addPage({
-			slug: '/members/' + user.nicename,
-			path: '/members/profile/index.njk',
-			subPage: '/members/profile/activity/index.njk',
-			context: {
-				profileid: user._id
-			}
-		}, (err, result) => {
+		crp.members.find({}, (err, users) => {
 			if (err) return cb(err);
 
-			crp.async.each(profilePages, (page, callback) => {
-				crp.pages.addPage({
-					slug: `/members/${user.nicename}/${page.slug}`,
+			var pages = [
+				{slug: 'info'},
+				{slug: 'friends'},
+				{slug: 'chapters'},
+				{slug: 'messages'},
+				{slug: 'account', context: {timezones: crp.moment.tz.names()}},
+				{slug: 'settings'}
+			];
+
+			for (var i in users) {
+				if (slug == `/members/${users[i].nicename}`) return cb(null, {
 					path: '/members/profile/index.njk',
-					subPage: `/members/profile/${page.slug}/index.njk`,
-					context: Object.assign({
-						profileid: user._id
-					}, page.context)
-				}, (err, result) => {
-					if (err) return callback(err);
-
-					callback();
+					subPage: `/members/profile/activity/index.njk`,
+					context: {
+						profileid: users[i]._id
+					}
 				});
-			}, cb);
+
+				for (var p in pages) {
+					if (slug == `/members/${users[i].nicename}/${pages[p].slug}`) return cb(null, {
+						path: '/members/profile/index.njk',
+						subPage: `/members/profile/${pages[p].slug}/index.njk`,
+						context: Object.assign({
+							profileid: users[i]._id
+						}, pages[p].context)
+					});
+				}
+			}
+
+			cb();
 		});
-	};
-
-	crp.members.removePage = (user, cb) => {
-		var profilePages = [
-			'info',
-			'friends',
-			'chapters',
-			'messages',
-			'account',
-			'settings'
-		];
-
-		crp.pages.removePage({slug: `/members/${user.nicename}`}, (err, result) => {
-			if (err) return cb(err);
-
-			crp.async.each(profilePages, (page, callback) => {
-				crp.pages.removePage({slug: `/members/${user.nicename}/${page}`}, (err, result) => {
-					if (err) return callback(err);
-
-					callback();
-				});
-			}, cb);
-		});
-	};
+	});
 };
