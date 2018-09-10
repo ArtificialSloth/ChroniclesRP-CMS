@@ -29,7 +29,7 @@
 						<p>{{chapter.tagline}}</p>
 					</li>
 					<li>
-						Game: <a class="subpage" href="/chapters/{{game.slug}}" container=".chapter" newurl="true">{{game.name}}</a>
+						Game: <a href="/chapters/{{game.slug}}" container=".chapter" newurl="true">{{game.name}}</a>
 						{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
 							<span><a href="/chapters/{{chapter.nicename}}/edit">Edit</a> | <a onclick="removeChapter('{{chapter._id}}')">Delete</a></span>
 						{% endif %}

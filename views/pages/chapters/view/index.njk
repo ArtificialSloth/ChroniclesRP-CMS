@@ -18,14 +18,14 @@
 
 	<ul class="nav noselect">
 		{% if chapter.type == 'group' %}
-			<li><a class="subpage" href="/chapters/{{chapter.nicename}}" container=".chapter .content" newurl="true">Home</a></li>
-			<li><a class="subpage" href="/chapters/{{chapter.nicename}}/forums" container=".chapter .content" newurl="true">Forums</a></li>
+			<li><a href="/chapters/{{chapter.nicename}}" container=".chapter .content" newurl="true">Home</a></li>
+			<li><a href="/chapters/{{chapter.nicename}}/forums" container=".chapter .content" newurl="true">Forums</a></li>
 		{% endif %}
 
-		<li><a class="subpage" href="/chapters/{{chapter.nicename}}/members" container=".chapter .content" newurl="true">Members</a></li>
+		<li><a href="/chapters/{{chapter.nicename}}/members" container=".chapter .content" newurl="true">Members</a></li>
 
 		{% if crp.chapters.getMember(chapter, user._id).role >= 2 or  user.role >= 3 %}
-			<li><a class="subpage" href="/chapters/{{chapter.nicename}}/edit" container=".chapter .content" newurl="true">Manage</a></li>
+			<li><a href="/chapters/{{chapter.nicename}}/edit" container=".chapter .content" newurl="true">Manage</a></li>
 		{% endif %}
 	</ul>
 

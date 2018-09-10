@@ -278,10 +278,10 @@ module.exports = (crp) => {
 
 		switch (chapter.type) {
 			case 'hosted':
-				return `<a class="redirect" href="//${chapter.slug}.chroniclesrp.com">${chapter.name}</a>`;
+				return `<a href="//${chapter.slug}.chroniclesrp.com">${chapter.name}</a>`;
 				break;
 			case 'url':
-				return `<a class="redirect" href="//${chapter.slug}">${chapter.name}</a>`;
+				return `<a href="//${chapter.slug}">${chapter.name}</a>`;
 				break;
 			default:
 				return `<a href="/chapters/${chapter.nicename}">${chapter.name}</a>`;

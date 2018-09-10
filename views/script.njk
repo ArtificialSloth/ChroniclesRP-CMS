@@ -150,10 +150,10 @@
 
 		$(document).on('click', 'a', (e) => {
 			var target = $(e.target).closest('a');
-			if (target.hasClass('redirect') || !target.prop('href')) return true;
+			if (target.hasClass('redirect') || !target.prop('href') || !target.prop('href').startsWith(`${window.location.protocol}//${window.location.hostname}`)) return true;
 
 			var href = target.prop('href').replace(`${window.location.protocol}//${window.location.hostname}`, '');
-			if (target.hasClass('subpage')) {
+			if (target.attr('container')) {
 				crpGetSubPage(
 					href,
 					target.attr('container'),
