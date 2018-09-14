@@ -3,12 +3,12 @@ module.exports = (crp, callback) => {
 	crp.discord = new Eris(process.env.DISCORD_TOKEN);
 
 	crp.discord.send = (msg) => {
-		var channel = crp.discord.getChannel('482697857158086666');
-		return crp.discord.createMessage(channel.id, msg);
+		var channel = crp.discord.getChannel(process.env.DISCORD_CHANNEL);
+		return channel ? crp.discord.createMessage(channel.id, msg) : false;
 	};
 
-	crp.discord.connect();
-	crp.discord.on('ready', () => {
+	//crp.discord.connect();
+	//crp.discord.on('ready', () => {
 		callback(null, crp);
-	});
+	//});
 };
