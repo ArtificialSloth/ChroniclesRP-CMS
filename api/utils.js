@@ -40,6 +40,17 @@ module.exports = (crp, callback) => {
 		return result;
 	};
 
+	crp.util.shuffleArray = (array) => {
+		var x, j;
+		for (var i = array.length - 1; i > 0; i--) {
+			j = Math.floor(Math.random() * (i + 1));
+			x = array[i];
+			array[i] = array[j];
+			array[j] = x;
+		}
+		return array;
+	};
+
 	crp.util.sanitizeObject = (object) => {
 		for (var k in object) {
 			if (typeof object[k] == 'object') {
