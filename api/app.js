@@ -51,10 +51,9 @@ module.exports = (crp, callback) => {
 		path: '*',
 		method: 'all',
 		lookup: ['ip'],
-		total: 180,
+		total: 240,
 		expire: 60 * 1000,
 		onRateLimited: (req, res, next) => {
-			console.log(req.ip + ' limited')
 			res.redirect(429, '/');
 		}
 	});
