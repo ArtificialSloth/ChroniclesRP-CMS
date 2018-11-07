@@ -6,7 +6,8 @@
 		{% lookup 'forums', {_id: forumid}, 'forum' %}
 		{% lookup 'categories', {_id: forum.category}, 'category' %}
 		{% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
-		{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
+		{% query 'topics', {parent: forum._id, type: 'sticky'}, {sort: [['date', -1]]}, 'sticky' %}
+		{% query 'topics', {parent: forum._id, type: 'normal'}, {sort: [['date', -1]]}, 'normal' %}
 
 		<p class="breadcrumbs">
 			<a href="/">Home</a>
@@ -27,7 +28,37 @@
 					</ul>
 				</li>
 
-				{% for topic in topics %}
+				{% for topic in sticky %}
+					{% lookup 'users', {_id: topic.author}, 'author' %}
+					{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
+					<li class="topic sticky">
+						<ul>
+							<li>
+								<a class="topic-name" href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
+								<div class="topic-author">
+									Started By: <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+								</div>
+							</li>
+							<li>{{replies.length}}</li>
+							<li>
+								{% if replies[0] %}
+									{% lookup 'users', {_id: replies[0].author}, 'author' %}
+									<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+									<br />
+									{{crp.moment(replies[0].date).fromNow()}}
+								{% else %}
+									No Replies
+								{% endif %}
+							</li>
+						</ul>
+					</li>
+				{% endfor %}
+
+				{% if sticky.length > 0 %}
+					<li class="topic divider"></li>
+				{% endif %}
+
+				{% for topic in normal %}
 					{% lookup 'users', {_id: topic.author}, 'author' %}
 					{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
 					<li class="topic">
