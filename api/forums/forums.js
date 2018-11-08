@@ -252,6 +252,21 @@ module.exports = (crp) => {
 		});
 	};
 
+	crp.forums.sortTopics = (topics, order, cb) => {
+		crp.forums.getReplies({}, (err, replies) => {
+			for (var i in topics) {
+				topics[i].sortDate = topics[i].date;
+				for (var j in replies) {
+					if (replies[j].parent.equals(topics[i]._id) && replies[j].date > topics[i].sortDate) {
+						topics[i].sortDate = replies[j].date;
+					}
+				}
+			}
+
+			return cb(null, crp.util.sortObjectArray(topics, 'sortDate', order));
+		});
+	};
+
 	crp.forums.setReplyData = (replyid, data, cb) => {
 		crp.forums.getReplyData(replyid, (err, reply) => {
 			if (err) return cb(err);
@@ -312,6 +327,30 @@ module.exports = (crp) => {
 			crp.db.deleteOne('replies', {_id: reply._id}, cb);
 		});
 	};
+
+	crp.nunjucks.addExtension('getTopics', new function() {
+		this.tags = ['getTopics'];
+
+		this.parse = (parser, nodes, lexer) => {
+			var tok = parser.nextToken();
+
+			var args = parser.parseSignature(null, true);
+			parser.advanceAfterBlockEnd(tok.value);
+
+			return new nodes.CallExtensionAsync(this, 'run', args);
+		};
+
+		this.run = (context, filter, key, cb) => {
+			crp.forums.getTopics(filter, (err, topics) => {
+				if (err) return cb(err);
+
+				crp.forums.sortTopics(topics, -1, (err, result) => {
+					context.ctx[key] = topics;
+					cb(err);
+				});
+			});
+		};
+	})
 
 	crp.pages.add((slug, cb) => {
 		if (slug == '/forums') return cb(null, {path: '/forums/index.njk'});

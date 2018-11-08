@@ -5,10 +5,10 @@ module.exports = (crp, callback) => {
 	crp.http = require('http');
 	crp.https = require('https');
 
-	crp.nunjucks = require('nunjucks');
-	crp.nunjucks.configure('views', {
+	crp.nunjucks = require('nunjucks').configure('views', {
 		express: crp.app
-	}).addExtension('query', new function() {
+	});
+	crp.nunjucks.addExtension('query', new function() {
 		this.tags = ['query'];
 
 		this.parse = (parser, nodes, lexer) => {

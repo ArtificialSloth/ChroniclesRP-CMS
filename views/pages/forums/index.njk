@@ -22,7 +22,7 @@
 
 				{% query 'forums', {category: category._id}, {sort: [['order', 1]]}, 'forums' %}
 				{% for forum in forums %}
-					{% query 'topics', {parent: forum._id}, {sort: [['date', -1]]}, 'topics' %}
+					{% getTopics {parent: forum._id}, 'topics' %}
 
 					<li class="forum">
 						<ul>

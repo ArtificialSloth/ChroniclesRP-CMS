@@ -6,8 +6,8 @@
 		{% lookup 'forums', {_id: forumid}, 'forum' %}
 		{% lookup 'categories', {_id: forum.category}, 'category' %}
 		{% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
-		{% query 'topics', {parent: forum._id, type: 'sticky'}, {sort: [['date', -1]]}, 'sticky' %}
-		{% query 'topics', {parent: forum._id, type: 'normal'}, {sort: [['date', -1]]}, 'normal' %}
+		{% getTopics {parent: forum._id, type: 'sticky'}, 'sticky' %}
+		{% getTopics {parent: forum._id, type: 'normal'}, 'normal' %}
 
 		<p class="breadcrumbs">
 			<a href="/">Home</a>
