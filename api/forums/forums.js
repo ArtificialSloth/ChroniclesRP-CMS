@@ -258,6 +258,7 @@ module.exports = (crp) => {
 				topics[i].sortDate = topics[i].date;
 				for (var j in replies) {
 					if (replies[j].parent.equals(topics[i]._id) && replies[j].date > topics[i].sortDate) {
+						topics[i].sortAuthor = replies[j].author;
 						topics[i].sortDate = replies[j].date;
 					}
 				}

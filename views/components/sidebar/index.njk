@@ -45,6 +45,11 @@
 
 					{% if not category.role or user.role >= category.role %}
 						<li>
+							{% if topic.sortAuthor %}
+								{% lookup 'users', {_id: topic.sortAuthor}, 'sortAuthor' %}
+								<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a>
+								replied to
+							{% endif %}
 							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
 							by
 							<a href="/members/{{author.nicename}}">{{author.display_name}}</a>

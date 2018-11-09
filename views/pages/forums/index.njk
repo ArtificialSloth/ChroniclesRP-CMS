@@ -34,6 +34,10 @@
 							<li>
 								{% if topics[0] %}
 									{% lookup 'users', {_id: topics[0].author}, 'author' %}
+									{% if topics[0].sortAuthor %}
+										{% lookup 'users', {_id: topics[0].sortAuthor}, 'sortAuthor' %}
+										<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a> replied to
+									{% endif %}
 									<a href="/forums/{{forum.slug}}/{{topics[0]._id}}">{{topics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 								{% else %}
 									No Topics
