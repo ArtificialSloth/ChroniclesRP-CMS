@@ -123,6 +123,10 @@ module.exports = (crp, callback) => {
 					content: req.body.body,
 				};
 
+				if (user.role >= 2) {
+					topicData.type = req.body.type;
+				}
+
 				crp.forums.setTopicData(topic._id, topicData, (err, result) => {
 					if (err) return res.send(err);
 

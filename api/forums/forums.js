@@ -183,7 +183,7 @@ module.exports = (crp) => {
 				_id: topic._id,
 				author: data.author || topic.author,
 				title: data.title || topic.title,
-				type: topic.type,
+				type: data.type || topic.type,
 				content: data.content || topic.content,
 				date: topic.date,
 				parent: data.parent || topic.parent

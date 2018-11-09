@@ -50,6 +50,14 @@
 								<input type="text" name="title" value="{{topic.title}}" />
 								<textarea class="tinymce" name="body">{{topic.content}}</textarea>
 
+								{% if user.role >= 2 %}
+									<label for="type">Type:</label>
+									<select name="type">
+										<option value="normal">Normal</option>
+										<option value="sticky" {% if topic.type == 'sticky' %}selected{% endif %}>Sticky</option>
+									</select>
+								{% endif %}
+
 								<input type="hidden" name="topicid" value="{{topic._id}}" />
 								<input type="submit" value="Save" />
 								<span class="input-error"></span>
