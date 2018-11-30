@@ -36,6 +36,7 @@ module.exports = (crp, callback) => {
 				var msg = `${site.discord.greeting}\n\n**${inquery.question}**${answers}`;
 				crp.discord.send(msg, channel, (err, result) => {
 					if (err && errChannel) return crp.discord.send(`\`\`\`${err}\`\`\``, errChannel);
+					if (errChannel) crp.discord.send('```Message sent without any errors.```', errChannel);
 
 					inquery.guild = guild;
 					crp.discord.inqueries[member.id] = inquery;
