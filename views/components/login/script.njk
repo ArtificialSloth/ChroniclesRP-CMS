@@ -1,33 +1,33 @@
 <script>
-	$('.login-form').submit((e) => {
-		e.preventDefault();
-		$(e.target).find('input[type=text]').removeClass('input-error');
-		$(e.target).find('input[type=password]').removeClass('input-error');
+	function loginSubmit(e) {
+		var form = $(e).parent('.login-form');
+		$(form).find('input[type=text]').removeClass('input-error');
+		$(form).find('input[type=password]').removeClass('input-error');
 
-		if ($(e.target).find('input[type=text]').val() == '') {
-			$(e.target).find('input[type=text]').addClass('input-error');
-			loginShowError(e.target, 'Username field cannot be empty!');
+		if ($(form).find('input[type=text]').val() == '') {
+			$(form).find('input[type=text]').addClass('input-error');
+			loginShowError(form, 'Username field cannot be empty!');
 			return;
 		}
-		if ($(e.target).find('input[type=password]').val().length < 6) {
-			$(e.target).find('input[type=password]').addClass('input-error');
-			loginShowError(e.target, 'Passwords must be at least 6 characters!');
+		if ($(form).find('input[type=password]').val().length < 6) {
+			$(form).find('input[type=password]').addClass('input-error');
+			loginShowError(form, 'Passwords must be at least 6 characters!');
 			return;
 		}
 
-		var formData = $(e.target).serialize();
+		var formData = $(form).serialize();
 		crpAjax('/login', formData, (response) => {
 			if (response == 'valid') {
 				location.reload();
 			} else if (response == 'tooMany') {
-				loginShowError(e.target, 'Too many failed login attempts. Please wait 5 minutes then try again.');
+				loginShowError(form, 'Too many failed login attempts. Please wait 5 minutes then try again.');
 			} else if (response == 'locked') {
-				loginShowError(e.target, 'Your account has been locked.');
+				loginShowError(form, 'Your account has been locked.');
 			} else {
-				loginShowError(e.target, 'Incorrect username or password');
+				loginShowError(form, 'Incorrect username or password');
 			}
 		});
-	});
+	}
 
 	function loginShowError(form, msg) {
 		$(form).addClass('error');

@@ -24,7 +24,7 @@
 				<div class="error-message"></div>
 
 				<input type="checkbox" name="remember_me" class="remember_me" /> <input type="button" onclick="$('.remember_me').prop('checked', !$('.remember_me').prop('checked'))" value="Remember me" />
-				<input type="submit" value="Login">
+				<input type="button" value="Login" onclick="loginSubmit(this)">
 			</form>
 
 			{% include "components/login/script.njk" %}
