@@ -23,6 +23,11 @@
 
 	<br />
 
+	<label for="new_pass">Password: </label>
+	<input type="text" name="new_pass" class="new_pass" value="" />
+
+	<br />
+
 	<label for="user_role">Role: </label>
 	<select name="user_role" class="user_role">
 		<option value="0" {% if user.role == 0 %}selected{% endif %}>Pending</option>
