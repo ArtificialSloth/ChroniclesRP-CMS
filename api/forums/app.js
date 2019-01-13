@@ -100,7 +100,19 @@ module.exports = (crp, callback) => {
 							crp.forums.addReply(replyData, (err, result) => {
 								if (err) return res.send(err);
 
-								res.send(result);
+								crp.async.each(topic.subs, (subid, cb) => {
+									if (subid.equals(user._id)) return cb();
+
+									crp.members.get(subid, (err, sub) => {
+										if (err) return cb(err);
+
+										crp.mail.send(sub.email, `New Reply to ${topic.title}`, `<a href="https://chroniclesrp.com/members/${user.slug}">${user.display_name}</a> replied to <a href="https://chroniclesrp.com/forums/${forum.slug}/${topic._id}">${topic.title}</a>`);
+										cb();
+									});
+								}, (err) => {
+									if (err) res.send(err);
+									res.send(result);
+								});
 							});
 						});
 					});
@@ -127,6 +139,47 @@ module.exports = (crp, callback) => {
 					topicData.type = req.body.type;
 				}
 
+				crp.forums.setTopicData(topic._id, topicData, (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
+			});
+		});
+	});
+
+	crp.app.post('/api/subscribe-topic', (req, res) => {
+		crp.members.get(req.user, (err, user) => {
+			if (err) return res.send(err);
+			if (!user) return res.send('notAllowed');
+
+			crp.forums.getTopicData(req.body.topicid, (err, topic) => {
+				if (err) return res.send(err);
+				if (!topic) return res.send('noTopic');
+				if (topic.subs && crp.util.idInArray(topic.subs, user._id)) return res.send('alreadySubbed');
+
+				var topicData = {subs: topic.subs ? topic.subs.concat([user._id]) : [user._id]};
+				crp.forums.setTopicData(topic._id, topicData, (err, result) => {
+					if (err) return res.send(err);
+
+					res.send(result);
+				});
+			});
+		});
+	});
+
+	crp.app.post('/api/unsubscribe-topic', (req, res) => {
+		crp.members.get(req.user, (err, user) => {
+			if (err) return res.send(err);
+			if (!user) return res.send('notAllowed');
+
+			crp.forums.getTopicData(req.body.topicid, (err, topic) => {
+				if (err) return res.send(err);
+				if (!topic) return res.send('noTopic');
+				if (!topic.subs || !crp.util.idInArray(topic.subs, user._id)) return res.send('notSubbed');
+
+				topic.subs.splice(crp.util.indexOfId(topic.subs, user._id), 1);
+				var topicData = {subs: topic.subs};
 				crp.forums.setTopicData(topic._id, topicData, (err, result) => {
 					if (err) return res.send(err);
 

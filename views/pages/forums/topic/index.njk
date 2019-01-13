@@ -31,7 +31,7 @@
 			<li class="sub-header">
 				<ul>
 					<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
-					<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editToggle(this)">Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
+					<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editToggle(this)">Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}{% if topic.subs and crp.util.idInArray(topic.subs, user._id) %}<a onclick="unSubToTopic('{{topic._id}}')">Unsubscribe</a>{% else %}<a onclick="subToTopic('{{topic._id}}')">Subscribe</a>{% endif %} | <a onclick="crpScrollTo('.reply')">Reply</a></li>
 				</ul>
 			</li>
 

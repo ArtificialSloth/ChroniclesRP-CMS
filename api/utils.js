@@ -40,6 +40,20 @@ module.exports = (crp, callback) => {
 		return result;
 	};
 
+	crp.util.idInArray = (array, id) => {
+		for (var i in array) {
+			if (array[i].equals(id)) return true;
+		}
+		return false;
+	};
+
+	crp.util.indexOfId = (array, id) => {
+		for (var i in array) {
+			if (array[i].equals(id)) return i;
+		}
+		return false;
+	};
+
 	crp.util.shuffleArray = (array) => {
 		var x, j;
 		for (var i = array.length - 1; i > 0; i--) {

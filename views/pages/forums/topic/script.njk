@@ -23,6 +23,26 @@
 		}
 	}
 
+	function subToTopic(topicid) {
+		crpAjax('/api/subscribe-topic', {topicid: topicid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
+	function unSubToTopic(topicid) {
+		crpAjax('/api/unsubscribe-topic', {topicid: topicid}, (res) => {
+			if (typeof res == 'object') {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
 	function editToggle(e) {
 		if ($(e).html() == 'Edit') {
 			$(e).html('Cancel');

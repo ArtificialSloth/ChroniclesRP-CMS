@@ -186,6 +186,7 @@ module.exports = (crp) => {
 				type: data.type || topic.type,
 				content: data.content || topic.content,
 				date: topic.date,
+				subs: data.subs || [],
 				parent: data.parent || topic.parent
 			};
 
@@ -206,6 +207,7 @@ module.exports = (crp) => {
 			type: data.type || 'normal',
 			content: data.content,
 			date: (data.date) ? Date.parse(data.date.replace('at ', '')) : Date.now(),
+			subs: [],
 			parent: data.parent
 		};
 
@@ -214,6 +216,7 @@ module.exports = (crp) => {
 			if (!user) return cb('noUser');
 
 			topic.author = user._id;
+			topic.subs.push(user._id);
 
 			if (!topic.title || topic.title.length < 4) return cb('titleShort');
 			if (topic.title.length > 80) return cb('titleLong');
