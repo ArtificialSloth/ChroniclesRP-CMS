@@ -33,8 +33,12 @@
 		var formData = new FormData();
 		formData.append('img', e.target.files[0]);
 		crpAjaxUpload('/api/admin/image-upload', formData, (res) => {
-			$(e.target).val('');
-			$(e.target).prev().val(res);
+			if (typeof res == 'string') {
+				$(e.target).val('');
+				$(e.target).prev().val(res);
+			} else {
+				console.log(res);
+			}
 		});
 	});
 

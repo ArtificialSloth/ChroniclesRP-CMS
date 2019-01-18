@@ -17,31 +17,34 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	var editChapter = crp.express.upload.fields([
-		{name: 'profile_pic', maxCount: 1},
-		{name: 'cover_pic', maxCount: 1}
-	]);
-	crp.app.post('/api/edit-chapter', editChapter, (req, res) => {
-		if (req.files) {
-			req.body.img = {};
-			if (req.files.profile_pic) req.body.img.profile = req.files.profile_pic;
-			if (req.files.cover_pic) req.body.img.cover = req.files.cover_pic;
-		}
-
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+	crp.app.post('/api/edit-chapter', (req, res) => {
+		var upload = crp.express.upload.fields([
+			{name: 'profile_pic', maxCount: 1},
+			{name: 'cover_pic', maxCount: 1}
+		]);
+		upload(req, res, (err) => {
 			if (err) return res.send(err);
-			if (!chapter) return res.send('noChapter');
+			if (req.files) {
+				req.body.img = {};
+				if (req.files.profile_pic) req.body.img.profile = req.files.profile_pic;
+				if (req.files.cover_pic) req.body.img.cover = req.files.cover_pic;
+			}
 
-			crp.members.get(req.user, (err, user) => {
+			crp.chapters.get(req.body.chapterid, (err, chapter) => {
 				if (err) return res.send(err);
-				if (!user) return res.send('noUser');
+				if (!chapter) return res.send('noChapter');
 
-				var member = crp.chapters.getMember(chapter, user._id);
-				if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-				crp.chapters.set(req.body.chapterid, req.body, (err, result) => {
+				crp.members.get(req.user, (err, user) => {
 					if (err) return res.send(err);
+					if (!user) return res.send('noUser');
 
-					res.send(result);
+					var member = crp.chapters.getMember(chapter, user._id);
+					if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
+					crp.chapters.set(req.body.chapterid, req.body, (err, result) => {
+						if (err) return res.send(err);
+
+						res.send(result);
+					});
 				});
 			});
 		});

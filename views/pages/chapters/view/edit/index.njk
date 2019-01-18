@@ -14,11 +14,12 @@
 		<div class="standard-input">
 			{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
 
-			<select name="game">
+			<select name="game" class="game">
 				{% for game in games %}
 					<option value="{{game._id}}" {% if game._id.equals(chapter.game) %}selected{% endif %}>{{game.name}}</option>
 				{% endfor %}
 			</select>
+			<span class="input-error"></span>
 		</div>
 
 		<label for="open">Mempership</label>
@@ -27,17 +28,18 @@
 					<option value="1" {% if chapter.open %}selected{% endif %}>Open</option>
 					<option value="0" {% if not chapter.open %}selected{% endif %}>Invite Only</option>
 			</select>
+			<span class="input-error"></span>
 		</div>
 
 		<label for="discord">Chapter Discord</label>
 		<div class="standard-input">
-			<input type="text" name="discord" value="{{chapter.discord}}" />
+			<input type="text" name="discord" class="discord" value="{{chapter.discord}}" />
 			<span class="input-error"></span>
 		</div>
 
 		<label for="tagline">Chapter Tagline</label>
 		<div class="standard-input">
-			<input type="text" name="tagline" value="{{chapter.tagline}}" />
+			<input type="text" name="tagline" class="tagline" value="{{chapter.tagline}}" />
 			<span class="input-error"></span>
 		</div>
 
@@ -47,7 +49,7 @@
 				<img class="profile-pic" src="{{crp.storage.getUrl(chapter.img.profile)}}" width="150px" height="150px" />
 				<br />
 			{% endif %}
-			<input type="file" name="profile_pic" />
+			<input type="file" name="profile_pic" class="profile_pic" />
 			<span class="input-error"></span>
 		</div>
 
@@ -57,14 +59,14 @@
 				<img class="cover-pic" src="{{crp.storage.getUrl(chapter.img.cover)}}" height="150px" />
 				<br />
 			{% endif %}
-			<input type="file" name="cover_pic" />
+			<input type="file" name="cover_pic" class="cover_pic" />
 			<span class="input-error"></span>
 		</div>
 
 		{% if chapter.type == 'group' %}
 			<label for="desc" class="fill">Chapter Description</label>
 			<div class="standard-input fill">
-				<textarea name="desc" class="tinymce">{{chapter.desc}}</textarea>
+				<textarea name="desc" class="tinymce desc">{{chapter.desc}}</textarea>
 				<script>crpTinyMCE()</script>
 				<span class="input-error"></span>
 			</div>

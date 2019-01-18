@@ -99,45 +99,48 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	var editUser = crp.express.upload.fields([
-		{name: 'profile_pic', maxCount: 1},
-		{name: 'cover_pic', maxCount: 1}
-	]);
-	crp.app.post('/api/admin/edit-user', editUser, (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+	crp.app.post('/api/admin/edit-user', (req, res, next) => {
+		var upload = crp.express.upload.fields([
+			{name: 'profile_pic', maxCount: 1},
+			{name: 'cover_pic', maxCount: 1}
+		]);
+		upload(req, res, (err) => {
 			if (err) return res.send(err);
+			crp.members.get(req.user, (err, user) => {
+				if (err) return res.send(err);
 
-			if (req.body.user_id == user._id || user.role >= 3) {
-				var userData = {
-					login: req.body.user_login,
-					old_pass: req.body.old_pass,
-					new_pass: req.body.new_pass,
-					confirm_new_pass: req.body.confirm_new_pass,
-					email: req.body.user_email,
-					display_name: req.body.display_name,
-					role: req.body.user_role,
-					locked: req.body.user_locked,
-					timezone: req.body.user_timezone,
-					date_of_birth: req.body.user_dob,
-					gender: req.body.user_gender,
-					tagline: req.body.user_tagline,
-					about: req.body.user_about,
-					img: {}
-				};
+				if (req.body.user_id == user._id || user.role >= 3) {
+					var userData = {
+						login: req.body.user_login,
+						old_pass: req.body.old_pass,
+						new_pass: req.body.new_pass,
+						confirm_new_pass: req.body.confirm_new_pass,
+						email: req.body.user_email,
+						display_name: req.body.display_name,
+						role: req.body.user_role,
+						locked: req.body.user_locked,
+						timezone: req.body.user_timezone,
+						date_of_birth: req.body.user_dob,
+						gender: req.body.user_gender,
+						tagline: req.body.user_tagline,
+						about: req.body.user_about,
+						img: {}
+					};
 
-				if (req.files) {
-					if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
-					if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+					if (req.files) {
+						if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
+						if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+					}
+
+					crp.members.set(req.body.user_id, userData, (user.role >= 3), (err, result) => {
+						if (err) return res.send(err);
+
+						result.pass = null;
+						res.send(result);
+					});
 				}
-
-				crp.members.set(req.body.user_id, userData, (user.role >= 3), (err, result) => {
-					if (err) return res.send(err);
-
-					result.pass = null;
-					res.send(result);
-				});
-			}
-		})
+			});
+		});
 	});
 
 	crp.app.post('/api/admin/add-user', (req, res) => {

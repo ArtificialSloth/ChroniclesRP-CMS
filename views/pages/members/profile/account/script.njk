@@ -12,7 +12,7 @@
 			$('.user-account-form .profile_pic').parent().removeClass('error');
 			$('.user-account-form .cover_pic').parent().removeClass('error');
 
-			if (typeof res != 'object') {
+			if (!res._id) {
 				if (res == 'dobInvalid') {
 					$('.user-account-form .user_dob').parent().addClass('error');
 					$('.user-account-form .user_dob + .input-error').html('Invalid date!');
@@ -22,12 +22,12 @@
 				} else if (res == 'genderInvalid') {
 					$('.user-account-form .user_gender').parent().addClass('error');
 					$('.user-account-form .user_gender + .input-error').html('Gender invalid!');
-				} else if (res == 'profileTooLarge') {
+				} else if (res.code == 'LIMIT_FILE_SIZE' && res.field == 'profile_pic') {
 					$('.user-account-form .profile_pic').parent().addClass('error');
-					$('.user-account-form .profile_pic + .input-error').html('File size must me < 2 MB');
-				} else if (res == 'coverTooLarge') {
+					$('.user-account-form .profile_pic + .input-error').html('File size must be < 2 MB');
+				} else if (res.code == 'LIMIT_FILE_SIZE' && res.field == 'cover_pic') {
 					$('.user-account-form .cover_pic').parent().addClass('error');
-					$('.user-account-form .cover_pic + .input-error').html('File size must me < 2 MB');
+					$('.user-account-form .cover_pic + .input-error').html('File size must be < 2 MB');
 				} else {
 					console.error(res);
 					$('.user-account-form .display_name').parent().addClass('error');

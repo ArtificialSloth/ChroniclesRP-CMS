@@ -57,21 +57,22 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	var imageUpload = crp.express.upload.fields([
-		{name: 'img', maxCount: 1}
-	]);
-	crp.app.post('/api/admin/image-upload', imageUpload, (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+	crp.app.post('/api/admin/image-upload', (req, res) => {
+		var upload = crp.express.upload.single('img');
+		upload(req, res, (err) => {
 			if (err) return res.send(err);
-			if (user.role < 3) return res.send('notAllowed');
+			crp.members.get(req.user, (err, user) => {
+				if (err) return res.send(err);
+				if (user.role < 3) return res.send('notAllowed');
 
-			crp.storage.upload(req.files.img[0].path, `img/posts/${req.files.img[0].originalname}`, (err, file) => {
-				if (err) res.send(err);
-
-				crp.fs.unlink(req.files.img[0].path, (err) => {
+				crp.storage.upload(req.file.path, `img/posts/${req.file.originalname}`, (err, file) => {
 					if (err) res.send(err);
 
-					res.send(crp.storage.getUrl(file));
+					crp.fs.unlink(req.file.path, (err) => {
+						if (err) res.send(err);
+
+						res.send(crp.storage.getUrl(file));
+					});
 				});
 			});
 		});
