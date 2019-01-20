@@ -158,6 +158,7 @@ module.exports = (crp) => {
 					},
 					(callback) => {
 						if (admin) {
+							if (!data.old_pass || !data.new_pass || !data.confirm_new_pass) return callback();
 							if (data.new_pass.length < 6) return callback('passLength');
 
 							crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
