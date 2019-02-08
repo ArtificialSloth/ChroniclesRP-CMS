@@ -11,7 +11,7 @@
 		{% for post in posts %}
 			{% lookup 'users', {_id: post.author}, 'author' %}
 			<div class="carousel-item {% if loop.first %}active{% endif %}">
-				<img src="{{post.img}}" alt="{{post.title}}" width="100%" />
+				<img class="ml-auto" src="{{post.img}}" alt="{{post.title}}" width="100%" />
 				<div class="carousel-caption px-5">
 					<h5><a class="text-white" href="{{post.slug}}">{{post.title}}</a></h5>
 					<h6><a class="text-white" href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</h6>
@@ -29,5 +29,28 @@
 			<span class="carousel-control-next-icon" aria-hidden="true"></span>
 			<span class="sr-only">Next</span>
 		</a>
+	</div>
+</div>
+
+<div class="container mt-3">
+	<div class="row featured-content">
+		{% query 'posts', {type: 'featured_content'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
+		{% for post in posts %}
+			<div class="col-lg-4">
+				<div class="card shadow-sm">
+					<img class="card-img-top" src="{{post.img}}" alt="">
+					<div class="card-body">
+						<h5 class="card-title"><a href="{{post.slug}}">{{post.title}}</a></h5>
+						<h6 class="card-subtitle text-muted">{{crp.moment(post.date).fromNow()}}</h6>
+						<p class="card-text">{{post.content | safe | striptags(true) | truncate(100)}}</p>
+						<a class="card-link" href="{{post.slug}}">Read More</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+
+	<div class="row recent-posts">
+
 	</div>
 </div>
