@@ -150,7 +150,7 @@
 
 		$(document).on('click', 'a', (e) => {
 			var target = $(e.target).closest('a');
-			if (target.hasClass('redirect') || !target.prop('href') || !target.prop('href').startsWith(`${window.location.protocol}//${window.location.hostname}`)) return true;
+			if (target.hasClass('redirect') || !target.prop('href') || target.prop('href').includes('#') || !target.prop('href').startsWith(`${window.location.protocol}//${window.location.hostname}`)) return true;
 
 			var href = target.prop('href').replace(`${window.location.protocol}//${window.location.hostname}`, '');
 			if (target.attr('container')) {

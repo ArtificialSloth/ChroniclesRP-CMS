@@ -1,109 +1,33 @@
-<div class="home page">
-	{% include "./style.njk" %}
-	{% lookup 'users', {_id: userid}, 'user' %}
+{% include "./style.njk" %}
+<div class="carousel slide" id="carouselHome" data-ride="carousel">
+	<div class="carousel-inner">
+		<ol class="carousel-indicators">
+			<li data-target="#carouselHome" data-slide-to="0" class="active"></li>
+			<li data-target="#carouselHome" data-slide-to="1"></li>
+			<li data-target="#carouselHome" data-slide-to="2"></li>
+		</ol>
 
-	<div class="slider">
-		<div class="slides">
-			{% query 'posts', {type: 'news'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
-
-			{% lookup 'users', {_id: posts[posts.length - 1].author}, 'author' %}
-			<div class="post" style="transform:translate(0); background-image:url({{posts[posts.length - 1].img}})">
-				<ul>
-					<li>News</li>
-					<li><a href="{{posts[posts.length - 1].slug}}">{{posts[posts.length - 1].title}}</a></li>
-					<li><a href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[posts.length - 1].date)}}</li>
-					<li>{{posts[posts.length - 1].content | safe | striptags(true) | truncate(150)}}</li>
-					<li><a href="{{posts[posts.length - 1].slug}}">Read More</a></li>
-				</ul>
-			</div>
-
-			{% for post in posts %}
-				{% lookup 'users', {_id: post.author}, 'author' %}
-				<div class="post" style="transform:translate({{posts.indexOf(post) + 1}}00%); background-image:url({{post.img}})">
-					<ul>
-						<li>News</li>
-						<li><a href="{{post.slug}}">{{post.title}}</a></li>
-						<li><a href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</li>
-						<li>{{post.content | safe | striptags(true) | truncate(150)}}</li>
-						<li><a href="{{post.slug}}">Read More</a></li>
-					</ul>
-				</div>
-			{% endfor %}
-
-			{% lookup 'users', {_id: posts[0].author}, 'author' %}
-			<div class="post" style="transform:translate({{posts.length + 1}}00%); background-image:url({{posts[0].img}})">
-				<ul>
-					<li>News</li>
-					<li><a href="{{posts[0].slug}}">{{posts[0].title}}</a></li>
-					<li><a href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(posts[0].date)}}</li>
-					<li>{{posts[0].content | safe | striptags(true) | truncate(150)}}</li>
-					<li><a href="{{posts[0].slug}}">Read More</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
-
-	<div class="sidebar left">
-		<div class="discord-widget">
-			<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
-		</div>
-
-		{% if user %}
-			<div class="chapter-discord-widget">
-				<h3>Your Discords</h3>
-
-				{% set count = 0 %}
-				{% query 'chapters', {}, {}, 'chapters' %}
-				{% for chapter in chapters %}
-					{% if crp.chapters.getMember(chapter, user._id) and chapter.discord %}
-						{% set count = count + 1 %}
-						<iframe src="https://discordapp.com/widget?id={{chapter.discord}}&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
-					{% endif %}
-				{% endfor %}
-
-				{% if count == 0 %}
-					It looks like none of your chapters have set up their Discord.
-				{% endif %}
-			</div>
-		{% endif %}
-
-		<div class="chronicles-discord-widget">
-			<h3>The Chronicles (RP)</h3>
-			<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
-		</div>
-
-		<div class="donate-widget">
-			<h3>Help Us</h3>
-			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-				<input type="hidden" name="cmd" value="_s-xclick">
-				<input type="hidden" name="hosted_button_id" value="S7UPCZZ9UYXZ6">
-				<input type="image" src="{{crp.storage.getUrl(css.img.donate)}}" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-				<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-			</form>
-		</div>
-	</div>
-
-	<div class="featured-content">
-		<h1>Featured Content</h1>
-
-		{% query 'posts', {type: 'featured_content'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
+		{% query 'posts', {type: 'news'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
 		{% for post in posts %}
-			<ul>
-				{% if post.img %}
-					<li><a><img src="{{post.img}}" /></a></li>
-				{% endif %}
-				<li class="title"><a href="{{post.slug}}">{{post.title}}</a></li>
-				<li class="date">{{crp.moment(post.date).fromNow()}}</li>
-				<li class="content">
-					{{post.content | safe | striptags(true) | truncate}}
-					{% if post.content.length > 255 %}
-						<a href="{{post.slug}}">[Read More]</a>
-					{% endif %}
-				</li>
-			</ul>
+			{% lookup 'users', {_id: post.author}, 'author' %}
+			<div class="carousel-item {% if loop.first %}active{% endif %}">
+				<img src="{{post.img}}" alt="{{post.title}}" width="100%" />
+				<div class="carousel-caption px-5">
+					<h5><a class="text-white" href="{{post.slug}}">{{post.title}}</a></h5>
+					<h6><a class="text-white" href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</h6>
+					<p>{{post.content | safe | striptags(true) | truncate(150)}}</p>
+					<p><a class="text-white" href="{{post.slug}}">Read More</a></p>
+				</div>
+			</div>
 		{% endfor %}
-	</div>
 
-	{% include "components/sidebar/index.njk" %}
-	{% include "./script.njk" %}
+		<a class="carousel-control-prev" href="#carouselHome" role="button" data-slide="prev">
+			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			<span class="sr-only">Previous</span>
+		</a>
+		<a class="carousel-control-next" href="#carouselHome" role="button" data-slide="next">
+			<span class="carousel-control-next-icon" aria-hidden="true"></span>
+			<span class="sr-only">Next</span>
+		</a>
+	</div>
 </div>

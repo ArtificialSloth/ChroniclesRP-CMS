@@ -3,16 +3,10 @@
 {% block body %}
 	{% include "./style.njk" %}
 
-	<div id="header-image"></div>
-
 	{% include "./components/navigation/index.njk" %}
-	{% include "./components/login/index.njk" %}
-	{% include "./components/header/index.njk" %}
 
-	<div class="content-blackout"></div>
 	<div class="content-main">
 		{% include "./pages" + path ignore missing %}
-		<div class="clear"></div>
 	</div>
 
 	{% include "./components/footer/index.njk" %}
