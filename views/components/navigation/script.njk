@@ -1,0 +1,34 @@
+<script>
+	$('.login-form').submit((e) => {
+		e.preventDefault();
+		$('#login').removeClass('is-invalid');
+		$('#pass').removeClass('is-invalid');
+
+		if ($('#login').val() == '') {
+			$('#login').next('.invalid-tooltip').html('Username field cannot be empty!');
+			$('#login').addClass('is-invalid');
+			return;
+		}
+		if ($('#pass').val().length < 6) {
+			$('#pass').next('.invalid-tooltip').html('Passwords must be at least 6 characters!');
+			$('#pass').addClass('is-invalid');
+			return;
+		}
+
+		var formData = $(e.target).serialize();
+		crpAjax('/login', formData, (res) => {
+			if (res == 'valid') {
+				location.reload();
+			} else if (res == 'tooMany') {
+				$('#login').next('.invalid-tooltip').html('Too many failed login attempts. Please wait 5 minutes then try again.');
+				$('#login').addClass('is-invalid');
+			} else if (res == 'locked') {
+				$('#login').next('.invalid-tooltip').html('Your account has been locked.');
+				$('#login').addClass('is-invalid');
+			} else {
+				$('#login').next('.invalid-tooltip').html('Incorrect username or password');
+				$('#login').addClass('is-invalid');
+			}
+		});
+	});
+</script>
