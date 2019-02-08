@@ -5,9 +5,9 @@
 
 	{% include "./components/navigation/index.njk" %}
 
-	<div class="content-main">
+	<main role="main">
 		{% include "./pages" + path ignore missing %}
-	</div>
+	</main>
 
 	{% include "./components/footer/index.njk" %}
 {% endblock %}
