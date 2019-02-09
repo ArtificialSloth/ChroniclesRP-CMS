@@ -46,27 +46,28 @@ async.waterfall([
 	crp.express.ready((err) => {
 		if (err) return console.error(err);
 
-		crp.fs.readFile(process.env.KEY, (err, key) => {
-			if (err) return console.error(err);
-
-			crp.fs.readFile(process.env.CERT, (err, cert) => {
+		var httpServer = crp.http.createServer(crp.app);
+		if (crp.prod && process.env.KEY && process.env.CERT) {
+			crp.fs.readFile(process.env.KEY, (err, key) => {
 				if (err) return console.error(err);
 
-				var httpServer = crp.http.createServer(crp.app);
-				var httpsServer = crp.https.createServer({key: key, cert: cert}, crp.app);
+				crp.fs.readFile(process.env.CERT, (err, cert) => {
+					if (err) return console.error(err);
 
-				httpServer.listen((process.env.PORT || 80), () => {
-					if (crp.prod) {
+					var httpsServer = crp.https.createServer({key: key, cert: cert}, crp.app);
+					httpServer.listen((process.env.PORT || 80), () => {
 						httpsServer.listen(443, () => {
 							if (process.send) process.send('online');
 							console.log('\nThe Chronicles RP is up and running!');
 						});
-					} else {
-						if (process.send) process.send('online');
-						console.log('\nThe Chronicles RP is up and running!');
-					}
+					});
 				});
 			});
-		});
+		} else {
+			httpServer.listen((process.env.PORT || 80), () => {
+				if (process.send) process.send('online');
+				console.log('\nThe Chronicles RP is up and running!');
+			});
+		}
 	});
 });
