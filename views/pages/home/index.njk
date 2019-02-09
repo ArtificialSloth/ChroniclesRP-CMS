@@ -1,4 +1,6 @@
 {% include "./style.njk" %}
+{% lookup 'users', {_id: userid}, 'user' %}
+
 <div class="carousel slide" id="carouselHome" data-ride="carousel">
 	<div class="carousel-inner">
 		<ol class="carousel-indicators">
@@ -13,10 +15,10 @@
 			<div class="carousel-item {% if loop.first %}active{% endif %}">
 				<img class="ml-auto" src="{{post.img}}" alt="{{post.title}}" width="100%" />
 				<div class="carousel-caption px-5">
-					<h5><a class="text-white" href="{{post.slug}}">{{post.title}}</a></h5>
-					<h6><a class="text-white" href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</h6>
+					<h5><a class="text-white text-bold" href="{{post.slug}}">{{post.title}}</a></h5>
+					<h6><a class="text-white font-italic" href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</h6>
 					<p>{{post.content | safe | striptags(true) | truncate(150)}}</p>
-					<p><a class="text-white" href="{{post.slug}}">Read More</a></p>
+					<p><a class="text-white text-bold" href="{{post.slug}}">Read More</a></p>
 				</div>
 			</div>
 		{% endfor %}
@@ -38,19 +40,61 @@
 		{% for post in posts %}
 			<div class="col-lg-4">
 				<div class="card shadow-sm">
-					<img class="card-img-top" src="{{post.img}}" alt="">
+					<img class="card-img-top" src="{{post.img}}" alt="" />
 					<div class="card-body">
-						<h5 class="card-title"><a href="{{post.slug}}">{{post.title}}</a></h5>
-						<h6 class="card-subtitle text-muted">{{crp.moment(post.date).fromNow()}}</h6>
+						<h5 class="card-title text-bold"><a href="{{post.slug}}">{{post.title}}</a></h5>
+						<h6 class="card-subtitle text-muted font-italic">{{crp.moment(post.date).fromNow()}}</h6>
 						<p class="card-text">{{post.content | safe | striptags(true) | truncate(100)}}</p>
-						<a class="card-link" href="{{post.slug}}">Read More</a>
+						<a class="card-link text-bold" href="{{post.slug}}">Read More</a>
 					</div>
 				</div>
 			</div>
 		{% endfor %}
 	</div>
 
-	<div class="row recent-posts">
+	<div class="row mt-3">
+		<div class="col-lg-8 recent-posts">
+			{% getTopics {}, 'topics' %}
+			{% set i = 0 %}
+			{% for topic in topics %}
+				{% if i < 5 %}
+					{% lookup 'users', {_id: topic.author}, 'author' %}
+					{% lookup 'forums', {_id: topic.parent}, 'forum' %}
+					{% lookup 'categories', {_id: forum.category}, 'category' %}
 
+					{% if not category.role or user.role >= category.role %}
+						<h3><a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a></h3>
+						<h6 class="text-muted font-italic"><a href="/members/{{author.nicename}}">{{author.display_name}}</a> - {{crp.moment(topic.sortDate).fromNow()}}</h6>
+						<p>{{topic.content | safe | striptags(true) | truncate}}</p>
+						<hr />
+						{% set i = i + 1 %}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		</div>
+		<div class="col-lg-4">
+			<div class="bg-white shadow-sm rounded p-3">
+				<h4 class="text-bold">About</h4>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+			</div>
+
+			<div class="shadow-sm mt-3">
+				<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
+			</div>
+
+			<div class="shadow-sm mt-3">
+				<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
+			</div>
+
+			<div class="bg-white shadow-sm mt-3">
+				<h3 class="text-bold pt-3 pr-3 pl-3 =">Help Us</h3>
+				<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+					<input type="hidden" name="cmd" value="_s-xclick">
+					<input type="hidden" name="hosted_button_id" value="S7UPCZZ9UYXZ6">
+					<input type="image" src="{{crp.storage.getUrl(css.img.donate)}}" name="submit" width="100%" alt="PayPal - The safer, easier way to pay online!">
+					<img src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" border="0" alt="" />
+				</form>
+			</div>
+		</div>
 	</div>
 </div>
