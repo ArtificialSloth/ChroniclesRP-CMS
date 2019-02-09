@@ -1,22 +1,47 @@
 <style>
-	a, a:hover {
-		color:#53377F;
-	}
-
 	body {
 		padding-top:3.5rem;
 	}
 
 	main {
+		font-family:Droid Serif, Georgia, serif;
 		min-height:200px;
+	}
+
+	a, a:hover {
+		color:#53377F;
+	}
+
+	.content-blackout {
+		background-color:rgba(0, 0, 0, 0);
+		height:100%;
+		position:fixed;
+		-webkit-transition:all 0.2s ease-in-out;
+		transition:all 0.2s ease-in-out;
+		visibility:hidden;
+		width:100%;
+		z-index:999;
+	}
+
+	.content-blackout.active {
+		background-color:rgba(0, 0, 0, 0.75);
+		visibility:visible;
 	}
 
 	.bg-primary {
 		background-color:#53377F !important;
 	}
 
-	.text-bold {
-		font-weight:bold;
+	.font-family-montserrat {
+		font-family:Montserrat, Helvetica Neue, Helvetica, sans-serif !important;
+	}
+
+	.text-transform-capitalize {
+		text-transform:capitalize !important;
+	}
+
+	.text-transform-uppercase {
+		text-transform:uppercase !important;
 	}
 
 	.container {
@@ -24,13 +49,13 @@
 	}
 
 	.noselect {
-		-webkit-user-select:none;
-		-moz-user-select:none;
-		-ms-user-select:none;
-		user-select:none;
+		-webkit-user-select:none !important;
+		-moz-user-select:none !important;
+		-ms-user-select:none !important;
+		user-select:none !important;
 	}
 
 	.pointer {
-		cursor:pointer;
+		cursor:pointer !important;
 	}
 </style>
