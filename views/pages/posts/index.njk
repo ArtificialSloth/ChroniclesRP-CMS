@@ -1,10 +1,31 @@
-<div class="page full post">
-	{% include "./style.njk" %}
-	{% lookup 'posts', {_id: postid}, 'post' %}
+{% lookup 'posts', {_id: postid}, 'post' %}
 
-	<div class="post-header">
-		{% if post.img %}<img src="{{post.img}}" class="post-image" />{% endif %}
-		<h1 class="post-title">{{post.title}}</h1>
-	</div>
+<div class="container post">
+	<header>
+		{% if post.img %}<img class="shadow-sm rounded d-block mx-auto my-3" src="{{post.img}}" alt="{{post.title}}" />{% endif %}
+		<h1 class="font-weight-bold text-center text-transform-uppercase pb-5">{{post.title}}</h1>
+	</header>
 	<div class="post-content">{{post.content | safe}}</div>
+
+	<div class="row mt-5">
+		<div class="col-lg-12">
+			<h4 class="font-family-montserrat text-transform-capitalize">{{post.type.replace('_', ' ')}}</h4>
+			<hr />
+		</div>
+
+		{% query 'posts', {type: post.type}, {sort: [['date', -1]], limit: 3}, 'posts' %}
+		{% for post in posts %}
+			<div class="col-lg-4 mt-3 mt-lg-0">
+				<div class="card shadow-sm">
+					<img class="card-img-top" src="{{post.img}}" height="250" alt="{{post.title}}" />
+					<div class="card-body">
+						<h5 class="card-title font-weight-bold"><a href="{{post.slug}}">{{post.title}}</a></h5>
+						<h6 class="card-subtitle text-muted font-italic">{{crp.moment(post.date).fromNow()}}</h6>
+						<p class="card-text">{{post.content | safe | striptags(true) | truncate(100)}}</p>
+						<a class="card-link font-weight-bold" href="{{post.slug}}">Read More</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
 </div>
