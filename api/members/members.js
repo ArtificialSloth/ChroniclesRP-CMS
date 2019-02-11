@@ -2,13 +2,8 @@ module.exports = (crp) => {
 	crp.members = {};
 
 	crp.members.validateEmail = (email) => {
-		var domain = email.split('@')
-
-		if (domain[0] != email && domain.length == 2 && domain[0].length >= 1) {
-			var dot = domain[1].split('.');
-			if (dot[0] != domain[1] && dot.length == 2 && dot[0].length >= 1) {
-				return true;
-			}
+		if (email && email.includes('@') && email.lastIndexOf('.') > email.lastIndexOf('@')) {
+			return true;
 		}
 
 		return false;
@@ -78,7 +73,7 @@ module.exports = (crp) => {
 				}
 
 				if (data.login && data.login != user.login) {
-					if (data.login < 4) return cb(null, 'loginLength');
+					if (data.login < 4 || data.login > 80) return cb(null, 'loginLength');
 					if (users.length > 0) return cb(null, 'loginTaken');
 
 					newUser.login = data.login.toLowerCase();
@@ -243,7 +238,7 @@ module.exports = (crp) => {
 				if (err) return cb(err);
 				if (users.length > 0) return cb('emailTaken');
 
-				if (user.login.length < 4) return cb('loginLength');
+				if (user.login.length < 4 || user.login.length > 80) return cb('loginLength');
 				if (!crp.members.validateEmail(user.email)) return cb('emailInvalid');
 
 				if (user.pass.length < 6) return cb('passLength');
