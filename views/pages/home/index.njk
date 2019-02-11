@@ -72,7 +72,12 @@
 					{% lookup 'categories', {_id: forum.category}, 'category' %}
 
 					{% if not category.role or user.role >= category.role %}
-						<h5><a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a></h5>
+						<h5>
+							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
+							{% if crp.moment().diff(crp.moment()) < 3 %}
+								<span class="badge badge-primary">New</span>
+							{% endif %}
+						</h5>
 						<h6 class="text-muted font-italic"><a href="/members/{{author.nicename}}">{{author.display_name}}</a> - {{crp.moment(topic.sortDate).fromNow()}}</h6>
 						<p>{{topic.content | safe | striptags(true) | truncate}}</p>
 						<hr />

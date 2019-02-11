@@ -322,8 +322,6 @@ module.exports = (crp) => {
 	};
 
 	crp.pages.add((slug, cb) => {
-		if (slug == '/register') return cb(null, {path: '/members/register/index.njk'});
-		if (slug == '/registered') return cb(null, {path: '/members/registered/index.njk'});
 		if (slug == '/admin/users') return cb(null, {
 			path: '/admin/index.njk',
 			subPage: '/members/admin/index.njk',

@@ -5,7 +5,7 @@
 
 	{% include "./components/navigation/index.njk" %}
 
-	<div class="content-blackout"></div>
+	<div class="content-blackout d-flex align-items-center justify-content-center"><div class="spinner-border text-white" role="status"></div></div>
 	<main role="main">
 		{% include "./pages" + path ignore missing %}
 	</main>

@@ -37,19 +37,75 @@
 					</div>
 				</li>
 			{% else %}
-				<form class="form-inline needs-validation login-form" novalidate>
+				<form class="form-inline needs-validation" id="login-form" novalidate>
 					<label for="login" class="d-lg-none text-light">Login:</label>
-					<input type="text" class="form-control form-control-sm" id="login" name="login" placeholder="Username" required />
+					<input type="text" class="form-control form-control-sm" id="login-form-login" name="login" placeholder="Username" required />
 					<div class="invalid-tooltip"></div>
-					<input type="password" class="form-control form-control-sm mt-1 mt-lg-0 ml-lg-1" id="pass" name="pass" placeholder="Password" required />
+					<input type="password" class="form-control form-control-sm mt-1 mt-lg-0 ml-lg-1" id="login-form-pass" name="pass" placeholder="Password" required />
 					<div class="invalid-tooltip"></div>
 					<button type="submit" class="btn btn-success btn-sm mt-1 mt-md-0 ml-lg-1 mr-lg-1">Login</button>
 				</form>
 				<span class="navbar-text">or</span>
-				<a class="nav-link" href="/register">Sign Up</a>
+				<a class="nav-link" href="#registerModal" data-toggle="modal">Sign Up</a>
 			{% endif %}
 		</ul>
 	</div>
 </nav>
+
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="registerModalTitle">Sign Up</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+
+			<div class="modal-body">
+				<form id="register-form" novalidate>
+					<div class="form-group">
+						<label for="register-form-login">Username</label>
+						<input type="text" class="form-control" id="register-form-login" name="login" placeholder="Username" required />
+						<div class="invalid-feedback"></div>
+					</div>
+
+					<div class="form-group">
+						<label for="register-form-email">Email Address</label>
+						<input type="email" class="form-control" id="register-form-email" name="email" placeholder="Email Address" required />
+						<div class="invalid-feedback"></div>
+					</div>
+
+					<div class="form-group">
+						<label for="register-form-email-confirm">Confirm Email Address</label>
+						<input type="email" class="form-control" id="register-form-email-confirm" name="email-confirm" placeholder="Confirm Email Address" required />
+						<div class="invalid-feedback"></div>
+					</div>
+
+					<div class="form-group">
+						<label for="register-form-pass">Password</label>
+						<input type="password" class="form-control" id="register-form-pass" name="pass" placeholder="Password" aria-describedby="register-form-pass-help" required />
+						<div class="invalid-feedback"></div>
+					</div>
+
+					<div class="form-group">
+						<label for="register-form-pass-confirm">Confirm Password</label>
+						<input type="password" class="form-control" id="register-form-pass-confirm" name="pass-confirm" placeholder="Confirm Password" required />
+						<div class="invalid-feedback"></div>
+					</div>
+
+					<div class="form-group">
+						<div class="g-recaptcha" data-sitekey="6Lf0MT8UAAAAAJ48jzvBm-QGZpB0Fer8WsGpguMS"></div>
+						<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+						<input type="hidden" class="form-control" id="register-form-captcha" />
+						<div class="invalid-feedback"></div>
+					</div>
+
+					<button type="submit" class="btn btn-success float-right">Sign Up</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
 
 {% include "./script.njk" %}

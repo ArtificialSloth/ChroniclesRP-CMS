@@ -41,9 +41,9 @@ module.exports = (crp, callback) => {
 	crp.app.post('/api/register', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
 			var userData = {
-				login: req.body.user_login,
-				pass: req.body.user_pass,
-				email: req.body.user_email
+				login: req.body.login,
+				pass: req.body.pass,
+				email: req.body.email
 			};
 
 			crp.members.add(userData, false, (err, result) => {
