@@ -3,13 +3,13 @@
 <div class="container post">
 	<header class="mt-3">
 		{% if post.img %}<img class="shadow-sm rounded d-none d-lg-block mx-auto mb-3" src="{{post.img}}" alt="{{post.title}}" />{% endif %}
-		<h1 class="font-weight-bold text-center text-transform-uppercase pb-5">{{post.title}}</h1>
+		<h1 class="font-weight-bold text-center text-uppercase pb-5">{{post.title}}</h1>
 	</header>
 	<div class="post-content">{{post.content | safe}}</div>
 
 	<div class="row mt-5">
 		<div class="col-lg-12">
-			<h4 class="font-family-montserrat text-transform-capitalize">{{post.type.replace('_', ' ')}}</h4>
+			<h4 class="font-family-montserrat text-capitalize">{{post.type.replace('_', ' ')}}</h4>
 			<hr />
 		</div>
 

@@ -15,7 +15,7 @@
 			<div class="carousel-item {% if loop.first %}active{% endif %}">
 				<img class="ml-auto" src="{{post.img}}" alt="{{post.title}}" width="100%" />
 				<div class="carousel-caption px-5">
-					<h5><a class="text-white text-transform-uppercase" href="{{post.slug}}">{{post.title}}</a></h5>
+					<h5><a class="text-white text-uppercase" href="{{post.slug}}">{{post.title}}</a></h5>
 					<h6><a class="font-italic text-white" href="/members/{{author.nicename}}">{{author.display_name}}</a> / {{crp.util.dateToStr(post.date)}}</h6>
 					<p>{{post.content | safe | striptags(true) | truncate(150)}}</p>
 					<p><a class="font-weight-bold text-white" href="{{post.slug}}">Read More</a></p>
@@ -47,7 +47,7 @@
 				<div class="card shadow-sm">
 					<img class="card-img-top" src="{{post.img}}" height="250" alt="{{post.title}}" />
 					<div class="card-body">
-						<h5 class="card-title font-weight-bold text-transform-uppercase"><a href="{{post.slug}}">{{post.title}}</a></h5>
+						<h5 class="card-title font-weight-bold text-uppercase"><a href="{{post.slug}}">{{post.title}}</a></h5>
 						<h6 class="card-subtitle text-muted font-italic">{{crp.moment(post.date).fromNow()}}</h6>
 						<p class="card-text">{{post.content | safe | striptags(true) | truncate(100)}}</p>
 						<a class="card-link font-weight-bold" href="{{post.slug}}">Read More</a>
@@ -74,7 +74,7 @@
 					{% if not category.role or user.role >= category.role %}
 						<h5>
 							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
-							{% if crp.moment().diff(crp.moment()) < 3 %}
+							{% if crp.moment(topic.date).diff(crp.moment()) < 3 %}
 								<span class="badge badge-primary">New</span>
 							{% endif %}
 						</h5>

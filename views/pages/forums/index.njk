@@ -1,54 +1,59 @@
-<div class="page">
-	<ul class="forums">
-		{% include "./style.njk" %}
-		{% lookup 'users', {_id: userid}, 'user' %}
+{% lookup 'users', {_id: userid}, 'user' %}
 
-		<p class="breadcrumbs">
-			<a href="/">Home</a>
-			<span>›</span>
-			<span>Index</span>
-		</p>
+<div class="container my-3">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Index</li>
+		</ol>
+	</nav>
 
-		{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
-		{% for category in categories %}
-			{% if not category.role or user.role >= category.role %}
-				<li class="category">
-					<ul>
-						<li>{{category.name}}</li>
-						<li>Topics</li>
-						<li>Most Recent</li>
-					</ul>
-				</li>
+	<div class="row px-3">
+		<div class="col-lg-10 container shadow-sm">
+			{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
+			{% for category in categories %}
+				{% if not category.role or user.role >= category.role %}
+					<div class="row bg-primary text-light border-bottom border-secondary p-2">
+						<div class="col-lg-8">{{category.name}}</div>
+						<div class="col-lg-2 text-center d-none d-lg-block">Topics</div>
+						<div class="col-lg-2 text-center d-none d-lg-block">Most Recent</div>
+					</div>
 
-				{% query 'forums', {category: category._id}, {sort: [['order', 1]]}, 'forums' %}
-				{% for forum in forums %}
-					{% getTopics {parent: forum._id}, 'topics' %}
-
-					<li class="forum">
-						<ul>
-							<li>
-								<a class="forum-name" href="/forums/{{forum.slug}}">{{forum.name}}</a>
-								<div class="forum-desc">{{forum.desc}}</div>
-							</li>
-							<li>{{topics.length}}</li>
-							<li>
+					{% query 'forums', {category: category._id}, {sort: [['order', 1]]}, 'forums' %}
+					{% for forum in forums %}
+						{% getTopics {parent: forum._id}, 'topics' %}
+						<div class="row bg-white p-2">
+							<div class="col-lg-8">
+								<a href="/forums/{{forum.slug}}" style="font-size:1.25rem">{{forum.name}}</a>
+								{% if topics[0] and crp.moment(topics[0].date).diff(crp.moment()) < 3 %}
+									<span class="badge badge-primary">New</span>
+								{% endif %}
+								<p class="text-muted d-none d-lg-block m-0 pl-3">{{forum.desc}}</p>
+							</div>
+							<div class="col-lg-2 text-center d-none d-lg-block">{{topics.length}}</div>
+							<div class="col-lg-2 text-lg-center ml-3 ml-lg-0">
 								{% if topics[0] %}
 									{% lookup 'users', {_id: topics[0].author}, 'author' %}
+
 									{% if topics[0].sortAuthor %}
 										{% lookup 'users', {_id: topics[0].sortAuthor}, 'sortAuthor' %}
 										<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a> replied to
 									{% endif %}
+
 									<a href="/forums/{{forum.slug}}/{{topics[0]._id}}">{{topics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 								{% else %}
 									No Topics
 								{% endif %}
-							</li>
-						</ul>
-					</li>
-				{% endfor %}
-			{% endif %}
-		{% endfor %}
-	</ul>
+							</div>
+						</div>
+						{% if not loop.last %}<hr class="m-0" />{% endif %}
+					{% endfor %}
+				{% endif %}
+			{% endfor %}
+		</div>
 
-	{% include "components/sidebar/index.njk" %}
+		<div class="col-lg-2 d-none d-lg-block">
+			{% include "components/sidebar/index.njk" %}
+		</div>
+	</div>
 </div>
