@@ -34,7 +34,7 @@ module.exports = (crp, callback) => {
 					if (err) return cb(err);
 					if ((!user && page.role) || (user && page.role && user.role < page.role) || (user && page.role && user.role < 3)) page = {path: '/404/index.njk'};
 
-					context.userid = user ? user._id : null;
+					context.user = user;
 					cb(null, {path: page.path, context: context});
 				});
 			});

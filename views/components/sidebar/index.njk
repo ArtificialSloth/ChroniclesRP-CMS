@@ -1,65 +1,52 @@
-<div class="sidebar">
-	{% include "./style.njk" %}
-	{% lookup 'users', {_id: userid}, 'user' %}
+<div class="container">
+	<div class="bg-white shadow-sm rounded p-3">
+		<h4 class="font-weight-bold">Recent Posts</h4>
+		<hr />
 
-	<div class="login-widget">
-		<h3></h3>
-
-		{% if user %}
-			<ul>
-				<li><img src="{{crp.members.getProfilePic(user)}}" /></li>
-				<li>
-					<a href="/members/{{user.nicename}}">{{user.display_name}}</a>
-					<a class="redirect" href="/logout">Logout</a>
-				</li>
-			</ul>
-		{% else %}
-			<form class="login-form">
-				<label for="login">Username</label>
-				<input type="text" name="login" placeholder="Username" />
-
-				<label for="pass">Password</label>
-				<input type="password" name="pass" placeholder="Password" />
-
-				<div class="error-message"></div>
-
-				<input type="checkbox" name="remember_me" class="remember_me" /> <input type="button" onclick="$('.remember_me').prop('checked', !$('.remember_me').prop('checked'))" value="Remember me" />
-				<input type="button" value="Login" onclick="loginSubmit(this)">
-			</form>
-
-			{% include "components/login/script.njk" %}
-		{% endif %}
-	</div>
-
-	<div class="recent-posts-widget">
-		{% getTopics {}, 'topics' %}
-
-		<h3>Recent Posts</h3>
-		<ul>
-			{% set i = 0 %}
+		<ul class="pl-3">
+			{% getTopics {}, 'topics' %}
 			{% for topic in topics %}
-				{% if i < 5 %}
+				{% if loop.index0 < 5 %}
 					{% lookup 'users', {_id: topic.author}, 'author' %}
 					{% lookup 'forums', {_id: topic.parent}, 'forum' %}
 					{% lookup 'categories', {_id: forum.category}, 'category' %}
 
 					{% if not category.role or user.role >= category.role %}
-						<li>
+						<li class="mb-2">
 							{% if topic.sortAuthor %}
 								{% lookup 'users', {_id: topic.sortAuthor}, 'sortAuthor' %}
-								<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a>
-								replied to
+								<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a> replied to
 							{% endif %}
-							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
-							by
-							<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+
+							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+							{% if crp.moment(topic.date).diff(crp.moment()) < 3 %}
+								<span class="badge badge-primary">New</span>
+							{% endif %}
 							<br />
-							{{crp.moment(topic.sortDate).fromNow()}}
+							<span>{{crp.moment(topic.sortDate).fromNow()}}</span>
 						</li>
-						{% set i = i + 1 %}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
 		</ul>
+	</div>
+
+	<div class="bg-white shadow-sm rounded mt-3 p-3">
+		<h4 class="font-weight-bold">Help Us</h4>
+		<hr />
+		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+			<input type="hidden" name="cmd" value="_s-xclick">
+			<input type="hidden" name="hosted_button_id" value="S7UPCZZ9UYXZ6">
+			<input type="image" src="{{crp.storage.getUrl(css.img.donate)}}" name="submit" width="100%" alt="PayPal - The safer, easier way to pay online!">
+			<img src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" border="0" alt="" />
+		</form>
+	</div>
+
+	<div class="shadow-sm mt-3">
+		<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
+	</div>
+
+	<div class="shadow-sm mt-3">
+		<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
 	</div>
 </div>
