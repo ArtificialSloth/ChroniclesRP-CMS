@@ -62,9 +62,10 @@
 			<h4 class="font-family-montserrat">Recent Posts</h4>
 			<hr />
 
+			{% set i = 0 %}
 			{% getTopics {}, 'topics' %}
 			{% for topic in topics %}
-				{% if loop.index0 < 5 %}
+				{% if i < 5 %}
 					{% lookup 'users', {_id: topic.author}, 'author' %}
 					{% lookup 'forums', {_id: topic.parent}, 'forum' %}
 					{% lookup 'categories', {_id: forum.category}, 'category' %}
@@ -72,13 +73,14 @@
 					{% if not category.role or user.role >= category.role %}
 						<h5>
 							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
-							{% if crp.moment(topic.date).diff(crp.moment()) < 3 %}
+							{% if crp.moment().diff(crp.moment(topic.date), 'days') < 3 %}
 								<span class="badge badge-primary">New</span>
 							{% endif %}
 						</h5>
 						<h6 class="text-muted font-italic"><a href="/members/{{author.nicename}}">{{author.display_name}}</a> - {{crp.moment(topic.sortDate).fromNow()}}</h6>
 						<p>{{topic.content | safe | striptags(true) | truncate}}</p>
 						<hr />
+						{% set i = i + 1 %}
 					{% endif %}
 				{% endif %}
 			{% endfor %}

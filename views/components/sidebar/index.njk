@@ -4,9 +4,10 @@
 		<hr />
 
 		<ul class="pl-3">
+			{% set i = 0 %}
 			{% getTopics {}, 'topics' %}
 			{% for topic in topics %}
-				{% if loop.index0 < 5 %}
+				{% if i < 5 %}
 					{% lookup 'users', {_id: topic.author}, 'author' %}
 					{% lookup 'forums', {_id: topic.parent}, 'forum' %}
 					{% lookup 'categories', {_id: forum.category}, 'category' %}
@@ -19,12 +20,13 @@
 							{% endif %}
 
 							<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
-							{% if crp.moment(topic.date).diff(crp.moment()) < 3 %}
+							{% if crp.moment().diff(crp.moment(topic.date), 'days') < 3 %}
 								<span class="badge badge-primary">New</span>
 							{% endif %}
 							<br />
 							<span>{{crp.moment(topic.sortDate).fromNow()}}</span>
 						</li>
+						{% set i = i + 1 %}
 					{% endif %}
 				{% endif %}
 			{% endfor %}

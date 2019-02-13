@@ -9,6 +9,8 @@
 	<div class="row px-3">
 		<div class="col-lg-9 container shadow-sm">
 			{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
+			{% query 'forums', {}, {sort: [['order', 1]]}, 'forums' %}
+			{% getTopics {}, 'topics' %}
 			{% for category in categories %}
 				{% if not category.role or user.role >= category.role %}
 					<div class="row bg-primary text-light border-bottom border-secondary p-2">
@@ -17,28 +19,28 @@
 						<div class="col-lg-2 text-center d-none d-lg-block">Most Recent</div>
 					</div>
 
-					{% query 'forums', {category: category._id}, {sort: [['order', 1]]}, 'forums' %}
-					{% for forum in forums %}
-						{% getTopics {parent: forum._id}, 'topics' %}
+					{% for forum in crp.util.filterObjectArray(forums, {category: category._id.toString()}) %}
+						{% set forumTopics = crp.util.filterObjectArray(topics, {parent: forum._id.toString()}) %}
+
 						<div class="row bg-white p-2">
 							<div class="col-lg-8">
 								<a href="/forums/{{forum.slug}}" style="font-size:1.25rem">{{forum.name}}</a>
-								{% if topics[0] and crp.moment(topics[0].date).diff(crp.moment()) < 3 %}
+								{% if forumTopics[0] and crp.moment().diff(crp.moment(forumTopics[0].date), 'days') < 3 %}
 									<span class="badge badge-primary">New</span>
 								{% endif %}
 								<p class="text-muted d-none d-lg-block m-0 pl-3">{{forum.desc}}</p>
 							</div>
-							<div class="col-lg-2 text-center d-none d-lg-block">{{topics.length}}</div>
+							<div class="col-lg-2 text-center d-none d-lg-block">{{forumTopics.length}}</div>
 							<div class="col-lg-2 text-lg-center ml-3 ml-lg-0">
-								{% if topics[0] %}
-									{% lookup 'users', {_id: topics[0].author}, 'author' %}
+								{% if forumTopics[0] %}
+									{% lookup 'users', {_id: forumTopics[0].author}, 'author' %}
 
-									{% if topics[0].sortAuthor %}
-										{% lookup 'users', {_id: topics[0].sortAuthor}, 'sortAuthor' %}
+									{% if forumTopics[0].sortAuthor %}
+										{% lookup 'users', {_id: forumTopics[0].sortAuthor}, 'sortAuthor' %}
 										<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a> replied to
 									{% endif %}
 
-									<a href="/forums/{{forum.slug}}/{{topics[0]._id}}">{{topics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+									<a href="/forums/{{forum.slug}}/{{topics[0]._id}}">{{forumTopics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
 								{% else %}
 									No Topics
 								{% endif %}
