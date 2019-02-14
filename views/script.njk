@@ -28,6 +28,7 @@
 	}
 
 	function crpGetPage(page) {
+		$('#navbarNavDropdown').collapse('hide');
 		$('.content-blackout').addClass('active');
 		crpAjax('/api/get-page', {page: page}, (res) => {
 			$('main').html(res);

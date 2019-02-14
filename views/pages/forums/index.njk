@@ -10,7 +10,7 @@
 		<div class="col-lg-9 container shadow-sm">
 			{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
 			{% query 'forums', {}, {sort: [['order', 1]]}, 'forums' %}
-			{% getTopics {}, 'topics' %}
+			{% getTopics {}, false, 'topics' %}
 			{% for category in categories %}
 				{% if not category.role or user.role >= category.role %}
 					<div class="row bg-primary text-light border-bottom border-secondary p-2">

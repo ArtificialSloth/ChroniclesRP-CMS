@@ -255,20 +255,35 @@ module.exports = (crp) => {
 		});
 	};
 
-	crp.forums.sortTopics = (topics, order, cb) => {
-		crp.forums.getReplies({}, (err, replies) => {
-			for (var i in topics) {
-				topics[i].sortDate = topics[i].date;
-				for (var j in replies) {
-					if (replies[j].parent.equals(topics[i]._id) && replies[j].date > topics[i].sortDate) {
-						topics[i].sortAuthor = replies[j].author;
-						topics[i].sortDate = replies[j].date;
+	crp.forums.sortTopics = (filter, type, cb) => {
+		crp.forums.getTopics(filter, (err, topics) => {
+			if (err) return cb(err);
+
+			crp.forums.getReplies({}, (err, replies) => {
+				if (err) return cb(err);
+
+				for (var i in topics) {
+					topics[i].sortDate = topics[i].date;
+					for (var j in replies) {
+						if (replies[j].parent.equals(topics[i]._id) && replies[j].date > topics[i].sortDate) {
+							topics[i].sortAuthor = replies[j].author;
+							topics[i].sortDate = replies[j].date;
+						}
 					}
 				}
-			}
 
-			return cb(null, crp.util.sortObjectArray(topics, 'sortDate', order));
+				var result = crp.util.sortObjectArray(topics, 'sortDate', -1);
+				if (type) {
+					result.sort((a, b) => {
+						if (a.type == 'sticky') return -1;
+						if (b.type == 'sticky') return 1;
+					});
+				}
+
+				return cb(null, result);
+			});
 		});
+
 	};
 
 	crp.forums.setReplyData = (replyid, data, cb) => {
@@ -344,14 +359,10 @@ module.exports = (crp) => {
 			return new nodes.CallExtensionAsync(this, 'run', args);
 		};
 
-		this.run = (context, filter, key, cb) => {
-			crp.forums.getTopics(filter, (err, topics) => {
-				if (err) return cb(err);
-
-				crp.forums.sortTopics(topics, -1, (err, result) => {
-					context.ctx[key] = topics;
-					cb(err);
-				});
+		this.run = (context, filter, type, key, cb) => {
+			crp.forums.sortTopics(filter, type, (err, result) => {
+				context.ctx[key] = result;
+				cb(err);
 			});
 		};
 	})

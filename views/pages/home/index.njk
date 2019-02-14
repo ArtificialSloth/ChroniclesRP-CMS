@@ -63,7 +63,7 @@
 			<hr />
 
 			{% set i = 0 %}
-			{% getTopics {}, 'topics' %}
+			{% getTopics {}, false, 'topics' %}
 			{% for topic in topics %}
 				{% if i < 5 %}
 					{% lookup 'users', {_id: topic.author}, 'author' %}
