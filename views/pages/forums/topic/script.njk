@@ -50,7 +50,8 @@
 			$(e).html('Edit');
 		}
 
-		$(e).parents('.sub-header').next().find('li:nth-child(2)').toggleClass('edit');
+		$(e).parents('.container').find('.topic-body').toggleClass('d-none');
+		$(e).parents('.container').find('.topic-edit').toggleClass('d-none');
 	}
 
 	$('.new-post form').submit((e) => {
@@ -74,7 +75,7 @@
 		});
 	});
 
-	$('.edit-topic').submit((e) => {
+	$('.edit-topic-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 

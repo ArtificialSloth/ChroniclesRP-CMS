@@ -15,13 +15,13 @@
 	<div class="row">
 		{% set member = crp.chapters.getMember(chapter, user._id) %}
 		{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
-			{% if topics[0] %}
-				<div class="col-lg-9">
+			<div class="col-lg-9">
+				{% if topics[0] %}
 					<div class="container shadow-sm">
 						<div class="row bg-primary text-light border-bottom border-secondary p-2">
-							<div class="col-lg-8">{{forum.name}}</div>
+							<div class="col col-lg-8">{{forum.name}}</div>
 							<div class="col-lg-2 text-center d-none d-lg-block">Replies</div>
-							<div class="col-lg-2 text-center d-none d-lg-block">Most Recent</div>
+							<div class="col col-lg-2 text-center">Most Recent</div>
 						</div>
 
 						{% for topic in topics %}
@@ -55,12 +55,43 @@
 							{% if not loop.last %}<hr class="m-0" />{% endif %}
 						{% endfor %}
 					</div>
-				</div>
-			{% else %}
-				<div class="col-lg-9">
+				{% else %}
 					<div class="alert alert-warning" role="alert">This forum has no topics.</div>
-				</div>
-			{% endif %}
+				{% endif %}
+
+				{% if user and user.role >= 1 %}
+					<form class="bg-white rounded shadow-sm mt-3 p-3" id="new-topic-form">
+						<h6 class="font-italic">Create New Topic in {{forum.name}}</h6>
+						<hr />
+
+						<div class="form-group">
+							<label for="new-topic-form-title">Topic Title (Max 80)</label>
+							<input type="text" class="form-control" id="new-topic-form-title" name="title" placeholder="Title" maxlength="80" />
+							<div class="invalid-feedback"></div>
+						</div>
+
+						{% if user.role >= 2 %}
+							<div class="form-group">
+								<label for="new-topic-form-type">Topic Type</label>
+								<select class="form-control" id="new-topic-form-type" name="type">
+									<option value="normal">Normal</option>
+									<option value="sticky">Sticky</option>
+								</select>
+								<div class="invalid-feedback"></div>
+							</div>
+						{% endif %}
+
+						<div class="form-group">
+							<textarea class="form-control tinymce" id="new-topic-form-body" name="body"></textarea>
+							<div class="invalid-feedback"></div>
+							<script>crpTinyMCE()</script>
+						</div>
+
+						<input type="hidden" name="parent" value="{{forum._id}}" />
+						<button type="submit" class="btn btn-primary d-block ml-auto">Post</button>
+					</form>
+				{% endif %}
+			</div>
 		{% else %}
 			<div class="col-lg-9">
 				<div class="alert alert-warning" role="alert">You're not allowed to view this forum.</div>
@@ -72,3 +103,5 @@
 		</div>
 	</div>
 </div>
+
+{% include "./script.njk" %}

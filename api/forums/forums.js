@@ -218,8 +218,7 @@ module.exports = (crp) => {
 			topic.author = user._id;
 			topic.subs.push(user._id);
 
-			if (!topic.title || topic.title.length < 4) return cb('titleShort');
-			if (topic.title.length > 80) return cb('titleLong');
+			if (!topic.title || topic.title.length < 4 || topic.title.length > 80) return cb('titleLength');
 			if (!topic.content || topic.content.length < 4) return cb('bodyLength');
 
 			crp.forums.getForumData(topic.parent, (err, forum) => {
