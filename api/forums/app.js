@@ -199,7 +199,7 @@ module.exports = (crp, callback) => {
 				if (!user || (!reply.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
 
 				var replyData = {
-					content: req.body.body,
+					content: req.body.reply,
 				};
 
 				crp.forums.setReplyData(reply._id, replyData, (err, result) => {

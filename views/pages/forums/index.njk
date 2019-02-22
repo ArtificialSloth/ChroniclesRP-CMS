@@ -6,50 +6,52 @@
 		</ol>
 	</nav>
 
-	<div class="row px-3">
-		<div class="col-lg-9 container shadow-sm">
-			{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
-			{% query 'forums', {}, {sort: [['order', 1]]}, 'forums' %}
-			{% getTopics {}, false, 'topics' %}
-			{% for category in categories %}
-				{% if not category.role or user.role >= category.role %}
-					<div class="row bg-primary text-light border-bottom border-secondary p-2">
-						<div class="col-lg-8">{{category.name}}</div>
-						<div class="col-lg-2 text-center d-none d-lg-block">Topics</div>
-						<div class="col-lg-2 text-center d-none d-lg-block">Most Recent</div>
-					</div>
-
-					{% for forum in crp.util.filterObjectArray(forums, {category: category._id.toString()}) %}
-						{% set forumTopics = crp.util.filterObjectArray(topics, {parent: forum._id.toString()}) %}
-
-						<div class="row bg-white p-2">
-							<div class="col-lg-8">
-								<a href="/forums/{{forum.slug}}" style="font-size:1.25rem">{{forum.name}}</a>
-								{% if forumTopics[0] and crp.moment().diff(crp.moment(forumTopics[0].date), 'days') < 3 %}
-									<span class="badge badge-primary">New</span>
-								{% endif %}
-								<p class="text-muted d-none d-lg-block m-0 pl-3">{{forum.desc}}</p>
-							</div>
-							<div class="col-lg-2 text-center d-none d-lg-block">{{forumTopics.length}}</div>
-							<div class="col-lg-2 text-lg-center ml-3 ml-lg-0">
-								{% if forumTopics[0] %}
-									{% lookup 'users', {_id: forumTopics[0].author}, 'author' %}
-
-									{% if forumTopics[0].sortAuthor %}
-										{% lookup 'users', {_id: forumTopics[0].sortAuthor}, 'sortAuthor' %}
-										<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a> replied to
-									{% endif %}
-
-									<a href="/forums/{{forum.slug}}/{{topics[0]._id}}">{{forumTopics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
-								{% else %}
-									No Topics
-								{% endif %}
-							</div>
+	<div class="row">
+		<div class="col-lg-9">
+			<div class="container bg-white shadow-sm">
+				{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
+				{% query 'forums', {}, {sort: [['order', 1]]}, 'forums' %}
+				{% getTopics {}, false, 'topics' %}
+				{% for category in categories %}
+					{% if not category.role or user.role >= category.role %}
+						<div class="row bg-primary text-light border-bottom border-secondary p-2">
+							<div class="col-lg-8">{{category.name}}</div>
+							<div class="col-lg-2 text-center d-none d-lg-block">Topics</div>
+							<div class="col-lg-2 text-center d-none d-lg-block">Most Recent</div>
 						</div>
-						{% if not loop.last %}<hr class="m-0" />{% endif %}
-					{% endfor %}
-				{% endif %}
-			{% endfor %}
+
+						{% for forum in crp.util.filterObjectArray(forums, {category: category._id.toString()}) %}
+							{% set forumTopics = crp.util.filterObjectArray(topics, {parent: forum._id.toString()}) %}
+
+							<div class="row p-2">
+								<div class="col-lg-8">
+									<a href="/forums/{{forum.slug}}" style="font-size:1.25rem">{{forum.name}}</a>
+									{% if forumTopics[0] and crp.moment().diff(crp.moment(forumTopics[0].date), 'days') < 3 %}
+										<span class="badge badge-primary">New</span>
+									{% endif %}
+									<p class="text-muted d-none d-lg-block m-0 pl-3">{{forum.desc}}</p>
+								</div>
+								<div class="col-lg-2 text-center d-none d-lg-block">{{forumTopics.length}}</div>
+								<div class="col-lg-2 text-lg-center ml-3 ml-lg-0">
+									{% if forumTopics[0] %}
+										{% lookup 'users', {_id: forumTopics[0].author}, 'author' %}
+
+										{% if forumTopics[0].sortAuthor %}
+											{% lookup 'users', {_id: forumTopics[0].sortAuthor}, 'sortAuthor' %}
+											<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a> replied to
+										{% endif %}
+
+										<a href="/forums/{{forum.slug}}/{{forumTopics[0]._id}}">{{forumTopics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+									{% else %}
+										No Topics
+									{% endif %}
+								</div>
+							</div>
+							{% if not loop.last %}<hr class="m-0" />{% endif %}
+						{% endfor %}
+					{% endif %}
+				{% endfor %}
+			</div>
 		</div>
 
 		<div class="col-lg-3 d-none d-lg-block">

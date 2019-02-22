@@ -17,7 +17,7 @@
 		{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
 			<div class="col-lg-9">
 				{% if topics[0] %}
-					<div class="container shadow-sm">
+					<div class="container bg-white shadow-sm">
 						<div class="row bg-primary text-light border-bottom border-secondary p-2">
 							<div class="col col-lg-8">{{forum.name}}</div>
 							<div class="col-lg-2 text-center d-none d-lg-block">Replies</div>
@@ -28,7 +28,7 @@
 							{% lookup 'users', {_id: topic.author}, 'author' %}
 							{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
 
-							<div class="row bg-white p-2">
+							<div class="row p-2">
 								<div class="col col-lg-8">
 									<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
 									{% if topic.type == 'sticky' %}
