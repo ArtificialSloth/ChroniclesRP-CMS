@@ -1,43 +1,17 @@
-<div class="page full profile">
-	{% include "./style.njk" %}
-	{% lookup 'users', {_id: profileid}, 'profile' %}
+{% include "./style.njk" %}
+{% lookup 'users', {_id: profileid}, 'profile' %}
 
-	<div class="profile-header">
-		<div class="header-cover-image" style="background-image:url('{{crp.members.getCoverPic(profile)}}')"></div>
-		<div class="header-meta">
-			<img class="profile-pic" src="{{crp.members.getProfilePic(profile)}}" />
-			<div class="profile-details">
-				<a class="profile-name" href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
-				<span class="profile-tagline">{{profile.tagline}}</span>
-			</div>
+<div class="profile-header d-flex flex-column-reverse" style="background-image:url('{{crp.members.getCoverPic(profile)}}')">
+	<div class="text-white text-center h-50" style="background-color:rgba(0, 0, 0, 0.5)">
+		<img src="{{crp.members.getProfilePic(profile)}}" alt="{{profile.display_name}}" width="150" height="150" />
+		<div class="pt-2">
+			<h2 class="font-weight-bold">{{profile.display_name}}</h2>
+			<p>{{profile.tagline}}</p>
 		</div>
 	</div>
+</div>
 
-	<div class="profile-content">
-		<div class="top-bar"></div>
 
-		<div class="containor">
-			{% include "pages" + subPage %}
-		</div>
-
-		<div class="nav noselect">
-			<a onclick="crpGetSubPage('/members/{{profile.nicename}}', '.profile-content .containor', true)">Activity</a>
-			<a onclick="crpGetSubPage('/members/{{profile.nicename}}/info', '.profile-content .containor', true)">Info</a>
-			<!--<a onclick="crpGetSubPage('/members/{{profile.nicename}}/friends', '.profile-content .containor', true)">Friends</a>-->
-			<a onclick="crpGetSubPage('/members/{{profile.nicename}}/chapters', '.profile-content .containor', true)">Chapters</a>
-			{% lookup 'users', {_id: userid}, 'user' %}
-			{% if profile._id.equals(user._id) %}
-				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/messages', '.profile-content .containor', true)">
-					Messages
-					{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
-					{% set chapters = crp.chapters.getInvites(chapters, profile._id) %}
-					{% if chapters.length > 0 %}
-						<span class="count">{{chapters.length}}</span>
-					{% endif %}
-				</a>
-				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/account', '.profile-content .containor', true)">Account</a>
-				<a onclick="crpGetSubPage('/members/{{profile.nicename}}/settings', '.profile-content .containor', true)">Settings</a>
-			{% endif %}
-		</div>
-	</div>
+<div class="profile-content">
+	{% include "pages" + subPage %}
 </div>

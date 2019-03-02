@@ -45,7 +45,9 @@
 		{% for post in posts %}
 			<div class="col-lg-4 mt-3 mt-lg-0">
 				<div class="card shadow-sm">
-					<img class="card-img-top" src="{{post.img}}" height="250" alt="{{post.title}}" />
+					<a class="card-img-container" href="{{post.slug}}">
+						<img class="card-img-top" src="{{post.img}}" alt="{{post.title}}" />
+					</a>
 					<div class="card-body">
 						<h5 class="card-title font-weight-bold text-uppercase"><a href="{{post.slug}}">{{post.title}}</a></h5>
 						<h6 class="card-subtitle text-muted font-italic">{{crp.moment(post.date).fromNow()}}</h6>

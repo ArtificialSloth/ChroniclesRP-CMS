@@ -1,6 +1,7 @@
 <style>
 	body {
 		padding-top:3.5rem;
+		position:relative;
 	}
 
 	main {
@@ -44,6 +45,30 @@
 
 	.container {
 		max-width:1800px !important;
+	}
+
+	.card-img-container {
+		height:250px;
+	}
+
+	.card-img-container img {
+		height:100%;
+		object-fit:cover;
+	}
+
+	.nav-vertical-tabs {
+		border-bottom:none;
+		border-left:1px solid #dee2e6;
+	}
+
+	.nav-vertical-tabs .nav-link.active,
+	.nav-vertical-tabs .nav-link:hover {
+		border-bottom:1px solid #dee2e6;
+		border-left:none;
+		border-top-left-radius:0;
+		border-bottom-left-radius:0;
+		border-top-right-radius:.25rem;
+		border-bottom-right-radius:.25rem;
 	}
 
 	.noselect {

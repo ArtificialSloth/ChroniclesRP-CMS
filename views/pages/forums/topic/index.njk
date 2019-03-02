@@ -1,3 +1,4 @@
+{% include "./style.njk" %}
 {% lookup 'topics', {_id: topicid}, 'topic' %}
 {% lookup 'forums', {_id: topic.parent}, 'forum' %}
 {% lookup 'categories', {_id: forum.category}, 'category' %}
@@ -55,7 +56,7 @@
 							<p class="font-italic m-0">{{crp.members.parseRole(author.role)}}</p>
 						</div>
 
-						<div class="col-lg-10 mt-3 mt-lg-0 p-0">
+						<div class="col-lg-10 body mt-3 mt-lg-0 p-0">
 							{{topic.content | safe}}
 						</div>
 
@@ -120,7 +121,7 @@
 								<p class="font-italic m-0">{{crp.members.parseRole(replyAuthor.role)}}</p>
 							</div>
 
-							<div class="col-lg-10 mt-3 mt-lg-0 p-0">
+							<div class="col-lg-10 body mt-3 mt-lg-0 p-0">
 								{{reply.content | safe}}
 							</div>
 

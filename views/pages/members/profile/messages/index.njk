@@ -1,20 +1,23 @@
-{% include "./style.njk" %}
+<div class="container">
+	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
+		<a class="nav-link" href="/members/{{profile.nicename}}">Activity</a>
+		<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters</a>
+		<a class="nav-link active" href="/members/{{profile.nicename}}/messages">Messages</a>
+		<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
+	</nav>
 
-{% lookup 'users', {_id: profileid}, 'profile' %}
-{% lookup 'users', {_id: userid}, 'user' %}
-{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
-{% set chapters = crp.chapters.getInvites(chapters, profile._id) %}
+	<div class="row mt-lg-3">
+		<div class="col-lg-9">
 
-{% if profile._id.equals(user._id) %}
-	<ul class="invites">
-		{% if chapters.length > 0 %}
-			{% for chapter in chapters %}
-				<li>You've been invited to join the <a href="/chapters/{{chapter.slug}}">{{chapter.name}}</a>. <span><a onclick="declineChapterInvite('{{chapter._id}}')">Decline</a> | <a onclick="acceptChapterInvite('{{chapter._id}}')">Accept</a></span></li>
-			{% endfor %}
-		{% else %}
-			<div class="warning">You don't have any messages.</div>
-		{% endif %}
-	</ul>
-{% endif %}
+		</div>
 
-{% include "./script.njk" %}
+		<div class="col-lg-3">
+			<nav class="nav nav-tabs nav-vertical-tabs flex-column justify-content-center mt-2 d-none d-lg-block">
+				<a class="nav-link" href="/members/{{profile.nicename}}">Activity</a>
+				<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters</a>
+				<a class="nav-link active" href="/members/{{profile.nicename}}/messages">Messages</a>
+				<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
+			</nav>
+		</div>
+	</div>
+</div>

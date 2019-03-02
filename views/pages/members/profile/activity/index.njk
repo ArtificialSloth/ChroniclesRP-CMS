@@ -1,58 +1,84 @@
-<ul class="activity">
-	{% include "./style.njk" %}
+{% lookup 'users', {_id: profileid}, 'profile' %}
+{% query 'topics', {author: profile._id}, {}, 'topics' %}
+{% query 'replies', {author: profile._id}, {}, 'replies' %}
+{% query 'forums', {}, {}, 'forums' %}
+{% query 'categories', {}, {}, 'categories' %}
+{% query 'chapters', {}, {}, 'chapters' %}
 
-	{% lookup 'users', {_id: profileid}, 'profile' %}
-	{% lookup 'users', {_id: userid}, 'user' %}
-	{% query 'topics', {author: profile._id}, {}, 'topics' %}
-	{% query 'replies', {author: profile._id}, {}, 'replies' %}
-	{% set activities = crp.util.sortObjectArray(topics.concat(replies), 'date', -1) %}
+<div class="container">
+	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
+		<a class="nav-link active" href="/members/{{profile.nicename}}">Activity</a>
+		<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters</a>
+		<a class="nav-link" href="/members/{{profile.nicename}}/messages">Messages</a>
+		<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
+	</nav>
 
-	{% for activity in activities %}
-		{% if activity.title %}
-			{% lookup 'forums', {_id: activity.parent}, 'parent' %}
-			<li>
-				<ul>
-					<li><img class="profile-pic" src="{{crp.members.getProfilePic(profile)}}" /></li>
-					<li>
-						<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
-						started topic
-						<a href="/forums/{{parent.slug}}/{{activity._id}}">{{activity.title}}</a>
-						in
-						<a href="/forums/{{parent.slug}}">{{parent.name}}</a>
-						{{crp.moment(activity.date).fromNow()}}
+	<div class="row mt-lg-3">
+		<div class="col-lg-9">
+			{% set activities = crp.util.sortObjectArray(topics.concat(replies), 'date', -1) %}
+			{% for activity in activities %}
+				{% if activity.title %}
+					{% set parent = crp.util.findObjectInArray(forums, '_id', activity.parent.toString()) %}
+					{% set category = crp.util.findObjectInArray(categories, '_id', parent.category.toString()) %}
+					{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
 
-						<div>
-							{{activity.content | safe | striptags(true) | truncate}}
-							{% if activity.content.length > 255 %}
-								<a href="/forums/{{parent.slug}}/{{activity._id}}">[Read More]</a>
-							{% endif %}
-						</div>
-					</li>
-				</ul>
-			</li>
-			{% else %}
-				{% lookup 'topics', {_id: activity.parent}, 'parent' %}
-				{% lookup 'forums', {_id: parent.parent}, 'forum' %}
-				<li>
-					<ul>
-						<li><img class="profile-pic" src="{{crp.members.getProfilePic(profile)}}" /></li>
-						<li>
-							<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
-							replied to
-							<a href="/forums/{{forum.slug}}/{{parent._id}}">{{parent.title}}</a>
-							in
-							<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
-							{{crp.moment(activity.date).fromNow()}}
+					{% set member = crp.chapters.getMember(chapter, user._id) %}
+					{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
+						<div class="card mt-2">
+							<div class="card-header">
+								<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
+								started topic
+								<a href="/forums/{{parent.slug}}/{{activity._id}}">{{activity.title}}</a>
+								in
+								<a href="/forums/{{parent.slug}}">{{parent.name}}</a>
+								{{crp.moment(activity.date).fromNow()}}
+							</div>
 
-							<div>
+							<div class="card-body">
 								{{activity.content | safe | striptags(true) | truncate}}
 								{% if activity.content.length > 255 %}
 									<a href="/forums/{{parent.slug}}/{{activity._id}}">[Read More]</a>
 								{% endif %}
 							</div>
-						</li>
-					</ul>
-				</li>
-		{% endif %}
-	{% endfor %}
-</ul>
+						</div>
+					{% endif %}
+				{% else %}
+					{% lookup 'topics', {_id: activity.parent}, 'parent' %}
+					{% set forum = crp.util.findObjectInArray(forums, '_id', parent.parent.toString()) %}
+					{% set category = crp.util.findObjectInArray(categories, '_id', forum.category.toString()) %}
+					{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
+
+					{% set member = crp.chapters.getMember(chapter, user._id) %}
+					{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
+						<div class="card mt-2">
+							<div class="card-header">
+								<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
+								replied to
+								<a href="/forums/{{forum.slug}}/{{parent._id}}">{{parent.title}}</a>
+								in
+								<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
+								{{crp.moment(activity.date).fromNow()}}
+							</div>
+
+							<div class="card-body">
+								{{activity.content | safe | striptags(true) | truncate}}
+								{% if activity.content.length > 255 %}
+									<a href="/forums/{{parent.slug}}/{{activity._id}}">[Read More]</a>
+								{% endif %}
+							</div>
+						</div>
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		</div>
+
+		<div class="col-lg-3">
+			<nav class="nav nav-tabs nav-vertical-tabs flex-column justify-content-center mt-2 d-none d-lg-block">
+				<a class="nav-link active" href="/members/{{profile.nicename}}">Activity</a>
+				<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters</a>
+				<a class="nav-link" href="/members/{{profile.nicename}}/messages">Messages</a>
+				<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
+			</nav>
+		</div>
+	</div>
+</div>
