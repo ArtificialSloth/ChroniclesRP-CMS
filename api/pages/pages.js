@@ -7,6 +7,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.pages.processPage = (slug, userid, cb) => {
+		slug = slug.split('?')[0];
 		crp.db.findOne('site', {}, (err, site) => {
 			if (err) return cb(err);
 			if (!site) return cb('noSite');

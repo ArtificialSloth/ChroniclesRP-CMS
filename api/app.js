@@ -107,6 +107,7 @@ module.exports = (crp, callback) => {
 
 			crp.app.get('/*', (req, res) => {
 				crp.pages.processPage(req.url, req.user, (err, page) => {
+					if (req.query) page.context.query = req.query;
 					crp.nunjucks.render('index.njk', page.context, (err, result) => {
 						if (err) return console.error(err);
 
@@ -117,6 +118,7 @@ module.exports = (crp, callback) => {
 
 			crp.app.post('/api/get-page', (req, res) => {
 				crp.pages.processPage(req.body.page, req.user, (err, page) => {
+					if (req.query) page.context.query = req.query;
 					crp.nunjucks.render('pages' + page.path, page.context, (err, result) => {
 						if (err) return console.error(err);
 

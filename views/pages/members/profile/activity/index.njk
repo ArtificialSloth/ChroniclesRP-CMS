@@ -1,9 +1,12 @@
 {% lookup 'users', {_id: profileid}, 'profile' %}
+{% query 'chapters', {}, {}, 'chapters' %}
+{% query 'categories', {}, {}, 'categories' %}
+{% query 'forums', {}, {}, 'forums' %}
 {% query 'topics', {author: profile._id}, {}, 'topics' %}
 {% query 'replies', {author: profile._id}, {}, 'replies' %}
-{% query 'forums', {}, {}, 'forums' %}
-{% query 'categories', {}, {}, 'categories' %}
-{% query 'chapters', {}, {}, 'chapters' %}
+
+{% set allActivities = crp.util.sortObjectArray(topics.concat(replies), 'date', -1) %}
+{% set activities = crp.util.paginateArray(allActivities, 10, query.page) %}
 
 <div class="container">
 	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
@@ -15,10 +18,9 @@
 
 	<div class="row mt-lg-3">
 		<div class="col-lg-9">
-			{% set activities = crp.util.sortObjectArray(topics.concat(replies), 'date', -1) %}
 			{% for activity in activities %}
 				{% if activity.title %}
-					{% set parent = crp.util.findObjectInArray(forums, '_id', activity.parent.toString()) %}
+					{% set forum = crp.util.findObjectInArray(forums, '_id', activity.parent.toString()) %}
 					{% set category = crp.util.findObjectInArray(categories, '_id', parent.category.toString()) %}
 					{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
 
@@ -28,23 +30,23 @@
 							<div class="card-header">
 								<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
 								started topic
-								<a href="/forums/{{parent.slug}}/{{activity._id}}">{{activity.title}}</a>
+								<a href="/forums/{{forum.slug}}/{{activity._id}}">{{activity.title}}</a>
 								in
-								<a href="/forums/{{parent.slug}}">{{parent.name}}</a>
+								<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
 								{{crp.moment(activity.date).fromNow()}}
 							</div>
 
 							<div class="card-body">
 								{{activity.content | safe | striptags(true) | truncate}}
 								{% if activity.content.length > 255 %}
-									<a href="/forums/{{parent.slug}}/{{activity._id}}">[Read More]</a>
+									<a href="/forums/{{forum.slug}}/{{activity._id}}">[Read More]</a>
 								{% endif %}
 							</div>
 						</div>
 					{% endif %}
 				{% else %}
-					{% lookup 'topics', {_id: activity.parent}, 'parent' %}
-					{% set forum = crp.util.findObjectInArray(forums, '_id', parent.parent.toString()) %}
+					{% lookup 'topics', {_id: activity.parent}, 'topic' %}
+					{% set forum = crp.util.findObjectInArray(forums, '_id', topic.parent.toString()) %}
 					{% set category = crp.util.findObjectInArray(categories, '_id', forum.category.toString()) %}
 					{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
 
@@ -54,7 +56,7 @@
 							<div class="card-header">
 								<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
 								replied to
-								<a href="/forums/{{forum.slug}}/{{parent._id}}">{{parent.title}}</a>
+								<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
 								in
 								<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
 								{{crp.moment(activity.date).fromNow()}}
@@ -63,13 +65,44 @@
 							<div class="card-body">
 								{{activity.content | safe | striptags(true) | truncate}}
 								{% if activity.content.length > 255 %}
-									<a href="/forums/{{parent.slug}}/{{activity._id}}">[Read More]</a>
+									<a href="/forums/{{forum.slug}}/{{topic._id}}">[Read More]</a>
 								{% endif %}
 							</div>
 						</div>
 					{% endif %}
 				{% endif %}
 			{% endfor %}
+
+			{% if allActivities.length > 10 %}
+				<nav class="float-right mt-3" aria-label="Activities navigation">
+					<ul class="pagination">
+						<li class="page-item {% if not query.page or query.page == 1 %}disabled{% endif %}">
+							<a class="page-link" href="/members/{{profile.nicename}}?page={{query.page - 1 or 1}}">Previous</a>
+						</li>
+
+						{% set chunks = crp.util.chunkArray(allActivities, 10) %}
+						{% for chunk in chunks %}
+							{% if loop.index < (query.page or 1)|int + 3 %}
+								<li class="page-item {% if loop.index == query.page or (not query.page and loop.index == 1) %}active{% endif %}">
+									<a class="page-link" href="/members/{{profile.nicename}}?page={{loop.index}}">{{loop.index}}</a>
+								</li>
+
+							{% elif loop.last %}
+								{% if chunks.length > (query.page or 1)|int + 3 %}
+									<li class="page-item"><a class="page-link">...</a></li>
+								{% endif %}
+								<li class="page-item {% if loop.index == query.page %}active{% endif %}">
+									<a class="page-link" href="/members/{{profile.nicename}}?page={{loop.index}}">{{loop.index}}</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+
+						<li class="page-item {% if query.page == chunks.length %}disabled{% endif %} ">
+							<a class="page-link" href="/members/{{profile.nicename}}?page={{(query.page|int + 1) or 2}}">Next</a>
+						</li>
+					</ul>
+				</nav>
+			{% endif %}
 		</div>
 
 		<div class="col-lg-3">

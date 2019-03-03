@@ -30,7 +30,10 @@
 	function crpGetPage(page) {
 		$('#navbarNavDropdown').collapse('hide');
 		$('.content-blackout').addClass('active');
-		crpAjax('/api/get-page', {page: page}, (res) => {
+
+		var query = page.split('?')[1];
+		query = query ? `?${query}` : '';
+		crpAjax('/api/get-page' + query, {page: page}, (res) => {
 			$('main').html(res);
 			$('.content-blackout').removeClass('active');
 

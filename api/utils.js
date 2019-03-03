@@ -65,6 +65,22 @@ module.exports = (crp, callback) => {
 		return array;
 	};
 
+	crp.util.chunkArray = (array, size) => {
+		var result = [];
+		if (size == 0) return result;
+
+		for (var i = 0; i < array.length; i += size) {
+			result.push(array.slice(i, i + size));
+		}
+
+		return result;
+	};
+
+	crp.util.paginateArray = (array, length, offset = 1) => {
+		var index = length * (offset - 1);
+		return array.slice(index, index + length);
+	};
+
 	crp.util.sanitizeObject = (object) => {
 		for (var k in object) {
 			if (typeof object[k] == 'object') {
