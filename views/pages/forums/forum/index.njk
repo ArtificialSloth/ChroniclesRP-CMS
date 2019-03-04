@@ -1,7 +1,8 @@
 {% lookup 'forums', {_id: forumid}, 'forum' %}
 {% lookup 'categories', {_id: forum.category}, 'category' %}
 {% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
-{% getTopics {parent: forum._id}, true, 'topics' %}
+{% getTopics {parent: forum._id}, true, 'allTopics' %}
+{% set topics = crp.util.paginateArray(allTopics, 20, query.page) %}
 
 <div class="container mt-3">
 	<nav aria-label="breadcrumb">
@@ -55,6 +56,14 @@
 							{% if not loop.last %}<hr class="m-0" />{% endif %}
 						{% endfor %}
 					</div>
+
+					{% if allTopics.length > 20 %}
+						<div class="pb-5">
+							{% set pageUrl = '/forums/' + forum.slug %}
+							{% set chunks = crp.util.chunkArray(allTopics, 20) %}
+							{% include "components/pagination/index.njk" %}
+						</div>
+					{% endif %}
 				{% else %}
 					<div class="alert alert-warning" role="alert">This forum has no topics.</div>
 				{% endif %}

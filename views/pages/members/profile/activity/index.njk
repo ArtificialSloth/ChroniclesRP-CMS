@@ -36,12 +36,15 @@
 								{{crp.moment(activity.date).fromNow()}}
 							</div>
 
-							<div class="card-body">
-								{{activity.content | safe | striptags(true) | truncate}}
-								{% if activity.content.length > 255 %}
-									<a href="/forums/{{forum.slug}}/{{activity._id}}">[Read More]</a>
-								{% endif %}
-							</div>
+							{% set content = activity.content|striptags(true) %}
+							{% if content %}
+								<div class="card-body">
+									{{content | safe | truncate}}
+									{% if content.length > 255 %}
+										<a href="/forums/{{forum.slug}}/{{activity._id}}">[Read More]</a>
+									{% endif %}
+								</div>
+							{% endif %}
 						</div>
 					{% endif %}
 				{% else %}
@@ -62,46 +65,24 @@
 								{{crp.moment(activity.date).fromNow()}}
 							</div>
 
-							<div class="card-body">
-								{{activity.content | safe | striptags(true) | truncate}}
-								{% if activity.content.length > 255 %}
-									<a href="/forums/{{forum.slug}}/{{topic._id}}">[Read More]</a>
-								{% endif %}
-							</div>
+							{% set content = activity.content|striptags(true) %}
+							{% if content %}
+								<div class="card-body">
+									{{activity.content | safe | striptags(true) | truncate}}
+									{% if activity.content.length > 255 %}
+										<a href="/forums/{{forum.slug}}/{{topic._id}}">[Read More]</a>
+									{% endif %}
+								</div>
+							{% endif %}
 						</div>
 					{% endif %}
 				{% endif %}
 			{% endfor %}
 
 			{% if allActivities.length > 10 %}
-				<nav class="float-right mt-3" aria-label="Activities navigation">
-					<ul class="pagination">
-						<li class="page-item {% if not query.page or query.page == 1 %}disabled{% endif %}">
-							<a class="page-link" href="/members/{{profile.nicename}}?page={{query.page - 1 or 1}}">Previous</a>
-						</li>
-
-						{% set chunks = crp.util.chunkArray(allActivities, 10) %}
-						{% for chunk in chunks %}
-							{% if loop.index < (query.page or 1)|int + 3 %}
-								<li class="page-item {% if loop.index == query.page or (not query.page and loop.index == 1) %}active{% endif %}">
-									<a class="page-link" href="/members/{{profile.nicename}}?page={{loop.index}}">{{loop.index}}</a>
-								</li>
-
-							{% elif loop.last %}
-								{% if chunks.length > (query.page or 1)|int + 3 %}
-									<li class="page-item"><a class="page-link">...</a></li>
-								{% endif %}
-								<li class="page-item {% if loop.index == query.page %}active{% endif %}">
-									<a class="page-link" href="/members/{{profile.nicename}}?page={{loop.index}}">{{loop.index}}</a>
-								</li>
-							{% endif %}
-						{% endfor %}
-
-						<li class="page-item {% if query.page == chunks.length %}disabled{% endif %} ">
-							<a class="page-link" href="/members/{{profile.nicename}}?page={{(query.page|int + 1) or 2}}">Next</a>
-						</li>
-					</ul>
-				</nav>
+				{% set pageUrl = '/members/' + profile.nicename %}
+				{% set chunks = crp.util.chunkArray(allActivities, 10) %}
+				{% include "components/pagination/index.njk" %}
 			{% endif %}
 		</div>
 
