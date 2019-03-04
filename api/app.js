@@ -130,6 +130,7 @@ module.exports = (crp, callback) => {
 			crp.app.post('/api/get-subpage', (req, res) => {
 				crp.pages.processPage(req.body.page, req.user, (err, page) => {
 					if (!page.context.subPage) page.context.subPage = '/404/index.njk';
+					if (req.query) page.context.query = req.query;
 					crp.nunjucks.render('pages' + page.context.subPage, page.context, (err, result) => {
 						if (err) return console.log(err);
 

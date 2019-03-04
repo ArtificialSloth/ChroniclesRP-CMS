@@ -1,3 +1,5 @@
+{% lookup 'users', {_id: profileid}, 'profile' %}
+
 <div class="container">
 	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
 		<a class="nav-link" href="/members/{{profile.nicename}}">Activity</a>

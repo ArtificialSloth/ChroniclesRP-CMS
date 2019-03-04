@@ -42,7 +42,9 @@
 	}
 
 	function crpGetSubPage(page, container, newUrl) {
-		crpAjax('/api/get-subpage', {page: page}, (res) => {
+		var query = page.split('?')[1];
+		query = query ? `?${query}` : '';
+		crpAjax('/api/get-subpage' + query, {page: page}, (res) => {
 			$(container).html(res);
 			if (newUrl) window.history.pushState({page: page}, page + ' - The Chronicles RP', page);
 		});
