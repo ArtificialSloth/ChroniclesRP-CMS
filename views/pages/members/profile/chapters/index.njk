@@ -1,29 +1,46 @@
 {% lookup 'users', {_id: profileid}, 'profile' %}
 {% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+{% set invites = crp.chapters.getInvites(chapters, profile._id) %}
 
 <div class="container">
 	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
 		<a class="nav-link" href="/members/{{profile.nicename}}">Activity</a>
-		<a class="nav-link active" href="/members/{{profile.nicename}}/chapters">Chapters</a>
-		<a class="nav-link" href="/members/{{profile.nicename}}/messages">Messages</a>
+		<a class="nav-link active" href="/members/{{profile.nicename}}/chapters">Chapters {% if invites.length > 0 %}<span class="badge badge-success">{{invites.length}}</span>{% endif %}</a>
 		<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
 	</nav>
 
 	<div class="row mt-lg-3">
 		<div class="col-lg-9">
+			{% if profile._id.equals(user._id) and invites.length > 0 %}
+				{% for chapter in invites %}
+					<div class="card shadow-sm mb-3">
+						<div class="card-body d-flex flex-wrap">
+							<img class="mx-auto mx-lg-0" src="{{crp.chapters.getProfilePic(chapter)}}" width="40" height="40" alt="{{chapter.name}}" />
+							<span class="mt-2 ml-lg-3">You've been invited to join <a href="/chapters/{{chapter.slug}}">{{chapter.name}}</a>.</span>
+							<div class="ml-auto w-lg-100">
+								<button class="btn btn-danger" onclick="declineChapterInvite('{{chapter._id}}')">Decline</button>
+								<button class="btn btn-success" onclick="acceptChapterInvite('{{chapter._id}}')">Accept</button>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			{% endif %}
+
 			{% set inChapter = false %}
 			{% for chapter in chapters %}
 					{% if crp.chapters.getMember(chapter, profile._id).role > 0 %}
 						{% set inChapter = true %}
 						{% lookup 'games', {_id: chapter.game}, 'game' %}
 
-						<div class="d-flex flex-wrap bg-white rounded shadow-sm mb-3 p-3">
-							<img src="{{crp.chapters.getProfilePic(chapter)}}" width="75" height="75" alt="{{chapter.name}}" />
-							<div class="ml-lg-3">
-								{{crp.chapters.getLink(chapter) | safe}}
-								<p class="text-muted">{{chapter.tagline}}</p>
+						<div class="card shadow-sm mb-3">
+							<div class="card-body d-flex flex-wrap">
+								<img src="{{crp.chapters.getProfilePic(chapter)}}" width="75" height="75" alt="{{chapter.name}}" />
+								<div class="ml-lg-3">
+									{{crp.chapters.getLink(chapter) | safe}}
+									<p class="text-muted">{{chapter.tagline}}</p>
+								</div>
+								<span class="ml-lg-auto w-auto"><a href="/chapters/{{game.slug}}">{{game.name}}</a></span>
 							</div>
-							<span class="ml-lg-auto w-100 w-auto"><a href="/chapters/{{game.slug}}">{{game.name}}</a></span>
 						</div>
 					{% endif %}
 			{% endfor %}
@@ -36,10 +53,11 @@
 		<div class="col-lg-3">
 			<nav class="nav nav-tabs nav-vertical-tabs flex-column justify-content-center mt-2 d-none d-lg-block">
 				<a class="nav-link" href="/members/{{profile.nicename}}">Activity</a>
-				<a class="nav-link active" href="/members/{{profile.nicename}}/chapters">Chapters</a>
-				<a class="nav-link" href="/members/{{profile.nicename}}/messages">Messages</a>
+				<a class="nav-link active" href="/members/{{profile.nicename}}/chapters">Chapters {% if invites.length > 0 %}<span class="badge badge-success">{{invites.length}}</span>{% endif %}</a>
 				<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
 			</nav>
 		</div>
 	</div>
 </div>
+
+{% include "./script.njk" %}

@@ -332,12 +332,8 @@ module.exports = (crp) => {
 			if (err) return cb(err);
 
 			var pages = [
-				{slug: 'info'},
-				{slug: 'friends'},
 				{slug: 'chapters'},
-				{slug: 'messages'},
-				{slug: 'account', context: {timezones: crp.moment.tz.names()}},
-				{slug: 'settings'}
+				{slug: 'account', context: {timezones: crp.moment.tz.names()}}
 			];
 
 			for (var i in users) {

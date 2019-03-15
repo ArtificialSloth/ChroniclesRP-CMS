@@ -172,19 +172,6 @@ module.exports = (crp, callback) => {
 		});;
 	});
 
-	crp.app.post('/api/get-chapter-invites', (req, res) => {
-		crp.chapters.find({}, (err, chapters) => {
-			if (err) return res.send(err);
-
-			crp.members.get(req.user, (err, user) => {
-				if (err) return res.send(err);
-				if (!user) return res.send('noUser');
-
-				res.send(crp.chapters.getInvites(chapters, user._id));
-			});
-		});;
-	});
-
 	crp.app.post('/api/remove-chapter-member', (req, res) => {
 		crp.chapters.get(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);

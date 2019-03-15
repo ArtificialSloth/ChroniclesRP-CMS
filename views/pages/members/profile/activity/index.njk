@@ -7,12 +7,12 @@
 
 {% set allActivities = crp.util.sortObjectArray(topics.concat(replies), 'date', -1) %}
 {% set activities = crp.util.paginateArray(allActivities, 10, query.page) %}
+{% set invites = crp.chapters.getInvites(chapters, profile._id) %}
 
 <div class="container">
 	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
 		<a class="nav-link active" href="/members/{{profile.nicename}}">Activity</a>
-		<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters</a>
-		<a class="nav-link" href="/members/{{profile.nicename}}/messages">Messages</a>
+		<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters {% if invites.length > 0 %}<span class="badge badge-success">{{invites.length}}</span>{% endif %}</a>
 		<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
 	</nav>
 
@@ -89,8 +89,7 @@
 		<div class="col-lg-3">
 			<nav class="nav nav-tabs nav-vertical-tabs flex-column justify-content-center mt-2 d-none d-lg-block">
 				<a class="nav-link active" href="/members/{{profile.nicename}}">Activity</a>
-				<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters</a>
-				<a class="nav-link" href="/members/{{profile.nicename}}/messages">Messages</a>
+				<a class="nav-link" href="/members/{{profile.nicename}}/chapters">Chapters {% if invites.length > 0 %}<span class="badge badge-success">{{invites.length}}</span>{% endif %}</a>
 				<a class="nav-link" href="/members/{{profile.nicename}}/account">Account</a>
 			</nav>
 		</div>
