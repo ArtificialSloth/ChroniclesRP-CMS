@@ -68,7 +68,6 @@ module.exports = (crp) => {
 
 				var newUser = user;
 
-				newUser.display_name = data.display_name || user.display_name;
 				newUser.tagline = data.tagline || user.tagline;
 				newUser.about = data.about || user.about;
 
@@ -78,11 +77,17 @@ module.exports = (crp) => {
 				}
 
 				if (data.login && data.login != user.login) {
-					if (data.login < 4) return cb(null, 'loginLength');
+					if (data.login.length < 4 || data.login.length > 80) return cb(null, 'loginLength');
 					if (users.length > 0) return cb(null, 'loginTaken');
 
 					newUser.login = data.login.toLowerCase();
 					newUser.nicename = crp.util.urlSafe(newUser.login);
+				}
+
+				if (data.display_name && data.display_name != user.display_name) {
+					if (data.display_name.length < 4 || data.display_name.length > 80) return cb(null, 'displayNameLength');
+
+					newUser.display_name = data.display_name;
 				}
 
 				if (data.email && data.email != user.email) {
@@ -158,7 +163,7 @@ module.exports = (crp) => {
 					},
 					(callback) => {
 						if (admin) {
-							if (!data.old_pass || !data.new_pass || !data.confirm_new_pass) return callback();
+							if (!data.old_pass || !data.new_pass || !data.new_pass_confirm) return callback();
 							if (data.new_pass.length < 6) return callback('passLength');
 
 							crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
@@ -168,14 +173,14 @@ module.exports = (crp) => {
 								callback();
 							});
 						} else {
-							if (!data.old_pass || !data.new_pass || !data.confirm_new_pass) return callback();
+							if (!data.old_pass || !data.new_pass || !data.new_pass_confirm) return callback();
 
 							crp.auth.bcrypt.compare(data.old_pass, user.pass, (err, isValid) => {
 								if (err) return callback(err);
 								if (!isValid) return callback('passMismatch');
 
 								if (data.new_pass.length < 6) return callback('passLength');
-								if (data.new_pass != data.confirm_new_pass) return callback('newPassMismatch');
+								if (data.new_pass != data.new_pass_confirm) return callback('newPassMismatch');
 
 								crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
 									if (err) return callback(err);
@@ -243,7 +248,7 @@ module.exports = (crp) => {
 				if (err) return cb(err);
 				if (users.length > 0) return cb('emailTaken');
 
-				if (user.login.length < 4) return cb('loginLength');
+				if (user.login.length < 4 || user.login.length > 80) return cb('loginLength');
 				if (!crp.members.validateEmail(user.email)) return cb('emailInvalid');
 
 				if (user.pass.length < 6) return cb('passLength');

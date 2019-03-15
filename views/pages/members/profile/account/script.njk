@@ -1,40 +1,47 @@
 <script>
-	$('.user-account-form').submit((e) => {
+	$('#account-form').submit((e) => {
 		e.preventDefault();
-		tinymce.triggerSave();
 
 		var formData = new FormData(e.target);
-		crpAjaxUpload('/api/admin/edit-user', formData, (res) => {
-			$('.user-account-form .user_dob').parent().removeClass('error');
-			$('.user-account-form .user_timezone').parent().removeClass('error');
-			$('.user-account-form .user_gender').parent().removeClass('error');
-			$('.user-account-form .display_name').parent().removeClass('error');
-			$('.user-account-form .profile_pic').parent().removeClass('error');
-			$('.user-account-form .cover_pic').parent().removeClass('error');
-
-			if (!res._id) {
-				if (res == 'dobInvalid') {
-					$('.user-account-form .user_dob').parent().addClass('error');
-					$('.user-account-form .user_dob + .input-error').html('Invalid date!');
-				} else if (res == 'tzInvalid') {
-					$('.user-account-form .user_timezone').parent().addClass('error');
-					$('.user-account-form .user_timezone + .input-error').html('Timezone invalid!');
+		crpAjaxUpload('/api/edit-user', formData, (res) => {
+			if (res._id) {
+				crpGetPage(window.location.pathname);
+			} else {
+				if (res == 'displayNameLength') {
+					$('#account-form-display_name').next('.invalid-feedback').html('Display Name must be at least 4 characters and no greater than 80 characters!');
+					$('#account-form-display_name').addClass('is-invalid');
 				} else if (res == 'genderInvalid') {
-					$('.user-account-form .user_gender').parent().addClass('error');
-					$('.user-account-form .user_gender + .input-error').html('Gender invalid!');
+					$('#account-form-gender').next('.invalid-feedback').html('Invalid gender!');
+					$('#account-form-gender').addClass('is-invalid');
+				} else if (res == 'dobInvalid') {
+					$('#account-form-dob').next('.invalid-feedback').html('Date format invalid!');
+					$('#account-form-dob').addClass('is-invalid');
+				} else if (res == 'tzInvalid') {
+					$('#account-form-timezone').next('.invalid-feedback').html('Invalid timezone!');
+					$('#account-form-timezone').addClass('is-invalid');
+				} else if (res = 'emailInvalid') {
+					$('#account-form-email').next('.invalid-feedback').html('Invalid email address!');
+					$('#account-form-email').addClass('is-invalid');
+				} else if (res = 'passMismatch') {
+					$('#account-form-old-pass').next('.invalid-feedback').html('Wrong password!');
+					$('#account-form-old-pass').addClass('is-invalid');
+				} else if (res = 'passLength') {
+					$('#account-form-new-pass').next('.invalid-feedback').html('New password must be at least 6 characters!');
+					$('#account-form-new-pass').addClass('is-invalid');
+				} else if (res = 'newPassMismatch') {
+					$('#account-form-new-pass-confirm').next('.invalid-feedback').html('Passwords don\'t match!');
+					$('#account-form-new-pass-confirm').addClass('is-invalid');
 				} else if (res.code == 'LIMIT_FILE_SIZE' && res.field == 'profile_pic') {
-					$('.user-account-form .profile_pic').parent().addClass('error');
-					$('.user-account-form .profile_pic + .input-error').html('File size must be < 2 MB');
+					$('#account-form-profile_pic').next('.invalid-feedback').html('File size must be < 2 MB!');
+					$('#account-form-profile_pic').addClass('is-invalid');
 				} else if (res.code == 'LIMIT_FILE_SIZE' && res.field == 'cover_pic') {
-					$('.user-account-form .cover_pic').parent().addClass('error');
-					$('.user-account-form .cover_pic + .input-error').html('File size must be < 2 MB');
+					$('#account-form-cover_pic').next('.invalid-feedback').html('File size must be < 2 MB!');
+					$('#account-form-cover_pic').addClass('is-invalid');
 				} else {
 					console.error(res);
-					$('.user-account-form .display_name').parent().addClass('error');
-					$('.user-account-form .display_name + .input-error').html('Something went wrong :(');
+					$('#account-form-login').next('.invalid-feedback').html('Something went wrong :(');
+					$('#account-form-login').addClass('is-invalid');
 				}
-			} else {
-				crpGetPage(window.location.pathname);
 			}
 		});
 	});

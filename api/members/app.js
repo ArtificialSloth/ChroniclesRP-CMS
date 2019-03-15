@@ -99,7 +99,7 @@ module.exports = (crp, callback) => {
 		});
 	});
 
-	crp.app.post('/api/admin/edit-user', (req, res, next) => {
+	crp.app.post('/api/edit-user', (req, res, next) => {
 		var upload = crp.express.upload.fields([
 			{name: 'profile_pic', maxCount: 1},
 			{name: 'cover_pic', maxCount: 1}
@@ -111,19 +111,19 @@ module.exports = (crp, callback) => {
 
 				if (req.body.user_id == user._id || user.role >= 3) {
 					var userData = {
-						login: req.body.user_login,
+						login: req.body.login,
 						old_pass: req.body.old_pass,
 						new_pass: req.body.new_pass,
-						confirm_new_pass: req.body.confirm_new_pass,
-						email: req.body.user_email,
+						new_pass_confirm: req.body.new_pass_confirm,
+						email: req.body.email,
 						display_name: req.body.display_name,
-						role: req.body.user_role,
-						locked: req.body.user_locked,
-						timezone: req.body.user_timezone,
-						date_of_birth: req.body.user_dob,
-						gender: req.body.user_gender,
-						tagline: req.body.user_tagline,
-						about: req.body.user_about,
+						role: req.body.role,
+						locked: req.body.locked,
+						timezone: req.body.timezone,
+						date_of_birth: req.body.dob,
+						gender: req.body.gender,
+						tagline: req.body.tagline,
+						about: req.body.about,
 						img: {}
 					};
 
