@@ -44,11 +44,11 @@
 	</div>
 
 	<div class="sidebar left">
-		<div class="discord-widget">
-			<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
-		</div>
-
 		{% if user %}
+			<div class="discord-widget">
+				<a class="redirect" href="/discord" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
+			</div>
+
 			<div class="chapter-discord-widget">
 				<h3>Your Discords</h3>
 
