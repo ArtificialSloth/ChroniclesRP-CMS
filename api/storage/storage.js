@@ -1,7 +1,10 @@
 module.exports = (crp) => {
 	crp.storage = {};
 
-	var storage = new require('@google-cloud/storage')({projectId: process.env.GOOGLE_PROJECT_ID});
+	var storage = new require('@google-cloud/storage')({
+		projectId: process.env.GOOGLE_PROJECT_ID,
+		credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+	});
 	crp.storage.bucket = storage.bucket(process.env.GOOGLE_BUCKET);
 
 	crp.storage.upload = (file, dest, cb) => {
