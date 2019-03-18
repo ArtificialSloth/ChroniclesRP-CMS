@@ -273,18 +273,18 @@ module.exports = (crp) => {
 		});
 	};
 
-	crp.chapters.getLink = (chapter) => {
+	crp.chapters.getURL = (chapter) => {
 		if (!chapter) return;
 
 		switch (chapter.type) {
 			case 'hosted':
-				return `<a href="//${chapter.slug}.chroniclesrp.com">${chapter.name}</a>`;
+				return `//${chapter.slug}.chroniclesrp.com`;
 				break;
 			case 'url':
-				return `<a href="${chapter.slug}">${chapter.name}</a>`;
+				return chapter.slug;
 				break;
 			default:
-				return `<a href="/chapters/${chapter.nicename}">${chapter.name}</a>`;
+				return `/chapters/${chapter.nicename}`;
 		}
 	};
 
@@ -344,12 +344,10 @@ module.exports = (crp) => {
 
 	crp.pages.add((slug, cb) => {
 		if (slug == '/chapters') return cb(null, {
-			path: '/chapters/index.njk',
-			subPage: '/chapters/browse/index.njk'
+			path: '/chapters/browse/index.njk'
 		});
 		if (slug == '/chapters/create') return cb(null, {
-			path: '/chapters/index.njk',
-			subPage: '/chapters/create/index.njk',
+			path: '/chapters/create/index.njk',
 			role: 2
 		});
 
@@ -358,8 +356,7 @@ module.exports = (crp) => {
 
 			for (var i in games) {
 				if (slug == `/chapters/${games[i].slug}`) return cb(null, {
-					path: '/chapters/index.njk',
-					subPage: '/chapters/browse/index.njk',
+					path: '/chapters/browse/index.njk',
 					context: {filter: games[i]._id}
 				});
 			}
