@@ -2,13 +2,8 @@ module.exports = (crp) => {
 	crp.members = {};
 
 	crp.members.validateEmail = (email) => {
-		var domain = email.split('@')
-
-		if (domain[0] != email && domain.length == 2 && domain[0].length >= 1) {
-			var dot = domain[1].split('.');
-			if (dot[0] != domain[1] && dot.length == 2 && dot[0].length >= 1) {
-				return true;
-			}
+		if (email && email.includes('@') && email.lastIndexOf('.') > email.lastIndexOf('@')) {
+			return true;
 		}
 
 		return false;

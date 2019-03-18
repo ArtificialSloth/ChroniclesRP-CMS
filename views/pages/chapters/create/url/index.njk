@@ -1,0 +1,24 @@
+<li class="step url details disabled">
+	<div class="standard-form">
+		<label for="name" required>Chapter Name</label>
+		<div class="standard-input">
+			<input type="text" name="name" value="">
+		</div>
+
+		<label for="url" required>URL</label>
+		<div class="standard-input">
+			<input type="text" name="slug" value="">
+		</div>
+
+		<label for="game" required>Game</label>
+		<div class="standard-input">
+			{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
+
+			<select name="game">
+				{% for game in games %}
+					<option value="{{game._id}}">{{game.name}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+</li>
