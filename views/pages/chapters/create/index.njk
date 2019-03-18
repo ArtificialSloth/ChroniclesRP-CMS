@@ -39,8 +39,8 @@
 					</label>
 				</div>
 
-				<div class="option disabled">
-					<input type="radio" name="type" value="url" disabled />
+				<div class="option">
+					<input type="radio" name="type" value="url" />
 					<label for="type" onclick="labelClick(this)">
 						<h1>Outside URL</h1>
 						<span>Already have a website? Choosing this option will make all references to your Chapter point to the URL you provide here.</span>
@@ -51,6 +51,7 @@
 
 		{% include "./hosted/index.njk" %}
 		{% include "./group/index.njk" %}
+		{% include "./url/index.njk" %}
 
 		<li class="step captcha final">
 			<div class="standard-form">

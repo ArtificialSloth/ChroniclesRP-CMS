@@ -10,6 +10,14 @@
 			<span class="input-error"></span>
 		</div>
 -->
+		{% if chapter.type == 'url' %}
+			<label for="slug">Chapter URL</label>
+			<div class="standard-input">
+				<input type="text" name="slug" class="slug" value="{{chapter.slug}}" />
+				<span class="input-error"></span>
+			</div>
+		{% endif %}
+
 		<label for="game">Game</label>
 		<div class="standard-input">
 			{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}

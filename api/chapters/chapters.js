@@ -24,7 +24,7 @@ module.exports = (crp) => {
 					type: chapter.type,
 					name: data.name || chapter.name,
 					nicename: crp.util.urlSafe(data.name) || chapter.nicename,
-					slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name) || chapter.slug,
+					slug: ((chapter.type == 'url') ? data.slug : (crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name))) || chapter.slug,
 					game: game._id || chapter.game,
 					open: data.open ? !!+data.open : chapter.open,
 					tagline: data.tagline || chapter.tagline,
@@ -109,7 +109,7 @@ module.exports = (crp) => {
 						type: data.type,
 						name: data.name,
 						nicename: crp.util.urlSafe(data.name),
-						slug: crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name),
+						slug: (data.type == 'url') ? data.slug : (crp.util.urlSafe(data.slug) || crp.util.urlSafe(data.name)),
 						game: game._id,
 						open: false,
 						tagline: data.tagline || '',
@@ -281,7 +281,7 @@ module.exports = (crp) => {
 				return `<a href="//${chapter.slug}.chroniclesrp.com">${chapter.name}</a>`;
 				break;
 			case 'url':
-				return `<a href="//${chapter.slug}">${chapter.name}</a>`;
+				return `<a href="${chapter.slug}">${chapter.name}</a>`;
 				break;
 			default:
 				return `<a href="/chapters/${chapter.nicename}">${chapter.name}</a>`;
