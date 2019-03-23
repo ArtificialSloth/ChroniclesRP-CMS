@@ -93,6 +93,20 @@ module.exports = (crp, callback) => {
 		});
 	});
 
+	crp.app.post('/api/resend-activation', (req, res) => {
+		crp.members.get(req.user, (err, user) => {
+			if (err) return res.send(err);
+			if (!user) return res.send(false);
+
+			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id.toString());
+			if (activation) crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
+			if (!activation && user.role > 0) return res.send(false);
+
+			crp.members.emailConfirmCode(user._id, activation ? activation.email : user.email);
+			res.send(true);
+		});
+	});
+
 	crp.app.post('/api/edit-user', (req, res, next) => {
 		var upload = crp.express.upload.fields([
 			{name: 'profile_pic', maxCount: 1},

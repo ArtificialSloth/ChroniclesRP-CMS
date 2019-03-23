@@ -119,10 +119,14 @@ module.exports = (crp, callback) => {
 			crp.app.post('/api/get-page', (req, res) => {
 				crp.pages.processPage(req.body.page, req.user, (err, page) => {
 					if (req.query) page.context.query = req.query;
-					crp.nunjucks.render('pages' + page.path, page.context, (err, result) => {
+					crp.nunjucks.render('components/navigation/index.njk', page.context, (err, nav) => {
 						if (err) return console.error(err);
 
-						res.send(result);
+						crp.nunjucks.render('pages' + page.path, page.context, (err, result) => {
+							if (err) return console.error(err);
+
+							res.send({page: result, nav: nav});
+						});
 					});
 				});
 			});

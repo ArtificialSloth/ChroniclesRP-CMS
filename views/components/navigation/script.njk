@@ -1,4 +1,16 @@
 <script>
+	function resendActivation(e) {
+		crpAjax('/api/resend-activation', {}, (res) => {
+			if (res === true) {
+				$(e).replaceWith('Sent!')
+			} else {
+				console.error(res);
+				$('#activate-form-code').next('.invalid-tooltip').html('Something went wrong :(');
+				$('#activate-form-code').addClass('is-invalid');
+			}
+		});
+	}
+
 	$('#activate-form').submit((e) => {
 		e.preventDefault();
 		$('#activate-form-code').removeClass('is-invalid');
@@ -12,7 +24,7 @@
 		var formData = $(e.target).serialize();
 		crpAjax('/api/activate', formData, (res) => {
 			if (res === true) {
-				location.reload();
+				crpGetPage(window.location.pathname);
 			} else if (res === false) {
 				$('#activate-form-code').next('.invalid-tooltip').html('Invalid activation code!');
 				$('#activate-form-code').addClass('is-invalid');
@@ -43,7 +55,7 @@
 		var formData = $(e.target).serialize();
 		crpAjax('/login', formData, (res) => {
 			if (res == 'valid') {
-				location.reload();
+				crpGetPage(window.location.pathname);
 			} else if (res == 'tooMany') {
 				$('#login-form-login').next('.invalid-tooltip').html('Too many failed login attempts. Please wait 5 minutes then try again.');
 				$('#login-form-login').addClass('is-invalid');
@@ -102,7 +114,7 @@
 		var formData = $(e.target).serialize();
 		crpAjax('/api/register', formData, (res) => {
 			if (res === true) {
-				location.reload();
+				crpGetPage(window.location.pathname);
 			} else if (res == 'noCaptcha') {
 				$('#register-form-captcha').next('.invalid-feedback').html('Please click the captcha first.');
 				$('#register-form-captcha').addClass('is-invalid');

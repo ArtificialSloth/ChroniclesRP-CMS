@@ -30,11 +30,19 @@
 	function crpGetPage(page) {
 		$('#navbarNavDropdown').collapse('hide');
 		$('.content-blackout').addClass('active');
+		$('.navbar .dropdown-toggle').each((i, e) => {
+			$(e).dropdown('hide');
+		});
+		$('.modal').each((i, e) => {
+			$(e).modal('hide');
+		});
 
 		var query = page.split('?')[1];
 		query = query ? `?${query}` : '';
 		crpAjax('/api/get-page' + query, {page: page}, (res) => {
-			$('main').html(res);
+			$('main').html(res.page);
+			$('#navbar').html(res.nav);
+			window.scrollTo({top: 0});
 			$('.content-blackout').removeClass('active');
 
 			window.history.pushState({page: page}, page + ' - The Chronicles RP', page);

@@ -43,89 +43,94 @@ module.exports = (crp) => {
 
 			crp.members.find({login: (data.login ? data.login.toLowerCase() : null)}, (err, users) => {
 				if (err) return cb(err);
-				if (users.length > 0 && data.login.toLowerCase() != user.login) return cb('loginTaken');
+				if (users && users.length > 0 && data.login.toLowerCase() != user.login) return cb('loginTaken');
 
-				var newUser = {
-					_id: user._id,
-					login: data.login ? data.login.toLowerCase() : user.login,
-					pass: data.pass || user.pass,
-					email: data.email ? data.email.toLowerCase() : user.email,
-					register_date: user.register_date,
-					display_name: data.display_name || user.display_name || user.login,
-					nicename: crp.util.urlSafe(data.login) || user.nicename,
-					role: parseInt(data.role) || user.role,
-					locked: data.locked ? !!+data.locked : user.locked,
-					timezone: data.timezone || user.timezone || crp.moment.tz.guess(),
-					date_of_birth: (typeof data.date_of_birth != 'undefined') ? data.date_of_birth : user.date_of_birth,
-					gender: data.gender || user.gender,
-					tagline: (typeof data.tagline != 'undefined') ? data.tagline : user.tagline,
-					about: (typeof data.about != 'undefined') ? data.about : user.about,
-					img: user.img || {},
-				};
-
-				if (newUser.login.length < 4 || newUser.login.length > 80) return cb('loginLength');
-				if (!crp.members.validateEmail(newUser.email)) return cb('emailInvalid');
-				if (newUser.display_name.length < 4 || newUser.display_name.length > 80) return cb('displayNameLength');
-
-				if (newUser.date_of_birth && !crp.moment(new Date(newUser.date_of_birth)).isValid()) return cb('dobInvalid');
-				if (newUser.date_of_birth) crp.moment(new Date(newUser.date_of_birth)).format('MM/DD/YYYY');
-
-				if (!crp.moment.tz.names().includes(newUser.timezone)) return cb('tzInvalid');
-				if (!['---', 'Bolian', 'Female', 'Male'].includes(newUser.gender)) return cb('genderInvalid');
-
-				crp.async.parallel([
-					(callback) => {
-						if (!data.img || !data.img.profile) return callback();
-
-						crp.storage.delete(user.img.profile, (err) => {
-							if (err) return callback(err);
-
-							crp.storage.upload(data.img.profile[0].path, `img/members/${newUser._id}/${data.img.profile[0].originalname}`, (err, file) => {
-								if (err) return callback(err);
-
-								crp.fs.unlink(data.img.profile[0].path, (err) => {
-									if (err) return callback(err);
-
-									newUser.img.profile = file.name;
-									callback();
-								});
-							});
-						});
-					},
-					(callback) => {
-						if (!data.img || !data.img.cover) return callback();
-
-						crp.storage.delete(user.img.cover, (err) => {
-							if (err) return callback(err);
-
-							crp.storage.upload(data.img.cover[0].path, `img/members/${newUser._id}/${data.img.cover[0].originalname}`, (err, file) => {
-								if (err) return callback(err);
-
-								crp.fs.unlink(data.img.cover[0].path, (err) => {
-									if (err) return callback(err);
-
-									newUser.img.cover = file.name;
-									callback();
-								});
-							});
-						});
-					},
-					(callback) => {
-						if (newUser.pass == user.pass) return callback();
-						if (newUser.pass.length < 6) return callback('passLength');
-
-						crp.auth.bcrypt.hash(newUser.pass, 10, (err, hash) => {
-							if (err) return callback(err);
-
-							newUser.pass = hash;
-							callback();
-						});
-					}
-				], (err) => {
+				crp.members.find({email: (data.email ? data.email.toLowerCase() : null)}, (err, users) => {
 					if (err) return cb(err);
+					if (users && users.length > 0 && data.email.toLowerCase() != user.email) return cb('emailTaken');
 
-					newUser = crp.util.sanitizeObject(newUser);
-					crp.db.replaceOne('users', {_id: user._id}, newUser, cb);
+					var newUser = {
+						_id: user._id,
+						login: data.login ? data.login.toLowerCase() : user.login,
+						pass: data.pass || user.pass,
+						email: data.email ? data.email.toLowerCase() : user.email,
+						register_date: user.register_date,
+						display_name: data.display_name || user.display_name || user.login,
+						nicename: crp.util.urlSafe(data.login) || user.nicename,
+						role: parseInt(data.role) || user.role,
+						locked: data.locked ? !!+data.locked : user.locked,
+						timezone: data.timezone || user.timezone || crp.moment.tz.guess(),
+						date_of_birth: (typeof data.date_of_birth != 'undefined') ? data.date_of_birth : user.date_of_birth,
+						gender: data.gender || user.gender,
+						tagline: (typeof data.tagline != 'undefined') ? data.tagline : user.tagline,
+						about: (typeof data.about != 'undefined') ? data.about : user.about,
+						img: user.img || {},
+					};
+
+					if (newUser.login.length < 4 || newUser.login.length > 80) return cb('loginLength');
+					if (!crp.members.validateEmail(newUser.email)) return cb('emailInvalid');
+					if (newUser.display_name.length < 4 || newUser.display_name.length > 80) return cb('displayNameLength');
+
+					if (newUser.date_of_birth && !crp.moment(new Date(newUser.date_of_birth)).isValid()) return cb('dobInvalid');
+					if (newUser.date_of_birth) crp.moment(new Date(newUser.date_of_birth)).format('MM/DD/YYYY');
+
+					if (!crp.moment.tz.names().includes(newUser.timezone)) return cb('tzInvalid');
+					if (!['---', 'Bolian', 'Female', 'Male'].includes(newUser.gender)) return cb('genderInvalid');
+
+					crp.async.parallel([
+						(callback) => {
+							if (!data.img || !data.img.profile) return callback();
+
+							crp.storage.delete(user.img.profile, (err) => {
+								if (err) return callback(err);
+
+								crp.storage.upload(data.img.profile[0].path, `img/members/${newUser._id}/${data.img.profile[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
+
+									crp.fs.unlink(data.img.profile[0].path, (err) => {
+										if (err) return callback(err);
+
+										newUser.img.profile = file.name;
+										callback();
+									});
+								});
+							});
+						},
+						(callback) => {
+							if (!data.img || !data.img.cover) return callback();
+
+							crp.storage.delete(user.img.cover, (err) => {
+								if (err) return callback(err);
+
+								crp.storage.upload(data.img.cover[0].path, `img/members/${newUser._id}/${data.img.cover[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
+
+									crp.fs.unlink(data.img.cover[0].path, (err) => {
+										if (err) return callback(err);
+
+										newUser.img.cover = file.name;
+										callback();
+									});
+								});
+							});
+						},
+						(callback) => {
+							if (newUser.pass == user.pass) return callback();
+							if (newUser.pass.length < 6) return callback('passLength');
+
+							crp.auth.bcrypt.hash(newUser.pass, 10, (err, hash) => {
+								if (err) return callback(err);
+
+								newUser.pass = hash;
+								callback();
+							});
+						}
+					], (err) => {
+						if (err) return cb(err);
+
+						newUser = crp.util.sanitizeObject(newUser);
+						crp.db.replaceOne('users', {_id: user._id}, newUser, cb);
+					});
 				});
 			});
 		});
@@ -151,16 +156,16 @@ module.exports = (crp) => {
 
 		crp.members.find({login: user.login}, (err, users) => {
 			if (err) return cb(err);
-			if (users.length > 0) return cb('loginTaken');
+			if (users && users.length > 0) return cb('loginTaken');
 
 			crp.members.find({email: user.email}, (err, users) => {
 				if (err) return cb(err);
-				if (users.length > 0) return cb('emailTaken');
+				if (users && users.length > 0) return cb('emailTaken');
 
 				if (!user.login || user.login.length < 4 || user.login.length > 80) return cb('loginLength');
 				if (!crp.members.validateEmail(user.email)) return cb('emailInvalid');
-
 				if (!user.pass || user.pass.length < 6) return cb('passLength');
+
 				crp.async.parallel([
 					(callback) => {
 						if (!data.encrypted) {
