@@ -160,11 +160,7 @@
 
 			var href = target.prop('href').replace(`${window.location.protocol}//${window.location.hostname}`, '');
 			if (target.attr('container')) {
-				crpGetSubPage(
-					href,
-					target.attr('container'),
-					target.attr('newurl')
-				);
+				crpGetSubPage(href, target.attr('container'), target.attr('newurl'));
 
 				return false;
 			}
