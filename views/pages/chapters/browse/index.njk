@@ -1,10 +1,5 @@
 {% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
-
-{% if filter %}
-	{% query 'chapters', {game: filter}, {sort: [['name', 1]]}, 'chapters' %}
-{% else %}
-	{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
-{% endif %}
+{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
 
 <nav class="nav nav-tabs justify-content-center mt-3">
 	<a href="/chapters" class="nav-item nav-link active">All Chapters</a>
@@ -13,9 +8,15 @@
 
 <nav class="nav nav-tabs d-block d-lg-flex justify-content-center text-center bg-white">
 	{% for game in games %}
-		<a href="/chapters/{{game.slug}}" class="nav-item nav-link border-top-0 border-bottom rounded-0 {% if game._id.equals(filter) %}active{% endif %}">{{game.name}}</a>
+		{% if crp.util.findObjectInArray(chapters, 'game', game._id.toString()) %}
+			<a href="/chapters/{{game.slug}}" class="nav-item nav-link border-top-0 border-bottom rounded-0 {% if game._id.equals(filter) %}active{% endif %}">{{game.name}}</a>
+		{% endif %}
 	{% endfor %}
 </nav>
+
+{% if filter %}
+	{% set chapters = crp.util.filterObjectArray(chapters, {game: filter.toString()}) %}
+{% endif %}
 
 <div class="container mt-3">
 	<div class="row">

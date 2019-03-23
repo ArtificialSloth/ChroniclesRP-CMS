@@ -18,71 +18,75 @@
 
 	<div class="row mt-lg-3">
 		<div class="col-lg-9">
-			{% for activity in activities %}
-				{% if activity.title %}
-					{% set forum = crp.util.findObjectInArray(forums, '_id', activity.parent.toString()) %}
-					{% set category = crp.util.findObjectInArray(categories, '_id', parent.category.toString()) %}
-					{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
+			{% if activities.length > 0 %}
+				{% for activity in activities %}
+					{% if activity.title %}
+						{% set forum = crp.util.findObjectInArray(forums, '_id', activity.parent.toString()) %}
+						{% set category = crp.util.findObjectInArray(categories, '_id', parent.category.toString()) %}
+						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
 
-					{% set member = crp.chapters.getMember(chapter, user._id) %}
-					{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
-						<div class="card mt-2">
-							<div class="card-header">
-								<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
-								started topic
-								<a href="/forums/{{forum.slug}}/{{activity._id}}">{{activity.title}}</a>
-								in
-								<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
-								{{crp.moment(activity.date).fromNow()}}
-							</div>
-
-							{% set content = activity.content|striptags(true) %}
-							{% if content %}
-								<div class="card-body">
-									{{content | safe | truncate}}
-									{% if content.length > 255 %}
-										<a href="/forums/{{forum.slug}}/{{activity._id}}">[Read More]</a>
-									{% endif %}
+						{% set member = crp.chapters.getMember(chapter, user._id) %}
+						{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
+							<div class="card mt-2">
+								<div class="card-header">
+									<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
+									started topic
+									<a href="/forums/{{forum.slug}}/{{activity._id}}">{{activity.title}}</a>
+									in
+									<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
+									{{crp.moment(activity.date).fromNow()}}
 								</div>
-							{% endif %}
-						</div>
-					{% endif %}
-				{% else %}
-					{% lookup 'topics', {_id: activity.parent}, 'topic' %}
-					{% set forum = crp.util.findObjectInArray(forums, '_id', topic.parent.toString()) %}
-					{% set category = crp.util.findObjectInArray(categories, '_id', forum.category.toString()) %}
-					{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
 
-					{% set member = crp.chapters.getMember(chapter, user._id) %}
-					{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
-						<div class="card mt-2">
-							<div class="card-header">
-								<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
-								replied to
-								<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
-								in
-								<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
-								{{crp.moment(activity.date).fromNow()}}
+								{% set content = activity.content|striptags(true) %}
+								{% if content %}
+									<div class="card-body">
+										{{content | safe | truncate}}
+										{% if content.length > 255 %}
+											<a href="/forums/{{forum.slug}}/{{activity._id}}">[Read More]</a>
+										{% endif %}
+									</div>
+								{% endif %}
 							</div>
+						{% endif %}
+					{% else %}
+						{% lookup 'topics', {_id: activity.parent}, 'topic' %}
+						{% set forum = crp.util.findObjectInArray(forums, '_id', topic.parent.toString()) %}
+						{% set category = crp.util.findObjectInArray(categories, '_id', forum.category.toString()) %}
+						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
 
-							{% set content = activity.content|striptags(true) %}
-							{% if content %}
-								<div class="card-body">
-									{{activity.content | safe | striptags(true) | truncate}}
-									{% if activity.content.length > 255 %}
-										<a href="/forums/{{forum.slug}}/{{topic._id}}">[Read More]</a>
-									{% endif %}
+						{% set member = crp.chapters.getMember(chapter, user._id) %}
+						{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
+							<div class="card mt-2">
+								<div class="card-header">
+									<a href="/members/{{profile.nicename}}">{{profile.display_name}}</a>
+									replied to
+									<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
+									in
+									<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
+									{{crp.moment(activity.date).fromNow()}}
 								</div>
-							{% endif %}
-						</div>
+
+								{% set content = activity.content|striptags(true) %}
+								{% if content %}
+									<div class="card-body">
+										{{activity.content | safe | striptags(true) | truncate}}
+										{% if activity.content.length > 255 %}
+											<a href="/forums/{{forum.slug}}/{{topic._id}}">[Read More]</a>
+										{% endif %}
+									</div>
+								{% endif %}
+							</div>
+						{% endif %}
 					{% endif %}
+				{% endfor %}
+
+				{% if allActivities.length > 10 %}
+					{% set pageUrl = '/members/' + profile.nicename %}
+					{% set chunks = crp.util.chunkArray(allActivities, 10) %}
+					{% include "components/pagination/index.njk" %}
 				{% endif %}
-			{% endfor %}
-
-			{% if allActivities.length > 10 %}
-				{% set pageUrl = '/members/' + profile.nicename %}
-				{% set chunks = crp.util.chunkArray(allActivities, 10) %}
-				{% include "components/pagination/index.njk" %}
+			{% else %}
+				<div class="alert alert-warning">No activity yet.</div>
 			{% endif %}
 		</div>
 

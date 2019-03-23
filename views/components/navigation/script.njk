@@ -1,4 +1,29 @@
 <script>
+	$('#activate-form').submit((e) => {
+		e.preventDefault();
+		$('#activate-form-code').removeClass('is-invalid');
+
+		if ($('#activate-form-code').val().length < 6 || $('#activate-form-code').val().length > 6) {
+			$('#activate-form-code').next('.invalid-tooltip').html('Activation code must be 6 characters!');
+			$('#activate-form-code').addClass('is-invalid');
+			return;
+		}
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/activate', formData, (res) => {
+			if (res === true) {
+				location.reload();
+			} else if (res === false) {
+				$('#activate-form-code').next('.invalid-tooltip').html('Invalid activation code!');
+				$('#activate-form-code').addClass('is-invalid');
+			} else {
+				console.error(res);
+				$('#activate-form-code').next('.invalid-tooltip').html('Something went wrong :(');
+				$('#activate-form-code').addClass('is-invalid');
+			}
+		});
+	});
+
 	$('#login-form').submit((e) => {
 		e.preventDefault();
 		$('#login-form-login').removeClass('is-invalid');
@@ -76,8 +101,8 @@
 		if (!isValid) return;
 		var formData = $(e.target).serialize();
 		crpAjax('/api/register', formData, (res) => {
-			if (res._id) {
-				window.location.replace('/members/' + res.nicename);
+			if (res === true) {
+				location.reload();
 			} else if (res == 'noCaptcha') {
 				$('#register-form-captcha').next('.invalid-feedback').html('Please click the captcha first.');
 				$('#register-form-captcha').addClass('is-invalid');

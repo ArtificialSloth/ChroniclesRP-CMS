@@ -66,16 +66,6 @@
 		}, 0);
 	}
 
-	function crpActivateUser(code) {
-		crpAjax('/api/activate', {code: code}, (res) => {
-			if (typeof res == 'object') {
-				location.reload();
-			} else {
-				console.error(res)
-			}
-		});
-	}
-
 	function crpScrollTo(selector) {
 		$('html, body').animate({
 	        scrollTop: $(selector).offset().top
@@ -146,6 +136,8 @@
 	}
 
 	$(() => {
+		$('[data-toggle="tooltip"]').tooltip();
+
 		window.onpopstate = (e) => {
 			if (e.state) {
 				var page = e.state.page;

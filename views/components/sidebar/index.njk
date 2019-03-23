@@ -45,7 +45,11 @@
 	</div>
 
 	<div class="shadow-sm mt-3">
-		<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
+		{% if user.role >= 1 %}
+			<a href="/discord" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%" /></a>
+		{% else %}
+			<a><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%" data-toggle="tooltip" data-placement="right" title="Please register and confirm your email address first, before joining our Discord." /></a>
+		{% endif %}
 	</div>
 
 	<div class="shadow-sm mt-3">

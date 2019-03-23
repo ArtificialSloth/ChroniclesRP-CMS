@@ -1,5 +1,6 @@
 module.exports = (crp) => {
 	crp.members = {};
+	crp.members.activations = [];
 
 	crp.members.validateEmail = (email) => {
 		if (email && email.includes('@') && email.lastIndexOf('.') > email.lastIndexOf('@')) {
@@ -9,14 +10,21 @@ module.exports = (crp) => {
 		return false;
 	};
 
-	crp.members.emailConfirmCode = (userid) => {
+	crp.members.emailConfirmCode = (userid, email) => {
+		var activation = {
+			_id: userid,
+			email: email,
+			code: crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase()
+		};
+		crp.members.activations.push(activation);
+
 		crp.util.wait(15 * 60 * 1000, () => {
-			crp.members.removeData(userid, ['new_email', 'activation_code'], (err, newUser) => {
-				if (err) console.error(err);
-			});
+			crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
 		});
 
-		return crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase();
+		var subject = 'Confirm your email address';
+		var msg = 'Please use the following code to confirm your email address <div style="font-size:20px; text-align:center">' + activation.code + '</div>';
+		crp.mail.send(activation.email, subject, msg);
 	};
 
 	crp.members.find = (filter, cb) => {
@@ -28,96 +36,42 @@ module.exports = (crp) => {
 		crp.db.findOne('users', {_id: userid}, cb);
 	};
 
-	crp.members.newUserObject = (user) => {
-		var newUser = {
-			_id: user._id,
-			login: user.login,
-			pass: user.pass,
-			email: user.email,
-			register_date: user.register_date || Date.now(),
-			display_name: user.display_name || user.login,
-			nicename: user.nicename || crp.util.urlSafe(user.login),
-			role: parseInt(user.role) || 0,
-			locked: user.locked || false,
-			timezone: user.timezone || crp.moment.tz.guess(),
-			date_of_birth: user.date_of_birth,
-			gender: user.gender || '---',
-			tagline: user.tagline,
-			about: user.about,
-			img: user.img || {},
-		};
-
-		if (user.activation_code) newUser.activation_code = user.activation_code;
-		if (user.new_email) newUser.new_email = user.new_email;
-
-		return newUser;
-	};
-
-	crp.members.set = (userid, data, admin, cb) => {
+	crp.members.set = (userid, data, cb) => {
 		crp.members.get(userid, (err, user) => {
 			if (err) return cb(err);
-			if (!user) return cb(null, 'noUser');
+			if (!user) return cb('noUser');
 
 			crp.members.find({login: (data.login ? data.login.toLowerCase() : null)}, (err, users) => {
 				if (err) return cb(err);
+				if (users.length > 0 && data.login.toLowerCase() != user.login) return cb('loginTaken');
 
-				var newUser = user;
+				var newUser = {
+					_id: user._id,
+					login: data.login ? data.login.toLowerCase() : user.login,
+					pass: data.pass || user.pass,
+					email: data.email ? data.email.toLowerCase() : user.email,
+					register_date: user.register_date,
+					display_name: data.display_name || user.display_name || user.login,
+					nicename: crp.util.urlSafe(data.login) || user.nicename,
+					role: parseInt(data.role) || user.role,
+					locked: data.locked ? !!+data.locked : user.locked,
+					timezone: data.timezone || user.timezone || crp.moment.tz.guess(),
+					date_of_birth: (typeof data.date_of_birth != 'undefined') ? data.date_of_birth : user.date_of_birth,
+					gender: data.gender || user.gender,
+					tagline: (typeof data.tagline != 'undefined') ? data.tagline : user.tagline,
+					about: (typeof data.about != 'undefined') ? data.about : user.about,
+					img: user.img || {},
+				};
 
-				newUser.tagline = data.tagline || user.tagline;
-				newUser.about = data.about || user.about;
+				if (newUser.login.length < 4 || newUser.login.length > 80) return cb('loginLength');
+				if (!crp.members.validateEmail(newUser.email)) return cb('emailInvalid');
+				if (newUser.display_name.length < 4 || newUser.display_name.length > 80) return cb('displayNameLength');
 
-				if (admin) {
-					newUser.role = data.role || user.role;
-					newUser.locked = (data.locked == 'on') ? true : false;
-				}
+				if (newUser.date_of_birth && !crp.moment(new Date(newUser.date_of_birth)).isValid()) return cb('dobInvalid');
+				if (newUser.date_of_birth) crp.moment(new Date(newUser.date_of_birth)).format('MM/DD/YYYY');
 
-				if (data.login && data.login != user.login) {
-					if (data.login.length < 4 || data.login.length > 80) return cb(null, 'loginLength');
-					if (users.length > 0) return cb(null, 'loginTaken');
-
-					newUser.login = data.login.toLowerCase();
-					newUser.nicename = crp.util.urlSafe(newUser.login);
-				}
-
-				if (data.display_name && data.display_name != user.display_name) {
-					if (data.display_name.length < 4 || data.display_name.length > 80) return cb(null, 'displayNameLength');
-
-					newUser.display_name = data.display_name;
-				}
-
-				if (data.email && data.email != user.email) {
-					if (!crp.members.validateEmail(data.email)) return cb(null, 'emailInvalid');
-
-					if (admin) {
-						newUser.email = data.email.toLowerCase();
-					} else {
-						newUser.new_email = data.email.toLowerCase();
-						newUser.activation_code = crp.members.emailConfirmCode(newUser._id);
-
-						var subject = 'Confirm your new email address';
-						var msg = 'Please use the following code to confirm your new email address <div style="font-size:20px; text-align:center">' + newUser.activation_code + '</div>';
-						crp.mail.send(newUser.new_email, subject, msg);
-					}
-				}
-
-				if (data.date_of_birth && data.date_of_birth != user.date_of_birth) {
-					if (!crp.moment(new Date(data.date_of_birth)).isValid()) return cb(null, 'dobInvalid');
-
-					newUser.date_of_birth = crp.moment(new Date(data.date_of_birth)).format('MM/DD/YYYY');
-				}
-
-				if (data.timezone && data.timezone != user.timezone) {
-					if (!crp.moment.tz.names().includes(data.timezone)) return cb(null, 'tzInvalid');
-
-					newUser.timezone = data.timezone;
-				}
-
-				if (data.gender && data.gender != user.gender) {
-					var genders = ['---', 'Bolian', 'Female', 'Male'];
-					if (!genders.includes(data.gender)) return cb(null, 'genderInvalid');
-
-					newUser.gender = data.gender;
-				}
+				if (!crp.moment.tz.names().includes(newUser.timezone)) return cb('tzInvalid');
+				if (!['---', 'Bolian', 'Female', 'Male'].includes(newUser.gender)) return cb('genderInvalid');
 
 				crp.async.parallel([
 					(callback) => {
@@ -157,83 +111,43 @@ module.exports = (crp) => {
 						});
 					},
 					(callback) => {
-						if (admin) {
-							if (!data.old_pass || !data.new_pass || !data.new_pass_confirm) return callback();
-							if (data.new_pass.length < 6) return callback('passLength');
+						if (newUser.pass == user.pass) return callback();
+						if (newUser.pass.length < 6) return callback('passLength');
 
-							crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
-								if (err) return callback(err);
+						crp.auth.bcrypt.hash(newUser.pass, 10, (err, hash) => {
+							if (err) return callback(err);
 
-								newUser.pass = hash;
-								callback();
-							});
-						} else {
-							if (!data.old_pass || !data.new_pass || !data.new_pass_confirm) return callback();
-
-							crp.auth.bcrypt.compare(data.old_pass, user.pass, (err, isValid) => {
-								if (err) return callback(err);
-								if (!isValid) return callback('passMismatch');
-
-								if (data.new_pass.length < 6) return callback('passLength');
-								if (data.new_pass != data.new_pass_confirm) return callback('newPassMismatch');
-
-								crp.auth.bcrypt.hash(data.new_pass, 10, (err, hash) => {
-									if (err) return callback(err);
-
-									newUser.pass = hash;
-									callback();
-								});
-							});
-						}
+							newUser.pass = hash;
+							callback();
+						});
 					}
 				], (err) => {
 					if (err) return cb(err);
 
-					newUser = crp.members.newUserObject(newUser);
 					newUser = crp.util.sanitizeObject(newUser);
-
-					crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
-						cb(err, newUser);
-					});
+					crp.db.replaceOne('users', {_id: user._id}, newUser, cb);
 				});
 			});
 		});
 	};
 
-	crp.members.removeData = (userid, keys, cb) => {
-		crp.members.get(userid, (err, user) => {
-			if (err) return cb(err);
-			if (!user) return cb(null, 'noUser');
-
-			var newUser = {};
-			for (var k in user) {
-				if (keys.includes(k)) continue;
-				newUser[k] = user[k];
-			}
-
-			newUser = crp.members.newUserObject(newUser);
-			newUser = crp.util.sanitizeObject(newUser);
-
-			crp.db.replaceOne('users', {_id: user._id}, newUser, (err, result) => {
-				cb(err, newUser);
-			});
-
-		});
-	};
-
-	crp.members.add = (data, admin, cb) => {
+	crp.members.add = (data, cb) => {
 		var user = {
 			login: data.login.toLowerCase(),
 			pass: data.pass,
 			email: data.email.toLowerCase(),
-			register_date: Date.parse(data.register_date) || Date.now()
+			register_date: Date.parse(data.register_date) || Date.now(),
+			display_name: data.login,
+			nicename: crp.util.urlSafe(data.login),
+			role: parseInt(data.role) || 0,
+			locked: false,
+			timezone: crp.moment.tz.guess(),
+			date_of_birth: null,
+			gender: '---',
+			tagline: '',
+			about: '',
+			img: {}
 		};
-
-		if (admin) {
-			user.role = data.role;
-		} else {
-			user.activation_code = crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase();
-		}
 
 		crp.members.find({login: user.login}, (err, users) => {
 			if (err) return cb(err);
@@ -243,36 +157,35 @@ module.exports = (crp) => {
 				if (err) return cb(err);
 				if (users.length > 0) return cb('emailTaken');
 
-				if (user.login.length < 4 || user.login.length > 80) return cb('loginLength');
+				if (!user.login || user.login.length < 4 || user.login.length > 80) return cb('loginLength');
 				if (!crp.members.validateEmail(user.email)) return cb('emailInvalid');
 
-				if (user.pass.length < 6) return cb('passLength');
-				if (!data.encrypted) {
-					crp.auth.bcrypt.hash(user.pass, 10, (err, hash) => {
-						if (err) return cb(err);
+				if (!user.pass || user.pass.length < 6) return cb('passLength');
+				crp.async.parallel([
+					(callback) => {
+						if (!data.encrypted) {
+							crp.auth.bcrypt.hash(user.pass, 10, (err, hash) => {
+								if (err) return callback(err);
 
-						user.pass = hash;
-						user = crp.members.newUserObject(user);
-						user = crp.util.sanitizeObject(user);
+								user.pass = hash;
+								callback();
+							});
+						} else {
+							user.pass = user.pass.replace('$2y$', '$2a$');
+							callback();
+						}
+					}
+				], (err) => {
+					if (err) return cb(err);
 
-						crp.db.insertOne('users', user, (err, result) => {
-							if (err) return cb(err);
-
-							cb(null, user);
-						});
-
-					});
-				} else {
-					user.pass = user.pass.replace('$2y$', '$2a$');
-					user = crp.members.newUserObject(user);
 					user = crp.util.sanitizeObject(user);
-
 					crp.db.insertOne('users', user, (err, result) => {
 						if (err) return cb(err);
 
+						user._id = result.insertedId;
 						cb(null, user);
 					});
-				}
+				});
 			});
 		});
 	};
@@ -291,22 +204,17 @@ module.exports = (crp) => {
 	};
 
 	crp.members.parseRole = (role) => {
-		switch (role) {
-			case 0:
-				return 'Pending';
-				break;
-			case 1:
-				return 'Member';
-				break;
-			case 2:
-				return 'Chapter Leader';
-				break;
-			case 3:
-				return 'Administrator';
-				break;
-			default:
-				return 'Guest';
+		if (role == 0) {
+			return 'Pending';
+		} else if (role == 1) {
+			return 'Member';
+		} else if (role == 2) {
+			return 'Chapter Leader';
+		} else if (role == 3) {
+			return 'Administrator';
 		}
+
+		return 'Guest';
 	};
 
 	crp.members.getProfilePic = (user) => {

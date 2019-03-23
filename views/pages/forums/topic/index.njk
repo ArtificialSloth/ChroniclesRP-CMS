@@ -17,7 +17,7 @@
 
 	<div class="row">
 		{% set member = crp.chapters.getMember(chapter, user._id) %}
-		{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
+		{% if (not chapter or (member and member.role >= 1)) and (not category.role or user.role >= category.role) %}
 			<div class="col-lg-9">
 				<div class="container bg-white shadow-sm">
 					<div class="row bg-primary text-light border-bottom border-secondary p-2">

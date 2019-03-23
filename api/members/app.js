@@ -40,29 +40,29 @@ module.exports = (crp, callback) => {
 
 	crp.app.post('/api/register', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
-			var userData = {
-				login: req.body.login,
-				pass: req.body.pass,
-				email: req.body.email
-			};
-
-			crp.members.add(userData, false, (err, result) => {
+			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
-				if (!result._id) return res.send(result);
+				if (user) return res.send('user');
 
-				req.login(result, (err) => {
+				var userData = {
+					login: req.body.login,
+					pass: req.body.pass,
+					email: req.body.email
+				};
+
+				crp.members.add(userData, (err, result) => {
 					if (err) return res.send(err);
 
-					var subject = 'Welcome to the Chronicles ' + result.login + '!';
-					var msg = 'You\'re almost done, all you have left to do is activate your account using the following code. <div style="font-size:20px; text-align:center">' + result.activation_code + '</div>';
-					crp.mail.send(result.email, subject, msg);
-					crp.mail.adminNotify('New User: ' + result.display_name, 'Username: ' + result.login + '<br>Email: ' + result.email);
+					req.login(result, (err) => {
+						if (err) return res.send(err);
 
-					result.pass = null;
-					res.send(result);
+						crp.members.emailConfirmCode(result._id, result.email);
+						res.send(true);
+					});
 				});
 			});
 		}).catch((err) => {
+			console.log('uwu' + err);
 			res.send('noCaptcha');
 		});
 	});
@@ -70,31 +70,25 @@ module.exports = (crp, callback) => {
 	crp.app.post('/api/activate', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
+			if (!user) return res.send(false);
 
-			if (user && user.activation_code == req.body.code) {
-				if (user.role == 0) {
-					crp.members.set(user._id, {role: 1}, true, (err, result) => {
-						if (err) return res.send(err);
-						crp.members.removeData(user._id, ['activation_code'], (err, result) => {
-							if (err) return res.send(err);
+			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id.toString());
+			if (!activation || activation.code != req.body.code) return res.send(false);
 
-							result.pass = null;
-							res.send(result);
-						});
-					});
-				} else {
-					crp.members.set(user._id, {email: user.new_email}, true, (err, result) => {
-						if (err) return res.send(err);
-						crp.members.removeData(user._id, ['new_email', 'activation_code'], (err, result) => {
-							if (err) return res.send(err);
+			if (user.role == 0) {
+				crp.members.set(user._id, {role: 1}, (err, result) => {
+					if (err) return res.send(err);
 
-							result.pass = null;
-							res.send(result);
-						});
-					});
-				}
+					crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
+					res.send(true);
+				});
 			} else {
-				res.send('invalid');
+				crp.members.set(user._id, {email: activation.email}, (err, result) => {
+					if (err) return res.send(err);
+
+					crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
+					res.send(true);
+				});
 			}
 		});
 	});
@@ -108,37 +102,64 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
+				if (!user) return res.send('noUser');
 
-				if (req.body.user_id == user._id || user.role >= 3) {
-					var userData = {
-						login: req.body.login,
-						old_pass: req.body.old_pass,
-						new_pass: req.body.new_pass,
-						new_pass_confirm: req.body.new_pass_confirm,
-						email: req.body.email,
-						display_name: req.body.display_name,
-						role: req.body.role,
-						locked: req.body.locked,
-						timezone: req.body.timezone,
-						date_of_birth: req.body.dob,
-						gender: req.body.gender,
-						tagline: req.body.tagline,
-						about: req.body.about,
-						img: {}
-					};
+				crp.members.get(req.body.userid, (err, profile) => {
+					if (err) return res.send(err);
+					if (!profile) return res.send('noUser');
 
-					if (req.files) {
-						if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
-						if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+					if (user._id.equals(profile._id) || user.role >= 3) {
+						var userData = {
+							display_name: req.body.display_name,
+							timezone: req.body.timezone,
+							date_of_birth: req.body.date_of_birth,
+							gender: req.body.gender,
+							tagline: req.body.tagline,
+							about: req.body.about,
+							img: {}
+						};
+
+						if (req.files) {
+							if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
+							if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+						}
+
+						crp.async.parallel([
+							(callback) => {
+								if (!req.body.old_pass || !req.body.new_pass || !req.body.new_pass_confirm) return callback();
+								if (req.body.new_pass != req.body.new_pass_confirm) return callback('newPassMismatch');
+
+								crp.auth.bcrypt.compare(req.body.old_pass, user.pass, (err, isValid) => {
+									if (err) return callback(err);
+									if (!isValid) return callback('passMismatch');
+
+									userData.pass = req.body.new_pass;
+									callback();
+								});
+							},
+							(callback) => {
+								if (!req.body.email || req.body.email.toLowerCase() == profile.email) return callback();
+								if (!crp.members.validateEmail(req.body.email)) return callback('emailInvalid');
+
+								crp.members.find({email: req.body.email}, (err, users) => {
+									if (err) return callback(err);
+									if (users && users.length > 0) return callback('emailTaken');
+
+									crp.members.emailConfirmCode(profile._id, req.body.email);
+									callback();
+								});
+							}
+						], (err) => {
+							if (err) return res.send(err);
+
+							crp.members.set(profile._id, userData, (err, result) => {
+								if (err) return res.send(err);
+
+								res.send(true);
+							});
+						});
 					}
-
-					crp.members.set(req.body.user_id, userData, (user.role >= 3), (err, result) => {
-						if (err) return res.send(err);
-
-						result.pass = null;
-						res.send(result);
-					});
-				}
+				});
 			});
 		});
 	});

@@ -46,7 +46,11 @@
 			{% endfor %}
 
 			{% if not inChapter %}
-				<div class="alert alert-warning" role="alert">You're not a member of any Chapters.</div>
+				{% if profile._id.equals(user._id) %}
+					<div class="alert alert-warning" role="alert">You're not a member of any Chapters.</div>
+				{% else %}
+					<div class="alert alert-warning" role="alert">{{profile.display_name}} is not a member of any Chapters.</div>
+				{% endif %}
 			{% endif %}
 		</div>
 

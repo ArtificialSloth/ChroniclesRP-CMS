@@ -47,7 +47,7 @@
 							<div class="form-group row">
 								<label for="account-form-dob" class="col-lg-2 col-form-label">Date of Birth</label>
 								<div class="col-lg-10">
-									<input type="text" class="form-control" id="account-form-dob" name="dob" placeholder="MM/DD/YYYY" value="{{profile.date_of_birth}}" />
+									<input type="text" class="form-control" id="account-form-dob" name="date_of_birth" placeholder="MM/DD/YYYY" value="{{profile.date_of_birth}}" />
 									<div class="invalid-feedback"></div>
 								</div>
 							</div>
@@ -128,7 +128,7 @@
 								</div>
 							</div>
 
-							<input type="hidden" name="user_id" value="{{profile._id}}" />
+							<input type="hidden" name="userid" value="{{profile._id}}" />
 							<button type="submit" class="btn btn-success float-right">Save</button>
 						</form>
 					</div>

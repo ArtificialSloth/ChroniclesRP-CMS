@@ -60,7 +60,21 @@
 	</div>
 
 	<div class="row mt-3">
-		<div class="col-lg-9 recent-posts">
+		<div class="col-lg-3">
+			<div class="shadow-sm mb-3">
+				{% if user.role >= 1 %}
+					<a href="/discord" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%" /></a>
+				{% else %}
+					<a><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%" data-toggle="tooltip" data-placement="right" title="Please register and confirm your email address first, before joining our Discord." /></a>
+				{% endif %}
+			</div>
+
+			<div class="d-none d-lg-block shadow-sm">
+				<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
+			</div>
+		</div>
+
+		<div class="col-lg-6 recent-posts">
 			<h4 class="font-family-montserrat">Recent Posts</h4>
 			<hr />
 
@@ -104,14 +118,6 @@
 					<input type="image" src="{{crp.storage.getUrl(css.img.donate)}}" name="submit" width="100%" alt="PayPal - The safer, easier way to pay online!">
 					<img src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" border="0" alt="" />
 				</form>
-			</div>
-
-			<div class="shadow-sm mt-3">
-				<a href="https://discord.gg/6GaYTAY" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%"></a>
-			</div>
-
-			<div class="shadow-sm mt-3">
-				<iframe src="https://discordapp.com/widget?id=324988028768485376&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0"></iframe>
 			</div>
 		</div>
 	</div>
