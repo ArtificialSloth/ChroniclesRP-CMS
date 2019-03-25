@@ -29,7 +29,7 @@ module.exports = (crp) => {
 					open: data.open ? !!+data.open : chapter.open,
 					tagline: data.tagline || chapter.tagline,
 					desc: (data.desc != chapter.desc) ? data.desc : chapter.desc,
-					discord: data.discord || chapter.discord,
+					discord: (typeof data.tagline != 'undefined') ? data.discord : chapter.discord,
 					img: chapter.img || {},
 					members: chapter.members || {}
 				};
@@ -367,27 +367,27 @@ module.exports = (crp) => {
 				for (var i in chapters) {
 					if (chapters[i].type == 'group') {
 						if (slug == `/chapters/${chapters[i].nicename}`) return cb(null, {
-							path: '/chapters/view/index.njk',
-							subPage: '/chapters/view/about/index.njk',
+							path: '/chapters/profile/index.njk',
+							subPage: '/chapters/profile/about/index.njk',
 							context: {chapterid: chapters[i]._id}
 						});
 
 						if (slug == `/chapters/${chapters[i].nicename}/forums`) return cb(null, {
-							path: '/chapters/view/index.njk',
-							subPage: `/chapters/view/forums/index.njk`,
+							path: '/chapters/profile/index.njk',
+							subPage: `/chapters/profile/forums/index.njk`,
 							context: {chapterid: chapters[i]._id}
 						});
 					}
 
 					if (slug == `/chapters/${chapters[i].nicename}/members`) return cb(null, {
-						path: '/chapters/view/index.njk',
-						subPage: `/chapters/view/members/index.njk`,
+						path: '/chapters/profile/index.njk',
+						subPage: `/chapters/profile/members/index.njk`,
 						context: {chapterid: chapters[i]._id}
 					});
 
-					if (slug == `/chapters/${chapters[i].nicename}/edit`) return cb(null, {
-						path: '/chapters/view/index.njk',
-						subPage: `/chapters/view/edit/index.njk`,
+					if (slug == `/chapters/${chapters[i].nicename}/settings`) return cb(null, {
+						path: '/chapters/profile/index.njk',
+						subPage: `/chapters/profile/settings/index.njk`,
 						context: {chapterid: chapters[i]._id}
 					});
 				}

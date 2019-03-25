@@ -1,0 +1,115 @@
+{% lookup 'chapters', {_id: chapterid}, 'chapter' %}
+{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
+
+<div class="container">
+	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
+		{% if chapter.type == 'group' %}
+			<a class="nav-link" href="/chapters/{{chapter.nicename}}" container=".profile-content" newurl="true">Home</a>
+			<a class="nav-link" href="/chapters/{{chapter.nicename}}/forums" container=".profile-content" newurl="true">Forums</a>
+		{% endif %}
+		<a class="nav-link" href="/chapters/{{chapter.nicename}}/members" container=".profile-content" newurl="true">Members</a>
+		{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+			<a class="nav-link active" href="/chapters/{{chapter.nicename}}/settings" container=".profile-content" newurl="true">Settings</a>
+		{% endif %}
+	</nav>
+
+	<div class="row mt-lg-3">
+		<div class="col-lg-9">
+			{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<form id="chapter-form" novalidate>
+							<div class="form-group row">
+								<label for="chapter-form-game" class="col-lg-2 col-form-label">Gender</label>
+								<div class="col-lg-10">
+									<select class="form-control" id="chapter-form-game" name="game">
+										{% for game in games %}
+											<option value="{{game._id}}" {% if game._id.equals(chapter.game) %}selected{% endif %}>{{game.name}}</option>
+										{% endfor %}
+									</select>
+									<div class="invalid-feedback"></div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="chapter-form-open" class="col-lg-2 col-form-label">Membership</label>
+								<div class="col-lg-10">
+									<select class="form-control" id="chapter-form-open" name="open">
+										<option value="1">Open</option>
+										<option value="0" {% if not chapter.open %}selected{% endif %}>Invite Only</option>
+									</select>
+									<div class="invalid-feedback"></div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="chapter-form-discord" class="col-lg-2 col-form-label">Discord Server ID</label>
+								<div class="col-lg-10">
+									<input type="text" class="form-control" id="chapter-form-discord" name="discord" placeholder="123456789012345678" value="{{chapter.discord}}" />
+									<div class="invalid-feedback"></div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="chapter-form-tagline" class="col-lg-2 col-form-label">Tagline</label>
+								<div class="col-lg-10">
+									<input type="text" class="form-control" id="chapter-form-tagline" name="tagline" placeholder="Tagline" value="{{chapter.tagline}}" />
+									<div class="invalid-feedback"></div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="chapter-form-profile_pic" class="col-lg-2 col-form-label">Chapter Picture</label>
+								<div class="col-lg-10">
+									{% if chapter.img.profile %}
+										<img src="{{crp.chapters.getProfilePic(chapter)}}" width="125px" height="125px" />
+									{% endif %}
+									<input type="file" class="form-control-file mt-3" id="chapter-form-profile_pic" name="profile_pic" />
+									<div class="invalid-feedback"></div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="chapter-form-cover_pic" class="col-lg-2 col-form-label">Cover Picture</label>
+								<div class="col-lg-10">
+									{% if chapter.img.cover %}
+										<img src="{{crp.chapters.getCoverPic(chapter)}}" height="125px" />
+									{% endif %}
+									<input type="file" class="form-control-file mt-3" id="chapter-form-cover_pic" name="cover_pic" />
+									<div class="invalid-feedback"></div>
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<label for="chapter-form-desc" class="col-lg-2 col-form-label">Description</label>
+								<div class="col-lg-10">
+									<textarea class="form-control tinymce" id="chapter-form-desc" name="desc" placeholder="Description">{{chapter.desc}}</textarea>
+									<script>crpTinyMCE()</script>
+									<div class="invalid-feedback"></div>
+								</div>
+							</div>
+
+							<input type="hidden" name="chapterid" value="{{chapter._id}}" />
+							<button type="submit" class="btn btn-success float-right">Save</button>
+						</form>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+
+		<div class="col-lg-3">
+			<nav class="nav nav-tabs nav-vertical-tabs flex-column justify-content-center mt-2 d-none d-lg-block">
+				{% if chapter.type == 'group' %}
+					<a class="nav-link" href="/chapters/{{chapter.nicename}}" container=".profile-content" newurl="true">Home</a>
+					<a class="nav-link" href="/chapters/{{chapter.nicename}}/forums" container=".profile-content" newurl="true">Forums</a>
+				{% endif %}
+				<a class="nav-link" href="/chapters/{{chapter.nicename}}/members" container=".profile-content" newurl="true">Members</a>
+				{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+					<a class="nav-link active" href="/chapters/{{chapter.nicename}}/settings" container=".profile-content" newurl="true">Settings</a>
+				{% endif %}
+			</nav>
+		</div>
+	</div>
+</div>
+
+{% include "./script.njk" %}

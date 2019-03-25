@@ -1,0 +1,16 @@
+{% include "./style.njk" %}
+{% lookup 'chapters', {_id: chapterid}, 'chapter' %}
+
+<div class="profile-header d-flex flex-column-reverse" style="background-image:url('{{crp.chapters.getCoverPic(chapter)}}')">
+	<div class="text-white text-center h-50" style="background-color:rgba(0, 0, 0, 0.5)">
+		<img src="{{crp.chapters.getProfilePic(chapter)}}" alt="{{chapter.name}}" width="150" height="150" />
+		<div class="py-2 px-3">
+			<h2 class="font-weight-bold">{{chapter.name}}</h2>
+			<p>{{chapter.tagline}}</p>
+		</div>
+	</div>
+</div>
+
+<div class="profile-content">
+	{% include "pages" + subPage %}
+</div>

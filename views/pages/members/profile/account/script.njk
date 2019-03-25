@@ -2,6 +2,18 @@
 	$('#account-form').submit((e) => {
 		e.preventDefault();
 
+		$('#account-form-login').removeClass('is-invalid');
+		$('#account-form-display_name').removeClass('is-invalid');
+		$('#account-form-gender').removeClass('is-invalid');
+		$('#account-form-dob').removeClass('is-invalid');
+		$('#account-form-timezone').removeClass('is-invalid');
+		$('#account-form-email').removeClass('is-invalid');
+		$('#account-form-old-pass').removeClass('is-invalid');
+		$('#account-form-new-pass').removeClass('is-invalid');
+		$('#account-form-new-pass-confirm').removeClass('is-invalid');
+		$('#account-form-profile_pic').removeClass('is-invalid');
+		$('#account-form-cover_pic').removeClass('is-invalid');
+
 		var formData = new FormData(e.target);
 		crpAjaxUpload('/api/edit-user', formData, (res) => {
 			if (res === true) {
