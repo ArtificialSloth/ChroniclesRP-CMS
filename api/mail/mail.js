@@ -1,8 +1,9 @@
 module.exports = (crp) => {
 	crp.mail = {};
-
-	crp.mail.sendgrid = require('@sendgrid/mail');
-	crp.mail.sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+	crp.mail.mailgun = require('mailgun-js')({
+		apiKey: process.env.MAILGUN_API_KEY,
+		domain: process.env.MAILGUN_DOMAIN
+	});
 
 	crp.mail.msgTemplate = (subject, msg, cb) => {
 		crp.db.findOne('site', {}, (err, site) => {
@@ -20,14 +21,16 @@ module.exports = (crp) => {
 
 	crp.mail.send = (to, subject, msg) => {
 		crp.mail.msgTemplate(subject, msg, (err, result) => {
-			if (err) return;
+			if (err) return console.error(err);
 
-			crp.mail.sendgrid.send({
+			crp.mail.mailgun.messages().send({
+				from: 'The Chronicles RP <no-reply@chroniclesrp.com>',
 				to: to,
-				from: 'no_reply@chroniclesrp.com',
 				subject: subject,
 				text: msg,
 				html: result
+			}, (err, body) => {
+				if (err) console.error(err);
 			});
 		});
 	};
