@@ -61,20 +61,22 @@
 		</div>
 	</nav>
 
-	{% set activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id.toString()) %}
-	{% if activation or user.role == 0 %}
-		<div class="position-fixed w-100 px-3 px-lg-5 mt-3" style="z-index:1000">
-			<div class="alert alert-warning mx-auto">
-				<span>Validate your new email with the code we sent to <i>{{activation.email or user.email}}</i>.</span>
+	{% if user %}
+		{% set activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id.toString()) %}
+		{% if activation or user.role == 0 %}
+			<div class="position-fixed w-100 px-3 px-lg-5 mt-3" style="z-index:1000">
+				<div class="alert alert-warning mx-auto">
+					<span>Validate your new email with the code we sent to <i>{{activation.email or user.email}}</i>.</span>
 
-				<form class="form-inline float-lg-right" id="activate-form" novalidate>
-					<input type="text" class="form-control form-control-sm" id="activate-form-code" name="code" placeholder="CODE" maxlength="6" required />
-					<div class="invalid-tooltip"></div>
-					<button type="submit" class="btn btn-success btn-sm mx-lg-1 mt-1 mt-lg-0">Validate</button>
-					<a class="pointer ml-1 ml-lg-0" onclick="resendActivation(this)">Resend</a>
-				</form>
+					<form class="form-inline float-lg-right" id="activate-form" novalidate>
+						<input type="text" class="form-control form-control-sm" id="activate-form-code" name="code" placeholder="CODE" maxlength="6" required />
+						<div class="invalid-tooltip"></div>
+						<button type="submit" class="btn btn-success btn-sm mx-lg-1 mt-1 mt-lg-0">Validate</button>
+						<a class="pointer ml-1 ml-lg-0" onclick="resendActivation(this)">Resend</a>
+					</form>
+				</div>
 			</div>
-		</div>
+		{% endif %}
 	{% endif %}
 
 	<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalTitle" aria-hidden="true">
