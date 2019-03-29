@@ -3,29 +3,40 @@
 		e.preventDefault();
 		tinymce.triggerSave();
 
+		$('#chapter-form-slug').removeClass('is-invalid');
+		$('#chapter-form-game').removeClass('is-invalid');
+		$('#chapter-form-discord').removeClass('is-invalid');
+		$('#chapter-form-tagline').removeClass('is-invalid');
+		$('#chapter-form-profile_pic').removeClass('is-invalid');
+		$('#chapter-form-cover_pic').removeClass('is-invalid');
+		$('#chapter-form-desc').removeClass('is-invalid');
+
 		var formData = new FormData(e.target);
 		crpAjaxUpload('/api/edit-chapter', formData, (res) => {
-			if (true) {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
+			} else if (res == 'badSlug') {
+				$('#chapter-form-slug').next('.invalid-feedback').html('URL must be less than 90 characters!');
+				$('#chapter-form-slug').addClass('is-invalid');
 			} else if (res == 'noGame') {
-				$('#chapter-form-').next('.invalid-feedback').html('You must select a valid game.');
-				$('#chapter-form-').addClass('is-invalid');
+				$('#chapter-form-game').next('.invalid-feedback').html('You must select a valid game.');
+				$('#chapter-form-game').addClass('is-invalid');
 			} else if (res == 'badDiscord') {
-				$('#chapter-form-').next('.invalid-feedback').html('Discord ID invalid!');
-				$('#chapter-form-').addClass('is-invalid');
+				$('#chapter-form-discord').next('.invalid-feedback').html('Discord ID invalid!');
+				$('#chapter-form-discord').addClass('is-invalid');
 			} else if (res == 'badTagline') {
-				$('#chapter-form-').next('.invalid-feedback').html('Tagline must be less than 140 characters!');
-				$('#chapter-form-').addClass('is-invalid');
+				$('#chapter-form-tagline').next('.invalid-feedback').html('Tagline must be less than 140 characters!');
+				$('#chapter-form-tagline').addClass('is-invalid');
 			} else if (res.code == 'LIMIT_FILE_SIZE' && res.field == 'profile_pic') {
-				$('#chapter-form-').next('.invalid-feedback').html('File size must be < 2 MB');
-				$('#chapter-form-').addClass('is-invalid');
+				$('#chapter-form-profile_pic').next('.invalid-feedback').html('File size must be < 2 MB');
+				$('#chapter-form-profile_pic').addClass('is-invalid');
 			} else if (res.code == 'LIMIT_FILE_SIZE' && res.field == 'cover_pic') {
-				$('#chapter-form-').next('.invalid-feedback').html('File size must be < 2 MB');
-				$('#chapter-form-').addClass('is-invalid');
+				$('#chapter-form-cover_pic').next('.invalid-feedback').html('File size must be < 2 MB');
+				$('#chapter-form-cover_pic').addClass('is-invalid');
 			} else {
 				console.error(res);
-				$('#chapter-form-').next('.invalid-feedback').html('Something went wrong :(');
-				$('#chapter-form-').addClass('is-invalid');
+				$('#chapter-form-desc').next('.invalid-feedback').html('Something went wrong :(');
+				$('#chapter-form-desc').addClass('is-invalid');
 			}
 		});
 	});

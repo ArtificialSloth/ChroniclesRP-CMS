@@ -19,8 +19,18 @@
 				<div class="card shadow-sm">
 					<div class="card-body">
 						<form id="chapter-form" novalidate>
+							{% if chapter.type == 'url' %}
+								<div class="form-group row">
+									<label for="chapter-form-slug" class="col-lg-2 col-form-label">URL</label>
+									<div class="col-lg-10">
+										<input type="text" class="form-control" id="chapter-form-slug" name="slug" placeholder="www.yourchapter.com" value="{{chapter.slug}}" />
+										<div class="invalid-feedback"></div>
+									</div>
+								</div>
+							{% endif %}
+
 							<div class="form-group row">
-								<label for="chapter-form-game" class="col-lg-2 col-form-label">Gender</label>
+								<label for="chapter-form-game" class="col-lg-2 col-form-label">Game</label>
 								<div class="col-lg-10">
 									<select class="form-control" id="chapter-form-game" name="game">
 										{% for game in games %}
@@ -73,21 +83,23 @@
 								<label for="chapter-form-cover_pic" class="col-lg-2 col-form-label">Cover Picture</label>
 								<div class="col-lg-10">
 									{% if chapter.img.cover %}
-										<img src="{{crp.chapters.getCoverPic(chapter)}}" height="125px" />
+										<img class="mw-100" src="{{crp.chapters.getCoverPic(chapter)}}" height="125px" />
 									{% endif %}
 									<input type="file" class="form-control-file mt-3" id="chapter-form-cover_pic" name="cover_pic" />
 									<div class="invalid-feedback"></div>
 								</div>
 							</div>
 
-							<div class="form-group row">
-								<label for="chapter-form-desc" class="col-lg-2 col-form-label">Description</label>
-								<div class="col-lg-10">
-									<textarea class="form-control tinymce" id="chapter-form-desc" name="desc" placeholder="Description">{{chapter.desc}}</textarea>
-									<script>crpTinyMCE()</script>
-									<div class="invalid-feedback"></div>
+							{% if chapter.type == 'group' %}
+								<div class="form-group row">
+									<label for="chapter-form-desc" class="col-lg-2 col-form-label">Description</label>
+									<div class="col-lg-10">
+										<textarea class="form-control tinymce" id="chapter-form-desc" name="desc" placeholder="Description">{{chapter.desc}}</textarea>
+										<script>crpTinyMCE()</script>
+										<div class="invalid-feedback"></div>
+									</div>
 								</div>
-							</div>
+							{% endif %}
 
 							<input type="hidden" name="chapterid" value="{{chapter._id}}" />
 							<button type="submit" class="btn btn-success float-right">Save</button>

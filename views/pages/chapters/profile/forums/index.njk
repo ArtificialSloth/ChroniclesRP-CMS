@@ -1,4 +1,8 @@
 {% lookup 'chapters', {_id: chapterid}, 'chapter' %}
+{% query 'categories', {chapter: chapter._id}, {sort: [['order', 1]]}, 'categories' %}
+{% query 'forums', {}, {sort: [['order', 1]]}, 'forums' %}
+{% query 'topics', {}, {sort: [['date', -1]]}, 'topics' %}
+
 
 <div class="container">
 	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
@@ -14,7 +18,74 @@
 
 	<div class="row mt-lg-3">
 		<div class="col-lg-9">
+			{% for category in categories %}
+				<div class="container bg-white shadow-sm">
+					<div class="row bg-primary text-light border-bottom border-secondary p-2">
+						<div class="col-lg-8">{{category.name}}</div>
+						<div class="col-lg-2 text-center d-none d-lg-block">Topics</div>
+						<div class="col-lg-2 text-center d-none d-lg-block">Most Recent</div>
+					</div>
 
+					{% for forum in crp.util.filterObjectArray(forums, {category: category._id.toString()}) %}
+						{% set forumTopics = crp.util.filterObjectArray(topics, {parent: forum._id.toString()}) %}
+
+						<div class="row p-2">
+							<div class="col-lg-8">
+								<a href="/forums/{{forum.slug}}" style="font-size:1.25rem">{{forum.name}}</a>
+								{% if forumTopics[0] and crp.moment().diff(crp.moment(forumTopics[0].date), 'days') < 3 %}
+									<span class="badge badge-primary">New</span>
+								{% endif %}
+								<p class="text-muted d-none d-lg-block m-0 pl-3">{{forum.desc}}</p>
+							</div>
+							<div class="col-lg-2 text-center d-none d-lg-block">{{forumTopics.length}}</div>
+							<div class="col-lg-2 text-lg-center ml-3 ml-lg-0">
+								{% if forumTopics[0] %}
+									{% lookup 'users', {_id: forumTopics[0].author}, 'author' %}
+
+									{% if forumTopics[0].sortAuthor %}
+										{% lookup 'users', {_id: forumTopics[0].sortAuthor}, 'sortAuthor' %}
+										<a href="/members/{{sortAuthor.nicename}}">{{sortAuthor.display_name}}</a> replied to
+									{% endif %}
+
+									<a href="/forums/{{forum.slug}}/{{forumTopics[0]._id}}">{{forumTopics[0].title}}</a> by <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+								{% else %}
+									No Topics
+								{% endif %}
+
+								{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+									<div class="">
+										<a class="float-right" href="" onclick="chaptersDeleteForum('{{forum._id}}')">Delete</a>
+									</div>
+								{% endif %}
+							</div>
+						</div>
+						{% if not loop.last %}<hr class="m-0" />{% endif %}
+					{% endfor %}
+				</div>
+
+				{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+					<div class="card shadow-sm mt-3">
+						<div class="card-body">
+							<form id="new-forum-form" novalidate>
+								<div class="form-group">
+									<label for="new-forum-form-name">New Forum Name</label>
+									<input type="text" class="form-control" id="new-forum-form-name" name="name" placeholder="Forum Name" />
+									<div class="invalid-feedback"></div>
+								</div>
+
+								<div class="form-group">
+									<label for="new-forum-form-desc">Forum Description</label>
+									<input type="text" class="form-control" id="new-forum-form-desc" name="desc" placeholder="Forum Description" />
+									<div class="invalid-feedback"></div>
+								</div>
+
+								<input type="hidden" name="category" class="category" value="{{category._id}}" />
+								<button type="submit" class="btn btn-success float-right">New Forum</button>
+							</form>
+						</div>
+					</div>
+				{% endif %}
+			{% endfor %}
 		</div>
 
 		<div class="col-lg-3">
@@ -31,3 +102,5 @@
 		</div>
 	</div>
 </div>
+
+{% include "./script.njk" %}
