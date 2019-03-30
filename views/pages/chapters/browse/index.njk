@@ -8,20 +8,20 @@
 
 <nav class="nav nav-tabs d-block d-lg-flex justify-content-center text-center bg-white">
 	{% for game in games %}
-		{% if crp.util.findObjectInArray(chapters, 'game', game._id.toString()) %}
+		{% if crp.util.findObjectInArray(chapters, 'game', game._id) %}
 			<a href="/chapters/{{game.slug}}" class="nav-item nav-link border-top-0 border-bottom rounded-0 {% if game._id.equals(filter) %}active{% endif %}">{{game.name}}</a>
 		{% endif %}
 	{% endfor %}
 </nav>
 
 {% if filter %}
-	{% set chapters = crp.util.filterObjectArray(chapters, {game: filter.toString()}) %}
+	{% set chapters = crp.util.filterObjectArray(chapters, {game: filter}) %}
 {% endif %}
 
 <div class="container mt-3">
 	<div class="row">
 		{% for chapter in chapters %}
-			{% set game = crp.util.findObjectInArray(games, '_id', chapter.game.toString()) %}
+			{% set game = crp.util.findObjectInArray(games, '_id', chapter.game) %}
 
 			<div class="col-lg-3 mb-3">
 				<div class="card shadow-sm">

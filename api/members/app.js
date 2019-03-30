@@ -72,7 +72,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!user) return res.send(false);
 
-			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id.toString());
+			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id);
 			if (!activation || activation.code != req.body.code) return res.send(false);
 
 			if (user.role == 0) {
@@ -98,7 +98,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!user) return res.send(false);
 
-			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id.toString());
+			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id);
 			if (activation) crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
 			if (!activation && user.role > 0) return res.send(false);
 

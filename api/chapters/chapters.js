@@ -143,7 +143,7 @@ module.exports = (crp) => {
 							switch (chapter.type) {
 								case 'hosted':
 									crp.chapters.deploy(data.cms, chapter.slug, (err) => {
-										if (err) return cb(err.toString());
+										if (err) return cb(err);
 
 										cb(null, chapter);
 									});
@@ -218,7 +218,7 @@ module.exports = (crp) => {
 
 	crp.chapters.getMember = (chapter, userid) => {
 		if (!chapter || !userid) return;
-		return crp.util.findObjectInArray(chapter.members, '_id', userid.toString());
+		return crp.util.findObjectInArray(chapter.members, '_id', userid);
 	};
 
 	crp.chapters.addMember = (chapterid, data, cb) => {

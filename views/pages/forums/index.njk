@@ -20,8 +20,8 @@
 							<div class="col-lg-2 text-center d-none d-lg-block">Most Recent</div>
 						</div>
 
-						{% for forum in crp.util.filterObjectArray(forums, {category: category._id.toString()}) %}
-							{% set forumTopics = crp.util.filterObjectArray(topics, {parent: forum._id.toString()}) %}
+						{% for forum in crp.util.filterObjectArray(forums, {category: category._id}) %}
+							{% set forumTopics = crp.util.filterObjectArray(topics, {parent: forum._id}) %}
 
 							<div class="row p-2">
 								<div class="col-lg-8">

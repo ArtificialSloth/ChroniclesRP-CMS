@@ -7,7 +7,8 @@ module.exports = (crp, callback) => {
 
 		for (var i in array) {
 			for (var k in array[i]) {
-				if (filter[k] && filter[k] == array[i][k]) result.push(array[i]);
+				var x = (filter[k] && filter[k].equals instanceof Function) ? filter[k].toString() : filter[k];
+				if (x && x == array[i][k]) result.push(array[i]);
 			}
 		}
 
@@ -16,7 +17,8 @@ module.exports = (crp, callback) => {
 
 	crp.util.findObjectInArray = (array, key, val) => {
 		for (var i in array) {
-			if (array[i][key] == val) {
+			var x = (array[i][key].equals instanceof Function) ? array[i][key].toString() : array[i][key];
+			if (x == val) {
 				return array[i];
 			}
 		}

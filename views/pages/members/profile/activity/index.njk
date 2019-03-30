@@ -21,9 +21,9 @@
 			{% if activities.length > 0 %}
 				{% for activity in activities %}
 					{% if activity.title %}
-						{% set forum = crp.util.findObjectInArray(forums, '_id', activity.parent.toString()) %}
-						{% set category = crp.util.findObjectInArray(categories, '_id', parent.category.toString()) %}
-						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
+						{% set forum = crp.util.findObjectInArray(forums, '_id', activity.parent) %}
+						{% set category = crp.util.findObjectInArray(categories, '_id', parent.category) %}
+						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter) %}
 
 						{% set member = crp.chapters.getMember(chapter, user._id) %}
 						{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
@@ -50,9 +50,9 @@
 						{% endif %}
 					{% else %}
 						{% lookup 'topics', {_id: activity.parent}, 'topic' %}
-						{% set forum = crp.util.findObjectInArray(forums, '_id', topic.parent.toString()) %}
-						{% set category = crp.util.findObjectInArray(categories, '_id', forum.category.toString()) %}
-						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter.toString()) %}
+						{% set forum = crp.util.findObjectInArray(forums, '_id', topic.parent) %}
+						{% set category = crp.util.findObjectInArray(categories, '_id', forum.category) %}
+						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter) %}
 
 						{% set member = crp.chapters.getMember(chapter, user._id) %}
 						{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}

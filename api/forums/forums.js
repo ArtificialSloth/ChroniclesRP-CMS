@@ -388,7 +388,7 @@ module.exports = (crp) => {
 				if (err) return cb(err);
 
 				for (var i in topics) {
-					var parent = crp.util.findObjectInArray(forums, '_id', topics[i].parent.toString());
+					var parent = crp.util.findObjectInArray(forums, '_id', topics[i].parent);
 					if (slug == `/forums/${parent.slug}/${topics[i]._id}`) return cb(null, {
 						path: '/forums/topic/index.njk',
 						context: {topicid: topics[i]._id}

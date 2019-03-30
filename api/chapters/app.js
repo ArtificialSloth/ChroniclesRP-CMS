@@ -43,7 +43,7 @@ module.exports = (crp, callback) => {
 					crp.chapters.set(req.body.chapterid, req.body, (err, result) => {
 						if (err) return res.send(err);
 
-						res.send(result);
+						res.send(true);
 					});
 				});
 			});
