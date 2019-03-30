@@ -2,22 +2,12 @@ module.exports = (crp, callback) => {
 	crp.app.post('/api/admin/add-post', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
-			if (user.role < 3) return res.send('notAllowed');
+			if (!user || user.role < 3) return res.send('notAllowed');
 
-			var postData = {
-				author: user._id,
-				title: req.body.title,
-				type: req.body.type,
-				slug: req.body.slug,
-				img: req.body.img,
-				content: req.body.content,
-				date: req.body.date
-			};
-
-			crp.posts.add(postData, (err, result) => {
+			new crp.posts(req.body).save((err) => {
 				if (err) return res.send(err);
 
-				res.send(result);
+				res.send(true);
 			});
 		});
 	});
@@ -25,21 +15,12 @@ module.exports = (crp, callback) => {
 	crp.app.post('/api/admin/edit-post', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
-			if (user.role < 3) return res.send('notAllowed');
+			if (!user || user.role < 3) return res.send('notAllowed');
 
-			var postData = {
-				title: req.body.title,
-				type: req.body.type,
-				slug: req.body.slug,
-				img: req.body.img,
-				content: req.body.content,
-				date: req.body.date
-			};
-
-			crp.posts.set(req.body.postid, postData, (err, result) => {
+			crp.posts.updateOne({_id: req.body.postid}, req.body, {runValidators: true}, (err) => {
 				if (err) return res.send(err);
 
-				res.send(result);
+				res.send(true);
 			});
 		});
 	});
@@ -47,12 +28,12 @@ module.exports = (crp, callback) => {
 	crp.app.post('/api/admin/remove-post', (req, res) => {
 		crp.members.get(req.user, (err, user) => {
 			if (err) return res.send(err);
-			if (user.role < 3) return res.send('notAllowed');
+			if (!user || user.role < 3) return res.send('notAllowed');
 
-			crp.posts.remove(req.body.postid, (err, result) => {
+			crp.posts.deleteOne({_id: req.body.postid}, (err) => {
 				if (err) return res.send(err);
 
-				res.send(result);
+				res.send(true);
 			});
 		});
 	});
@@ -61,9 +42,10 @@ module.exports = (crp, callback) => {
 		var upload = crp.express.upload.single('img');
 		upload(req, res, (err) => {
 			if (err) return res.send(err);
+
 			crp.members.get(req.user, (err, user) => {
 				if (err) return res.send(err);
-				if (user.role < 3) return res.send('notAllowed');
+				if (!user || user.role < 3) return res.send('notAllowed');
 
 				crp.storage.upload(req.file.path, `img/posts/${req.file.originalname}`, (err, file) => {
 					if (err) res.send(err);

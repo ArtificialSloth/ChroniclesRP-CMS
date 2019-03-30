@@ -136,22 +136,42 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.editSite = (data, cb) => {
-		crp.db.findOne('site', {}, (err, site) => {
-			if (err) return cb(err);
-
-			var newSite = {
-				name: data.name || site.name,
-				tagline: data.tagline || site.tagline,
-				mail_template: data.mail_template || site.mail_template,
-				css: site.css
-			};
-
-			newSite = crp.util.sanitizeObject(newSite);
-			crp.db.replaceOne('site', {}, newSite, (err, result) => {
-				cb(err, site)
-			});
-
+		var schema = new crp.db.Schema({
+			name: String,
+			tagline: String,
+			mail_template: String,
+			css: {
+				colors: {
+					font: String,
+					link: String,
+					bg: String,
+					bodyBg: String,
+					header: String,
+					primary: String,
+					secondary: String
+				},
+				img: {
+					bg: String,
+					ico: String,
+					cover: String,
+					phpBB: String,
+					donate: String,
+					header: String,
+					drupal: String,
+					joomla: String,
+					discord: String,
+					wordpress: String
+				}
+			}
 		});
+		var Site = crp.db.model('site', schema);
+
+		var site = {};
+		if (data.name) site.name = data.name;
+		if (data.tagline) site.tagline = data.tagline;
+		if (data.mail_template) site.mail_template = data.mail_template;
+
+		Site.updateOne({}, site, cb);
 	};
 
 	callback(null, crp);

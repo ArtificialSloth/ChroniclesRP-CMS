@@ -1,5 +1,11 @@
 module.exports = (crp, callback) => {
-	var mongodb = require('mongodb');
+	crp.db = require('mongoose');
+	
+	crp.db.connect('mongodb://127.0.0.1:27017/chroniclesrp', {useNewUrlParser: true}, (err) => {
+		callback(err, crp);
+	});
+
+	/*var mongodb = require('mongodb');
 	var mongoClient = mongodb.MongoClient;
 
 	mongoClient.connect(process.env.MONGODB_URL, (err, db) => {
@@ -44,5 +50,5 @@ module.exports = (crp, callback) => {
 		};
 
 		callback(null, crp);
-	});
+	});*/
 };

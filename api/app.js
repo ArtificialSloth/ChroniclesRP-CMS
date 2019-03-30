@@ -158,14 +158,15 @@ module.exports = (crp, callback) => {
 			});
 
 			crp.app.post('/api/admin/edit-site', (req, res) => {
-				var site = {
-					name: req.body.site_name,
-					tagline: req.body.site_tagline,
-					mail_template: req.body.mail_template
-				};
+				crp.members.get(req.user, (err, user) => {
+					if (err) return res.send(err);
+					if (!user || user.role < 3) return res.send('notAllowed');
 
-				crp.util.editSite(site, (err, result) => {
-					res.send(result);
+					crp.util.editSite(req.body, (err) => {
+						if (err) return res.send(err);
+
+						res.send(true);
+					});
 				});
 			});
 
