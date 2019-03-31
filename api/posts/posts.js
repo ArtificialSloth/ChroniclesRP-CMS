@@ -18,13 +18,13 @@ module.exports = (crp) => {
 				return `/posts/${crp.util.urlSafe(this.title)}`;
 			},
 			validate: {
-				msg: 'Slug cannot be taken.',
+				msg: 'URL {VALUE} is already in use.',
 				validator: function(val) {
 					return new Promise((resolve, reject) => {
 						crp.posts.find({slug: val}, (err, posts) => {
 							if (err) return reject(err);
 							if (posts && posts.length > 0) return resolve(false);
-							resolve(true)
+							resolve(true);
 						});
 					});
 				}
@@ -41,10 +41,6 @@ module.exports = (crp) => {
 			default: Date.now()
 		}
 	}));
-
-	new crp.posts({title: 'Test', content: 'test'}).save((err) => {
-		if (err) console.error(err);
-	});
 
 	crp.pages.add((slug, cb) => {
 		if (slug == '/admin/posts') return cb(null, {

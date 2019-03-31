@@ -20,8 +20,8 @@ module.exports = (crp, callback) => {
 			return new nodes.CallExtensionAsync(this, 'run', args);
 		};
 
-		this.run = (context, collection, filter, options, key, cb) => {
-			crp.db.find(collection, filter, options, (err, result) => {
+		this.run = (context, model, filter, options, key, cb) => {
+			crp[model].find(filter, options, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});
@@ -38,8 +38,8 @@ module.exports = (crp, callback) => {
 			return new nodes.CallExtensionAsync(this, 'run', args);
 		};
 
-		this.run = (context, collection, filter, key, cb) => {
-			crp.db.findOne(collection, filter, (err, result) => {
+		this.run = (context, model, filter, key, cb) => {
+			crp[model].findOne(filter, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});
@@ -158,7 +158,7 @@ module.exports = (crp, callback) => {
 			});
 
 			crp.app.post('/api/admin/edit-site', (req, res) => {
-				crp.members.get(req.user, (err, user) => {
+				crp.users.findById(req.user, (err, user) => {
 					if (err) return res.send(err);
 					if (!user || user.role < 3) return res.send('notAllowed');
 

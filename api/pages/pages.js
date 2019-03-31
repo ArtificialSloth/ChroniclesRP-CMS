@@ -8,7 +8,7 @@ module.exports = (crp, callback) => {
 
 	crp.pages.processPage = (slug, userid, cb) => {
 		slug = slug.split('?')[0];
-		crp.db.findOne('site', {}, (err, site) => {
+		crp.sites.findOne({}, (err, site) => {
 			if (err) return cb(err);
 			if (!site) return cb('noSite');
 
@@ -31,7 +31,7 @@ module.exports = (crp, callback) => {
 				if (page.subPage) context.subPage = page.subPage;
 				if (page.context) context = Object.assign(context, page.context);
 
-				crp.members.get(userid, (err, user) => {
+				crp.users.findById(userid, (err, user) => {
 					if (err) return cb(err);
 					if ((!user && page.role) || (user && page.role && user.role < page.role) || (user && page.role && user.role < 3)) page = {path: '/404/index.njk'};
 

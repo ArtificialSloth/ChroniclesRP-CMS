@@ -1,5 +1,5 @@
 module.exports = (crp) => {
-	crp.mail = {};
+	crp.mail = {activations: []};
 	crp.mail.mailgun = require('mailgun-js')({
 		apiKey: process.env.MAILGUN_API_KEY,
 		domain: process.env.MAILGUN_DOMAIN
@@ -35,8 +35,25 @@ module.exports = (crp) => {
 		});
 	};
 
+	crp.mail.sendConfirmCode = (userid, email) => {
+		var activation = {
+			_id: userid,
+			email: email,
+			code: crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase()
+		};
+		crp.mail.activations.push(activation);
+
+		crp.util.wait(15 * 60 * 1000, () => {
+			crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);
+		});
+
+		var subject = 'Confirm your email address';
+		var msg = 'Please use the following code to confirm your email address <div style="font-size:20px; text-align:center">' + activation.code + '</div>';
+		crp.mail.send(activation.email, subject, msg);
+	};
+
 	crp.mail.adminNotify = (subject, msg) => {
-		crp.members.find({role: 3}, (err, users) => {
+		crp.users.find({role: 3}, (err, users) => {
 			var to = []
 			for (var i in users) {
 				to.push(users[i].email);

@@ -1,6 +1,6 @@
 module.exports = (crp, callback) => {
 	crp.app.post('/api/admin/add-post', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -13,7 +13,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/admin/edit-post', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -26,7 +26,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/admin/remove-post', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -43,7 +43,7 @@ module.exports = (crp, callback) => {
 		upload(req, res, (err) => {
 			if (err) return res.send(err);
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || user.role < 3) return res.send('notAllowed');
 

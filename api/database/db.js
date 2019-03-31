@@ -1,7 +1,36 @@
 module.exports = (crp, callback) => {
 	crp.db = require('mongoose');
-	
+
 	crp.db.connect('mongodb://127.0.0.1:27017/chroniclesrp', {useNewUrlParser: true}, (err) => {
+		crp.sites = crp.db.model('site', new crp.db.Schema({
+			name: {type: String, required: true},
+			tagline: String,
+			mail_template: {type: String, required: true},
+			css: {
+				colors: {
+					font: String,
+					link: String,
+					bg: String,
+					bodyBg: String,
+					header: String,
+					primary: String,
+					secondary: String
+				},
+				img: {
+					bg: String,
+					ico: String,
+					cover: String,
+					phpBB: String,
+					donate: String,
+					header: String,
+					drupal: String,
+					joomla: String,
+					discord: String,
+					wordpress: String
+				}
+			}
+		}));
+
 		callback(err, crp);
 	});
 

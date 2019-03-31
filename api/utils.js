@@ -83,18 +83,6 @@ module.exports = (crp, callback) => {
 		return array.slice(index, index + length);
 	};
 
-	crp.util.sanitizeObject = (object) => {
-		for (var k in object) {
-			if (typeof object[k] == 'object') {
-				object[k] = crp.util.sanitizeObject(object[k]);
-			} else {
-				object[k] = crp.db.sanitize(object[k]);
-			}
-		}
-
-		return object;
-	};
-
 	crp.util.parseString = (str, keys) => {
 		for (var i in keys) {
 			str = str.replace(new RegExp(keys[i][0], 'g'), keys[i][1]);
@@ -136,42 +124,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.editSite = (data, cb) => {
-		var schema = new crp.db.Schema({
-			name: String,
-			tagline: String,
-			mail_template: String,
-			css: {
-				colors: {
-					font: String,
-					link: String,
-					bg: String,
-					bodyBg: String,
-					header: String,
-					primary: String,
-					secondary: String
-				},
-				img: {
-					bg: String,
-					ico: String,
-					cover: String,
-					phpBB: String,
-					donate: String,
-					header: String,
-					drupal: String,
-					joomla: String,
-					discord: String,
-					wordpress: String
-				}
-			}
-		});
-		var Site = crp.db.model('site', schema);
-
-		var site = {};
-		if (data.name) site.name = data.name;
-		if (data.tagline) site.tagline = data.tagline;
-		if (data.mail_template) site.mail_template = data.mail_template;
-
-		Site.updateOne({}, site, cb);
+		crp.sites.updateOne({}, data, {runValidators: true}, cb);
 	};
 
 	callback(null, crp);

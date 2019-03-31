@@ -1,41 +1,149 @@
 module.exports = (crp) => {
-	crp.members = {};
-	crp.members.activations = [];
+	var schema = new crp.db.Schema({
+		login: {
+			type: String,
+			required: true,
+			minlength: 4,
+			maxlength: 80,
+			lowercase: true,
+			validate: {
+				msg: 'Login {VALUE} is already in use.',
+				validator: function(val) {
+					return new Promise((resolve, reject) => {
+						crp.users.find({login: val}, (err, users) => {
+							if (err) return reject(err);
+							if (users && users.length > 0) return resolve(false);
+							resolve(true);
+						});
+					});
+				}
+			},
+			set: function(val) {
+				this.set('nicename', crp.util.urlSafe(val));
+				return val;
+			}
+		},
+		pass: {
+			type: String,
+			required: true,
+			minlength: 6
+		},
+		email: {
+			type: String,
+			required: true,
+			lowercase: true,
+			validate: [
+				{
+					msg: '{VALUE} is not a valid email address.',
+					validator: function(val) {
+						return (val.includes('@') && val.lastIndexOf('.') > val.lastIndexOf('@'));
+					}
+				},
+				{
+					msg: '{VALUE} is already in use.',
+					validator: function(val) {
+						return new Promise((resolve, reject) => {
+							crp.users.find({email: val}, (err, users) => {
+								if (err) return reject(err);
+								if (users && users.length > 0) return resolve(false);
+								resolve(true);
+							});
+						});
+					}
+				}
+			]
+		},
+		register_date: {
+			type: Date,
+			default: Date.now()
+		},
+		display_name: {
+			type: String,
+			minlength: 4,
+			maxlength: 80,
+			default: function() {
+				return this.login;
+			}
+		},
+		nicename: {
+			type: String,
+			lowercase: true,
+			default: function() {
+				return this.login;
+			}
+		},
+		role: {
+			type: Number,
+			min: 0,
+			default: 0
+		},
+		locked: {
+			type: Boolean,
+			default: false
+		},
+		timezone: {
+			type: String,
+			default: crp.moment.tz.guess()
+		},
+		date_of_birth: {
+			type: String,
+			validate: {
+				msg: 'Invalid date format.',
+				validator: function(val) {
+					return crp.moment(new Date(val)).isValid();
+				}
+			},
+			set: function(val) {
+				return crp.moment(new Date(val)).format('MM/DD/YYYY');
+			}
+		},
+		gender: {
+			type: String,
+			enum: ['---', 'Male', 'Female', 'Bolian'],
+			default: '---'
+		},
+		tagline: {
+			type: String,
+			maxlength: 140
+		},
+		img: {
+			default: {},
+			profile: {
+				type: String,
+				default: null
+			},
+			cover: {
+				type: String,
+				default: null
+			}
+		}
+	});
 
-	crp.members.validateEmail = (email) => {
-		if (email && email.includes('@') && email.lastIndexOf('.') > email.lastIndexOf('@')) {
-			return true;
+	schema.methods.parseRole = function() {
+		if (this.role == 0) {
+			return 'Pending';
+		} else if (this.role == 1) {
+			return 'Member';
+		} else if (this.role == 2) {
+			return 'Chapter Leader';
+		} else if (this.role == 3) {
+			return 'Administrator';
 		}
 
-		return false;
+		return 'Guest';
 	};
 
-	crp.members.emailConfirmCode = (userid, email) => {
-		var activation = {
-			_id: userid,
-			email: email,
-			code: crp.auth.crypto.randomBytes(3).toString('hex').toUpperCase()
-		};
-		crp.members.activations.push(activation);
-
-		crp.util.wait(15 * 60 * 1000, () => {
-			crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
-		});
-
-		var subject = 'Confirm your email address';
-		var msg = 'Please use the following code to confirm your email address <div style="font-size:20px; text-align:center">' + activation.code + '</div>';
-		crp.mail.send(activation.email, subject, msg);
+	schema.methods.getProfilePic = function() {
+		return crp.storage.getUrl(this.img.profile) || crp.storage.getUrl('img/members/profile.png');
 	};
 
-	crp.members.find = (filter, cb) => {
-		crp.db.find('users', filter, {}, cb);
+	schema.methods.getCoverPic = function() {
+		return crp.storage.getUrl(this.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
-	crp.members.get = (userid, cb) => {
-		if (typeof userid != 'object') userid = crp.db.objectID(userid);
-		crp.db.findOne('users', {_id: userid}, cb);
-	};
+	crp.users = new crp.db.model('user', schema);
 
+	crp.members = {};
 	crp.members.set = (userid, data, cb) => {
 		crp.members.get(userid, (err, user) => {
 			if (err) return cb(err);
@@ -193,45 +301,6 @@ module.exports = (crp) => {
 				});
 			});
 		});
-	};
-
-	crp.members.remove = (userid, cb) => {
-		crp.members.get(userid, (err, user) => {
-			if (err) return cb(err);
-			if (!user) return cb();
-
-			crp.db.deleteOne('users', {_id: user._id}, (err, result) => {
-				if (err) return cb(err);
-
-				cb(null, user);
-			});
-		});
-	};
-
-	crp.members.parseRole = (role) => {
-		if (role == 0) {
-			return 'Pending';
-		} else if (role == 1) {
-			return 'Member';
-		} else if (role == 2) {
-			return 'Chapter Leader';
-		} else if (role == 3) {
-			return 'Administrator';
-		}
-
-		return 'Guest';
-	};
-
-	crp.members.getProfilePic = (user) => {
-		if (!user) return;
-
-		return crp.storage.getUrl(user.img.profile) || crp.storage.getUrl('img/members/profile.png');
-	};
-
-	crp.members.getCoverPic = (user) => {
-		if (!user) return;
-
-		return crp.storage.getUrl(user.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
 	crp.pages.add((slug, cb) => {
