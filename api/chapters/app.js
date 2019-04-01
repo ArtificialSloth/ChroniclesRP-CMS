@@ -1,7 +1,7 @@
 module.exports = (crp, callback) => {
 	crp.app.post('/api/add-chapter', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -34,7 +34,7 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!chapter) return res.send('noChapter');
 
-				crp.members.get(req.user, (err, user) => {
+				crp.users.findById(req.user, (err, user) => {
 					if (err) return res.send(err);
 					if (!user) return res.send('noUser');
 
@@ -55,7 +55,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -97,7 +97,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -117,7 +117,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -137,7 +137,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -157,7 +157,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -177,7 +177,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 

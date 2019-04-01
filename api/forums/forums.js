@@ -211,7 +211,7 @@ module.exports = (crp) => {
 			parent: data.parent
 		};
 
-		crp.members.get(topic.author, (err, user) => {
+		crp.users.findById(topic.author, (err, user) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');
 
@@ -315,7 +315,7 @@ module.exports = (crp) => {
 			parent: data.parent
 		};
 
-		crp.members.get(reply.author, (err, user) => {
+		crp.users.findById(reply.author, (err, user) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');;
 

@@ -94,7 +94,7 @@ module.exports = (crp) => {
 	};
 
 	crp.chapters.add = (data, userid, cb) => {
-		crp.members.get(userid, (err, user) => {
+		crp.users.findById(userid, (err, user) => {
 			if (err) return cb(err);
 			if (!user) return cb('noUser');
 
@@ -226,7 +226,7 @@ module.exports = (crp) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.members.get(data._id, (err, user) => {
+			crp.users.findById(data._id, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 
@@ -243,7 +243,7 @@ module.exports = (crp) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.members.get(userid, (err, user) => {
+			crp.users.findById(userid, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 
@@ -261,7 +261,7 @@ module.exports = (crp) => {
 			if (err) return cb(err);
 			if (!chapter) return cb('noChapter');
 
-			crp.members.get(data.userid, (err, user) => {
+			crp.users.findById(data.userid, (err, user) => {
 				if (err) return cb(err);
 				if (!user) return cb('noUser');
 				if (!data.role) return cb('noRole');

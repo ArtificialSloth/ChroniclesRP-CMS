@@ -40,53 +40,57 @@ module.exports = (crp, callback) => {
 
 	crp.app.post('/api/register', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (user) return res.send('user');
+				if (req.body.pass && req.body.pass.length < 6) return res.send('passLength');
 
-				var userData = {
-					login: req.body.login,
-					pass: req.body.pass,
-					email: req.body.email
-				};
-
-				crp.members.add(userData, (err, result) => {
+				crp.auth.bcrypt.hash(req.body.pass, 10, (err, hash) => {
 					if (err) return res.send(err);
 
-					req.login(result, (err) => {
+					var userData = {
+						login: req.body.login,
+						pass: hash,
+						email: req.body.email
+					};
+
+					new crp.users(userData).save((err, user) => {
 						if (err) return res.send(err);
 
-						crp.members.emailConfirmCode(result._id, result.email);
-						res.send(true);
+						req.login(user, (err) => {
+							if (err) return res.send(err);
+
+							crp.mail.sendConfirmCode(user._id, user.email);
+							res.send(true);
+						});
 					});
 				});
 			});
 		}).catch((err) => {
-			console.log('uwu' + err);
 			res.send('noCaptcha');
 		});
 	});
 
 	crp.app.post('/api/activate', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user) return res.send(false);
 
-			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id);
+			var activation = crp.util.findObjectInArray(crp.mail.activations, '_id', user._id);
 			if (!activation || activation.code != req.body.code) return res.send(false);
 
 			if (user.role == 0) {
-				crp.members.set(user._id, {role: 1}, (err, result) => {
+				crp.users.updateOne({_id: user._id}, {email: activation.email, role: 1}, {runValidators: true}, (err) => {
 					if (err) return res.send(err);
 
-					crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
+					crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);
 					res.send(true);
 				});
 			} else {
-				crp.members.set(user._id, {email: activation.email}, (err, result) => {
+				crp.users.updateOne({_id: user._id}, {email: activation.email}, {runValidators: true}, (err, result) => {
 					if (err) return res.send(err);
 
-					crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
+					crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);
 					res.send(true);
 				});
 			}
@@ -94,15 +98,15 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/resend-activation', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user) return res.send(false);
 
-			var activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id);
-			if (activation) crp.members.activations.splice(crp.members.activations.indexOf(activation), 1);
+			var activation = crp.util.findObjectInArray(crp.mail.activations, '_id', user._id);
+			if (activation) crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);
 			if (!activation && user.role > 0) return res.send(false);
 
-			crp.members.emailConfirmCode(user._id, activation ? activation.email : user.email);
+			crp.mail.sendConfirmCode(user._id, activation ? activation.email : user.email);
 			res.send(true);
 		});
 	});
@@ -114,104 +118,140 @@ module.exports = (crp, callback) => {
 		]);
 		upload(req, res, (err) => {
 			if (err) return res.send(err);
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findByid(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				crp.members.get(req.body.userid, (err, profile) => {
+				crp.users.findById(req.body.userid, (err, profile) => {
 					if (err) return res.send(err);
 					if (!profile) return res.send('noUser');
+					if (!user._id.equals(profile._id) || user.role < 3) return res.send('notAllowed');
 
-					if (user._id.equals(profile._id) || user.role >= 3) {
-						var userData = {
-							display_name: req.body.display_name,
-							timezone: req.body.timezone,
-							date_of_birth: req.body.date_of_birth,
-							gender: req.body.gender,
-							tagline: req.body.tagline,
-							about: req.body.about,
-							img: {}
-						};
+					var userData = {
+						display_name: req.body.display_name,
+						timezone: req.body.timezone,
+						date_of_birth: req.body.date_of_birth,
+						gender: req.body.gender,
+						tagline: req.body.tagline,
+						about: req.body.about,
+						img: {}
+					};
 
-						if (req.files) {
-							if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
-							if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+					if (req.files) {
+						if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
+						if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
+					}
+
+					crp.async.parallel([
+						(callback) => {
+							if (!req.body.old_pass || !req.body.new_pass || !req.body.new_pass_confirm) return callback();
+							if (req.body.new_pass != req.body.new_pass_confirm) return callback('newPassMismatch');
+							if (req.body.new_pass.length < 6) return res.send('passLength');
+
+							crp.auth.bcrypt.compare(req.body.old_pass, user.pass, (err, isValid) => {
+								if (err) return callback(err);
+								if (!isValid) return callback('passMismatch');
+
+								crp.auth.bcrypt.hash(req.body.new_pass, 10, (err, hash) => {
+									if (err) return callback(err);
+
+									userData.pass = hash;
+									callback();
+								});
+							});
+						},
+						(callback) => {
+							if (!req.body.email || req.body.email.toLowerCase() == profile.email) return callback();
+							if (!crp.mail.validateEmail(req.body.email)) return callback('emailInvalid');
+
+							crp.users.find({email: req.body.email}, (err, users) => {
+								if (err) return callback(err);
+								if (users && users.length > 0) return callback('emailTaken');
+
+								crp.mail.sendConfirmCode(profile._id, req.body.email);
+								callback();
+							});
+						},
+						(callback) => {
+							if (!req.files.profile_pic) return callback();
+
+							crp.storage.delete(profile.img.profile, (err) => {
+								if (err) return callback(err);
+
+								crp.storage.upload(req.files.profile_pic[0].path, `img/members/${profile._id}/${req.files.profile_pic[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
+
+									crp.fs.unlink(req.files.profile_pic[0].path, (err) => {
+										if (err) return callback(err);
+
+										userData.img.profile = file.name;
+										callback();
+									});
+								});
+							});
+						},
+						(callback) => {
+							if (!req.files.cover_pic) return callback();
+
+							crp.storage.delete(profile.img.cover, (err) => {
+								if (err) return callback(err);
+
+								crp.storage.upload(req.files.cover_pic[0].path, `img/members/${profile._id}/${req.files.cover_pic[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
+
+									crp.fs.unlink(req.files.cover_pic[0].path, (err) => {
+										if (err) return callback(err);
+
+										userData.img.cover = file.name;
+										callback();
+									});
+								});
+							});
 						}
+					], (err) => {
+						if (err) return res.send(err);
 
-						crp.async.parallel([
-							(callback) => {
-								if (!req.body.old_pass || !req.body.new_pass || !req.body.new_pass_confirm) return callback();
-								if (req.body.new_pass != req.body.new_pass_confirm) return callback('newPassMismatch');
-
-								crp.auth.bcrypt.compare(req.body.old_pass, user.pass, (err, isValid) => {
-									if (err) return callback(err);
-									if (!isValid) return callback('passMismatch');
-
-									userData.pass = req.body.new_pass;
-									callback();
-								});
-							},
-							(callback) => {
-								if (!req.body.email || req.body.email.toLowerCase() == profile.email) return callback();
-								if (!crp.members.validateEmail(req.body.email)) return callback('emailInvalid');
-
-								crp.members.find({email: req.body.email}, (err, users) => {
-									if (err) return callback(err);
-									if (users && users.length > 0) return callback('emailTaken');
-
-									crp.members.emailConfirmCode(profile._id, req.body.email);
-									callback();
-								});
-							}
-						], (err) => {
+						crp.users.updateOne({_id: profile._id}, userData, (err, user) => {
 							if (err) return res.send(err);
 
-							crp.members.set(profile._id, userData, (err, result) => {
-								if (err) return res.send(err);
-
-								res.send(true);
-							});
+							res.send(true);
 						});
-					}
+					});
 				});
 			});
 		});
 	});
 
 	crp.app.post('/api/admin/add-user', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
+			if (!user || user.role < 3) return res.send('notAllowed');
 
-			if (user.role >= 3) {
-				var userData = {
-					login: req.body.user_login,
-					pass: req.body.user_pass,
-					encrypted: req.body.encrypted,
-					email: req.body.user_email,
-					register_date: req.body.register_date,
-					role: 1
-				};
+			var userData = {
+				login: req.body.login,
+				pass: req.body.pass,
+				email: req.body.email,
+				register_date: req.body.register_date,
+				role: 1
+			};
 
-				crp.members.add(userData, true, (err, result) => {
-					if (err) return res.send(err);
+			new crp.users(userData).save((err, user) => {
+				if (err) return res.send(err);
 
-					result.pass = null;
-					res.send(result);
-				});
-			}
+				res.send(true);
+			});
 		});
 	});
 
 	crp.app.post('/api/admin/remove-user', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
-			if (user.role < 3) return res.send('notAllowed');
+			if (!user || user.role < 3) return res.send('notAllowed');
 
-			crp.members.remove(req.body.userid, (err, result) => {
+			crp.users.deleteOne({_id: req.body.userid}, (err, user) => {
 				if (err) return res.send(err);
 
-				result.pass = null;
-				res.send(result);
+				res.send(true);
 			});
 		});
 	});

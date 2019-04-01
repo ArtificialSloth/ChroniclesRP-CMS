@@ -5,6 +5,10 @@ module.exports = (crp) => {
 		domain: process.env.MAILGUN_DOMAIN
 	});
 
+	crp.mail.validateEmail = (email) => {
+		return (email instanceof String && email.includes('@') && email.lastIndexOf('.') > email.lastIndexOf('@'));
+	};
+
 	crp.mail.msgTemplate = (subject, msg, cb) => {
 		crp.db.findOne('site', {}, (err, site) => {
 			if (err) return cb(err);

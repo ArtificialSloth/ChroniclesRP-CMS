@@ -7,7 +7,7 @@ module.exports = (crp, callback) => {
 			crp.chapters.get(category.chapter, (err, chapter) => {
 				if (err) return res.send(err);
 
-				crp.members.get(req.user, (err, user) => {
+				crp.users.findById(req.user, (err, user) => {
 					if (err) return res.send(err);
 					if (!user) return res.send('noUser');
 
@@ -33,7 +33,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/new-topic', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 1) return res.send('notAllowed');
 
@@ -70,7 +70,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/new-reply', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 1) return res.send('notAllowed');
 
@@ -103,7 +103,7 @@ module.exports = (crp, callback) => {
 								crp.async.each(topic.subs, (subid, cb) => {
 									if (subid.equals(user._id)) return cb();
 
-									crp.members.get(subid, (err, sub) => {
+									crp.users.findById(subid, (err, sub) => {
 										if (err) return cb(err);
 
 										crp.mail.send(sub.email, `New Reply to ${topic.title}`, `<a href="https://chroniclesrp.com/members/${user.slug}">${user.display_name}</a> replied to <a href="https://chroniclesrp.com/forums/${forum.slug}/${topic._id}">${topic.title}</a>`);
@@ -126,7 +126,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || (!topic.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
 
@@ -149,7 +149,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/subscribe-topic', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user) return res.send('notAllowed');
 
@@ -169,7 +169,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/unsubscribe-topic', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user) return res.send('notAllowed');
 
@@ -194,7 +194,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || (!reply.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
 
@@ -223,7 +223,7 @@ module.exports = (crp, callback) => {
 				crp.chapters.get(category.chapter, (err, chapter) => {
 					if (err) return res.send(err);
 
-					crp.members.get(req.user, (err, user) => {
+					crp.users.findById(req.user, (err, user) => {
 						if (err) return res.send(err);
 						if (!user) return res.send('noUser');
 
@@ -248,7 +248,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -270,7 +270,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!reply) return res.send('noReply');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
@@ -288,7 +288,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/admin/new-topic', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -313,7 +313,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!topic) return res.send('noTopic');
 
-			crp.members.get(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user || user.role < 3) return res.send('notAllowed');
 
@@ -334,7 +334,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/admin/new-reply', (req, res) => {
-		crp.members.get(req.user, (err, user) => {
+		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
