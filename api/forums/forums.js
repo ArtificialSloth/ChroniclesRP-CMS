@@ -41,7 +41,7 @@ module.exports = (crp) => {
 		crp.forums.getCategories({}, (err, categories) => {
 			if (err) return cb(err);
 
-			crp.chapters.get(data.chapter, (err, chapter) => {
+			crp.chapters.findById(data.chapter, (err, chapter) => {
 				if (err) return cb(err);
 
 				var category = {

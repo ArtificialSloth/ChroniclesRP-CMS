@@ -4,14 +4,14 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!category) return res.send('noCategory');
 
-			crp.chapters.get(category.chapter, (err, chapter) => {
+			crp.chapters.findById(category.chapter, (err, chapter) => {
 				if (err) return res.send(err);
 
 				crp.users.findById(req.user, (err, user) => {
 					if (err) return res.send(err);
 					if (!user) return res.send('noUser');
 
-					var member = crp.chapters.getMember(chapter, user._id);
+					var member = chapter.getMember(user._id);
 					if ((member && member.role >= 2) || user.role >= 3) {
 						var forumData = {
 							name: req.body.name,
@@ -46,9 +46,9 @@ module.exports = (crp, callback) => {
 					if (!category) return res.send('noCategory');
 					if (category.role && user.role < category.role && user.role < 3) return res.send('notAllowed');
 
-					crp.chapters.get(category.chapter, (err, chapter) => {
+					crp.chapters.findById(category.chapter, (err, chapter) => {
 						if (err) return res.send(err);
-						if (chapter && !crp.chapters.getMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
+						if (chapter && !chapter.getMember(user._id) && user.role < 3) return res.send('notAllowed');
 
 						var topicData = {
 							author: req.user,
@@ -87,9 +87,9 @@ module.exports = (crp, callback) => {
 						if (!category) return res.send('noCategory');
 						if (category.role && user.role < category.role && user.role < 3) return res.send('notAllowed');
 
-						crp.chapters.get(category.chapter, (err, chapter) => {
+						crp.chapters.findById(category.chapter, (err, chapter) => {
 							if (err) return res.send(err);
-							if (chapter && !crp.chapters.getMember(chapter, user._id) && user.role < 3) return res.send('notAllowed');
+							if (chapter && !chapter.getMember(user._id) && user.role < 3) return res.send('notAllowed');
 
 							var replyData = {
 								author: req.user,
@@ -220,14 +220,14 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!category) return res.send('noCategory');
 
-				crp.chapters.get(category.chapter, (err, chapter) => {
+				crp.chapters.findById(category.chapter, (err, chapter) => {
 					if (err) return res.send(err);
 
 					crp.users.findById(req.user, (err, user) => {
 						if (err) return res.send(err);
 						if (!user) return res.send('noUser');
 
-						var member = crp.chapters.getMember(chapter, user._id);
+						var member = chapter.getMember(user._id);
 						if ((member && member.role >= 2) || user.role >= 3) {
 							crp.forums.removeForum(forum._id, (err, result) => {
 								if (err) return res.send(err);

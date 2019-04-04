@@ -80,14 +80,14 @@ module.exports = (crp, callback) => {
 			if (!activation || activation.code != req.body.code) return res.send(false);
 
 			if (user.role == 0) {
-				crp.users.updateOne({_id: user._id}, {email: activation.email, role: 1}, {runValidators: true}, (err) => {
+				crp.users.updateOne({_id: user._id}, {email: activation.email, role: 1}, {runValidators: true}, (err, user) => {
 					if (err) return res.send(err);
 
 					crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);
 					res.send(true);
 				});
 			} else {
-				crp.users.updateOne({_id: user._id}, {email: activation.email}, {runValidators: true}, (err, result) => {
+				crp.users.updateOne({_id: user._id}, {email: activation.email}, {runValidators: true}, (err, user) => {
 					if (err) return res.send(err);
 
 					crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);
@@ -118,7 +118,7 @@ module.exports = (crp, callback) => {
 		]);
 		upload(req, res, (err) => {
 			if (err) return res.send(err);
-			crp.users.findByid(req.user, (err, user) => {
+			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 

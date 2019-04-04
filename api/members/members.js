@@ -69,7 +69,7 @@ module.exports = (crp) => {
 			type: String,
 			lowercase: true,
 			default: function() {
-				return this.login;
+				return crp.util.urlSafe(this.login);
 			}
 		},
 		role: {
@@ -107,7 +107,6 @@ module.exports = (crp) => {
 			maxlength: 140
 		},
 		img: {
-			default: {},
 			profile: {
 				type: String,
 				default: null
@@ -139,6 +138,19 @@ module.exports = (crp) => {
 
 	schema.methods.getCoverPic = function() {
 		return crp.storage.getUrl(this.img.cover) || crp.storage.getUrl('img/cover.png');
+	};
+
+	schema.methods.getChapterInvites = function() {
+		crp.chapters.find({}, (err, chapters) => {
+			var result = [];
+			for (var i in chapters) {
+				var member = chapters[i].getMember(this._id);
+				if (member && member.role == 0) {
+					result.push(chapters[i]);
+				}
+			}
+			return result;
+		});
 	};
 
 	crp.users = new crp.db.model('user', schema);

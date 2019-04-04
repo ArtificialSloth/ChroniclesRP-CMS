@@ -6,10 +6,22 @@ module.exports = (crp, callback) => {
 				if (!user) return res.send('noUser');
 
 				if (user.role < 2) return res.send('notAllowed');
-				crp.chapters.add(req.body, user._id, (err, result) => {
+				new crp.chapters(req.body).save((err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(result);
+					if (chapter.type == 'group') {
+						crp.forums.addCategory({name: chapter.name, chapter: chapter._id}, (err, result) => {
+							if (err) return res.send(err);
+
+							crp.forums.addForum({name: chapter.name, desc: chapter.tagline, category: result.insertedId}, (err, result) => {
+								if (err) return res.send(err);
+
+								res.send(chapter);
+							});
+						});
+					} else {
+						res.send(chapter);
+					}
 				});
 			});
 		}).catch((err) => {
@@ -30,7 +42,7 @@ module.exports = (crp, callback) => {
 				if (req.files.cover_pic) req.body.img.cover = req.files.cover_pic;
 			}
 
-			crp.chapters.get(req.body.chapterid, (err, chapter) => {
+			crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 				if (err) return res.send(err);
 				if (!chapter) return res.send('noChapter');
 
@@ -38,9 +50,9 @@ module.exports = (crp, callback) => {
 					if (err) return res.send(err);
 					if (!user) return res.send('noUser');
 
-					var member = crp.chapters.getMember(chapter, user._id);
+					var member = chapter.getMember(user._id);
 					if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-					crp.chapters.set(req.body.chapterid, req.body, (err, result) => {
+					crp.chapters.updateOne({_id: chapters._id}, req.body, (err, chapter) => {
 						if (err) return res.send(err);
 
 						res.send(true);
@@ -51,7 +63,7 @@ module.exports = (crp, callback) => {
 	});
 
 	crp.app.post('/api/remove-chapter', (req, res) => {
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
@@ -59,41 +71,64 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.chapters.getMember(chapter, user._id);
+				var member = chapter.getMember(user._id);
 				if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-				crp.chapters.remove(req.body.chapterid, (err, result) => {
-					if (err) return res.send(err);
 
-					res.send(result);
-				});
+				if (chapter.type == 'group') {
+					crp.forums.getCategories({chapter: chapter._id}, (err, categories) => {
+						if (err) return res.send(err);
+						if (!categories[0]) return res.send('noCategories');
+
+						crp.forums.removeCategory(categories[0]._id, (err, result) => {
+							if (err) return res.send(err);
+
+							crp.chapters.deleteOne({_id: chapter._id}, (err) => {
+								if (err) return res.send(err);
+
+								res.send(true);
+							});
+						});
+					});
+				} else {
+					crp.chapters.deleteOne({_id: chapter._id}, (err) => {
+						if (err) return res.send(err);
+
+						res.send(true);
+					});
+				}
 			});
 		});
 	});
 
 	crp.app.post('/api/join-chapter', (req, res) => {
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 			if (!chapter.open) return res.send('closed');
 
-			crp.chapters.addMember(req.body.chapterid, {_id: req.user, role: 1}, (err, result) => {
+			chapter.addMember({_id: req.user, role: 1}, (err, chapter) => {
 				if (err) return res.send(err);
 
-				res.send(result);
+				res.send(chapter);
 			});
 		});
 	});
 
 	crp.app.post('/api/leave-chapter', (req, res) => {
-		crp.chapters.removeMember(req.body.chapterid, req.user, (err, result) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
+			if (!chapter) return res.send('noChapter');
 
-			res.send(result);
+			chapter.removeMember(req.user, (err, chapter) => {
+				if (err) return res.send(err);
+
+				res.send(chapter);
+			});
 		});
 	});
 
 	crp.app.post('/api/accept-chapter-invite', (req, res) => {
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
@@ -101,19 +136,19 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.chapters.getMember(chapter, user._id);
+				var member = chapter.getMember(user._id);
 				if (!member || member.role != 0) return res.send('notAllowed');
-				crp.chapters.setMemberRole(req.body.chapterid, {userid: req.user, role: 1}, (err, result) => {
+				chapter.setMemberRole(req.user, 1, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(result);
+					res.send(chapter);
 				});
 			});
 		});
 	});
 
 	crp.app.post('/api/promote-chapter-member', (req, res) => {
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
@@ -121,19 +156,19 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.chapters.getMember(chapter, user._id);
+				var member = chapter.getMember(user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.chapters.setMemberRole(req.body.chapterid, {userid: req.body.userid, role: 2}, (err, result) => {
+				chapter.setMemberRole(req.body.userid, 2, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(result);
+					res.send(chapter);
 				});
 			});
 		});
 	});
 
 	crp.app.post('/api/demote-chapter-member', (req, res) => {
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
@@ -141,19 +176,19 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.chapters.getMember(chapter, user._id);
+				var member = chapter.getMember(user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.chapters.setMemberRole(req.body.chapterid, {userid: req.body.userid, role: 1}, (err, result) => {
+				chapter.setMemberRole(req.body.userid, 1, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(result);
+					res.send(chapter);
 				});
 			});
 		});
 	});
 
 	crp.app.post('/api/invite-chapter-member', (req, res) => {
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
@@ -161,19 +196,19 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.chapters.getMember(chapter, user._id);
+				var member = chapter.getMember(user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.chapters.addMember(req.body.chapterid, {_id: req.body.userid}, (err, result) => {
+				chapter.addMember({_id: req.body.userid}, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(result);
+					res.send(chapter);
 				});
 			});
 		});;
 	});
 
 	crp.app.post('/api/remove-chapter-member', (req, res) => {
-		crp.chapters.get(req.body.chapterid, (err, chapter) => {
+		crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 			if (err) return res.send(err);
 			if (!chapter) return res.send('noChapter');
 
@@ -181,12 +216,12 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user) return res.send('noUser');
 
-				var member = crp.chapters.getMember(chapter, user._id);
+				var member = chapter.getMember(user._id);
 				if ((!member || member.role < 2) && user.role < 3) return cb('notAllowed');
-				crp.chapters.removeMember(req.body.chapterid, req.body.userid, (err, result) => {
+				chapter.removeMember(req.body.userid, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(result);
+					res.send(chapter);
 				});
 			});
 		});;
