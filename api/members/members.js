@@ -140,17 +140,15 @@ module.exports = (crp) => {
 		return crp.storage.getUrl(this.img.cover) || crp.storage.getUrl('img/cover.png');
 	};
 
-	schema.methods.getChapterInvites = function() {
-		crp.chapters.find({}, (err, chapters) => {
-			var result = [];
-			for (var i in chapters) {
-				var member = chapters[i].getMember(this._id);
-				if (member && member.role == 0) {
-					result.push(chapters[i]);
-				}
+	schema.methods.getChapterInvites = function(chapters) {
+		var result = [];
+		for (var i in chapters) {
+			var member = chapters[i].getMember(this._id);
+			if (member && member.role == 0) {
+				result.push(chapters[i]);
 			}
-			return result;
-		});
+		}
+		return result;
 	};
 
 	crp.users = new crp.db.model('user', schema);

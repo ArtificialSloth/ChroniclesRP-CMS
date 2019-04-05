@@ -10,10 +10,10 @@ module.exports = (crp, callback) => {
 					if (err) return res.send(err);
 
 					if (chapter.type == 'group') {
-						crp.forums.addCategory({name: chapter.name, chapter: chapter._id}, (err, result) => {
+						new crp.categories({name: chapter.name, chapter: chapter._id}).save((err, category) => {
 							if (err) return res.send(err);
 
-							crp.forums.addForum({name: chapter.name, desc: chapter.tagline, category: result.insertedId}, (err, result) => {
+							new crp.forums({name: chapter.name, desc: chapter.tagline, category: category._id}).save((err, forum) => {
 								if (err) return res.send(err);
 
 								res.send(chapter);
@@ -52,7 +52,7 @@ module.exports = (crp, callback) => {
 
 					var member = chapter.getMember(user._id);
 					if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-					crp.chapters.updateOne({_id: chapters._id}, req.body, (err, chapter) => {
+					crp.chapters.updateOne({_id: chapters._id}, req.body, {runValidators: true}, (err) => {
 						if (err) return res.send(err);
 
 						res.send(true);
@@ -75,11 +75,11 @@ module.exports = (crp, callback) => {
 				if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
 
 				if (chapter.type == 'group') {
-					crp.forums.getCategories({chapter: chapter._id}, (err, categories) => {
+					crp.categories.findOne({chapter: chapter._id}, (err, category) => {
 						if (err) return res.send(err);
-						if (!categories[0]) return res.send('noCategories');
+						if (!category) return res.send('noCategories');
 
-						crp.forums.removeCategory(categories[0]._id, (err, result) => {
+						crp.categories.deleteOne({_id: category._id}, (err) => {
 							if (err) return res.send(err);
 
 							crp.chapters.deleteOne({_id: chapter._id}, (err) => {

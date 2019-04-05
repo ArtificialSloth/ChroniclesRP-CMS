@@ -39,6 +39,7 @@ module.exports = (crp, callback) => {
 		};
 
 		this.run = (context, model, filter, key, cb) => {
+			if (!crp[model]) return cb();
 			crp[model].findOne(filter, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);

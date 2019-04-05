@@ -1,7 +1,7 @@
 {% lookup 'site', {}, 'site' %}
 {% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
 {% query 'chapters', {}, {}, 'chapters' %}
-{% set invites = crp.chapters.getInvites(chapters, user._id) %}
+{% set invites = user.getChapterInvites(chapters) %}
 
 <div id="navbar">
 	<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
@@ -61,7 +61,7 @@
 		</div>
 	</nav>
 
-	{% set activation = crp.util.findObjectInArray(crp.members.activations, '_id', user._id) %}
+	{% set activation = crp.util.findObjectInArray(crp.mail.activations, '_id', user._id) %}
 	{% if activation or user.role == 0 %}
 		<div class="position-fixed w-100 px-3 px-lg-5 mt-3" style="z-index:1000">
 			<div class="alert alert-warning mx-auto">

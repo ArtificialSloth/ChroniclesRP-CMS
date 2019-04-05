@@ -211,7 +211,7 @@ module.exports = (crp, callback) => {
 					], (err) => {
 						if (err) return res.send(err);
 
-						crp.users.updateOne({_id: profile._id}, userData, (err, user) => {
+						crp.users.updateOne({_id: profile._id}, userData, {runValidators: true}, (err) => {
 							if (err) return res.send(err);
 
 							res.send(true);
