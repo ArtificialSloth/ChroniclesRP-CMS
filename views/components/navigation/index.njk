@@ -1,7 +1,10 @@
-{% lookup 'site', {}, 'site' %}
-{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
+{% lookup 'sites', {}, 'site' %}
+{% query 'games', {}, {sort: [[['name', 1]]]}, 'games' %}
 {% query 'chapters', {}, {}, 'chapters' %}
-{% set invites = user.getChapterInvites(chapters) %}
+
+{% if user %}
+	{% set invites = user.getChapterInvites(chapters) %}
+{% endif %}
 
 <div id="navbar">
 	<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
@@ -30,7 +33,7 @@
 				{% if user %}
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle p-0 mt-1 pointer noselect" id="navbarUserMenulink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<img class="d-none d-lg-inline" src="{{crp.members.getProfilePic(user)}}" width="30" height="30" alt="" />
+							<img class="d-none d-lg-inline" src="{{user.getProfilePic()}}" width="30" height="30" alt="" />
 							<span class="d-lg-none">{{user.display_name}}</span>
 							{% if invites.length > 0 %}
 								<span class="badge badge-success">{{invites.length}}</span>

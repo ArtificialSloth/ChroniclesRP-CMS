@@ -7,7 +7,7 @@
 
 {% set allActivities = crp.util.sortObjectArray(topics.concat(replies), 'date', -1) %}
 {% set activities = crp.util.paginateArray(allActivities, 10, query.page) %}
-{% set invites = crp.chapters.getInvites(chapters, profile._id) %}
+{% set invites = profile.getChapterInvites(chapters) %}
 
 <div class="container">
 	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
@@ -27,7 +27,7 @@
 						{% set category = crp.util.findObjectInArray(categories, '_id', parent.category) %}
 						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter) %}
 
-						{% set member = crp.chapters.getMember(chapter, user._id) %}
+						{% if chapter %}{% set member = chapter.getMember(user._id) %}{% endif %}
 						{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
 							<div class="card mt-2">
 								<div class="card-header">
@@ -56,7 +56,7 @@
 						{% set category = crp.util.findObjectInArray(categories, '_id', forum.category) %}
 						{% set chapter = crp.util.findObjectInArray(chapters, '_id', category.chapter) %}
 
-						{% set member = crp.chapters.getMember(chapter, user._id) %}
+						{% if chapter %}{% set member = chapter.getMember(user._id) %}{% endif %}
 						{% if (not chapter or (member and member.role >= 1)) and not category.role or user.role >= category.role %}
 							<div class="card mt-2">
 								<div class="card-header">

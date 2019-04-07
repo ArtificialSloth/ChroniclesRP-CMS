@@ -1,9 +1,9 @@
 {% include "./style.njk" %}
 {% lookup 'users', {_id: profileid}, 'profile' %}
 
-<div class="profile-header d-flex flex-column-reverse" style="background-image:url('{{crp.members.getCoverPic(profile)}}')">
+<div class="profile-header d-flex flex-column-reverse" style="background-image:url('{{profile.getCoverPic()}}')">
 	<div class="text-white text-center h-50" style="background-color:rgba(0, 0, 0, 0.5)">
-		<img src="{{crp.members.getProfilePic(profile)}}" alt="{{profile.display_name}}" width="150" height="150" />
+		<img src="{{profile.getProfilePic()}}" alt="{{profile.display_name}}" width="150" height="150" />
 		<div class="py-2 px-3">
 			<h2 class="font-weight-bold">{{profile.display_name}}</h2>
 			<p>{{profile.tagline}}</p>

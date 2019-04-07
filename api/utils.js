@@ -7,7 +7,7 @@ module.exports = (crp, callback) => {
 
 		for (var i in array) {
 			for (var k in array[i]) {
-				var x = (filter[k] && filter[k].equals instanceof Function) ? filter[k].toString() : filter[k];
+				var x = (crp.db.Types.ObjectId.isValid(filter[k])) ? filter[k].toString() : filter[k];
 				if (x && x == array[i][k]) result.push(array[i]);
 			}
 		}
@@ -17,7 +17,7 @@ module.exports = (crp, callback) => {
 
 	crp.util.findObjectInArray = (array, key, val) => {
 		for (var i in array) {
-			var x = (array[i][key].equals instanceof Function) ? array[i][key].toString() : array[i][key];
+			var x = (crp.db.Types.ObjectId.isValid(array[i][key])) ? array[i][key].toString() : array[i][key];
 			if (x == val) {
 				return array[i];
 			}
@@ -44,7 +44,7 @@ module.exports = (crp, callback) => {
 
 	crp.util.idInArray = (array, id) => {
 		for (var i in array) {
-			if (array[i].equals(id)) return true;
+			if (crp.db.Types.ObjectId.isValid(array[i]) && array[i].equals(id)) return true;
 		}
 		return false;
 	};

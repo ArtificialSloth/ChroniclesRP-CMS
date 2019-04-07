@@ -16,7 +16,7 @@
 	</nav>
 
 	<div class="row">
-		{% set member = crp.chapters.getMember(chapter, user._id) %}
+		{% if chapter %}{% set member = chapter.getMember(user._id) %}{% endif %}
 		{% if (not chapter or (member and member.role >= 1)) and (not category.role or user.role >= category.role) %}
 			<div class="col-lg-9">
 				<div class="container bg-white shadow-sm">
@@ -28,7 +28,7 @@
 					<div class="row p-2">
 						<div class="col-lg d-none d-lg-block">{{crp.util.dateToStr(topic.date, user.timezone)}}</div>
 						<div class="d-lg-none mb-3">
-							<img src="{{crp.members.getProfilePic(author)}}" alt="{{author.display_name}}" width="30" height="30" />
+							<img src="{{author.getProfilePic()}}" alt="{{author.display_name}}" width="30" height="30" />
 							<a href="/members/{{author.nicename}}" class="pl-1 pt-2">{{author.display_name}}</a>
 						</div>
 						<div class="col-lg text-lg-right p-0">
@@ -51,9 +51,9 @@
 
 					<div class="row p-3">
 						<div class="col-lg-2 text-center d-none d-lg-block p-0">
-							<img class="d-block ml-auto mr-auto" src="{{crp.members.getProfilePic(author)}}" alt="{{author.display_name}}" width="80" height="80" />
+							<img class="d-block ml-auto mr-auto" src="{{author.getProfilePic()}}" alt="{{author.display_name}}" width="80" height="80" />
 							<a href="/members/{{author.nicename}}" class="mt-0">{{author.display_name}}</a>
-							<p class="font-italic m-0">{{crp.members.parseRole(author.role)}}</p>
+							<p class="font-italic m-0">{{author.parseRole()}}</p>
 						</div>
 
 						<div class="col-lg-10 body mt-3 mt-lg-0 p-0">
@@ -91,7 +91,7 @@
 					</div>
 					<div class="row d-lg-none font-italic text-muted p-3">{{crp.util.dateToStr(topic.date, user.timezone)}}</div>
 
-					{% query 'replies', {parent: topic._id}, {sort: [['date', 1]]}, 'replies' %}
+					{% query 'replies', {parent: topic._id}, {sort: [[['date', 1]]]}, 'replies' %}
 					{% for reply in replies %}
 						{% lookup 'users', {_id: reply.author}, 'replyAuthor' %}
 
@@ -99,7 +99,7 @@
 						<div class="row p-2">
 							<div class="col-lg d-none d-lg-block">{{crp.util.dateToStr(reply.date, user.timezone)}}</div>
 							<div class="d-lg-none mb-3">
-								<img src="{{crp.members.getProfilePic(replyAuthor)}}" alt="{{replyAuthor.display_name}}" width="30" height="30" />
+								<img src="{{replyAuthor.getProfilePic()}}" alt="{{replyAuthor.display_name}}" width="30" height="30" />
 								<a href="/members/{{replyAuthor.nicename}}" class="pl-1 pt-2">{{replyAuthor.display_name}}</a>
 							</div>
 							<div class="col-lg text-lg-right p-0">
@@ -116,9 +116,9 @@
 
 						<div class="row p-3">
 							<div class="col-lg-2 text-center d-none d-lg-block p-0">
-								<img class="d-block ml-auto mr-auto" src="{{crp.members.getProfilePic(replyAuthor)}}" alt="{{replyAuthor.display_name}}" width="80" height="80" />
+								<img class="d-block ml-auto mr-auto" src="{{replyAuthor.getProfilePic()}}" alt="{{replyAuthor.display_name}}" width="80" height="80" />
 								<a href="/members/{{replyAuthor.nicename}}" class="mt-0">{{replyAuthor.display_name}}</a>
-								<p class="font-italic m-0">{{crp.members.parseRole(replyAuthor.role)}}</p>
+								<p class="font-italic m-0">{{replyAuthor.parseRole()}}</p>
 							</div>
 
 							<div class="col-lg-10 body mt-3 mt-lg-0 p-0">

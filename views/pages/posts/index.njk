@@ -13,7 +13,7 @@
 			<hr />
 		</div>
 
-		{% query 'posts', {type: post.type}, {sort: [['date', -1]], limit: 3}, 'posts' %}
+		{% query 'posts', {type: post.type}, {sort: [[['date', -1]]], limit: 3}, 'posts' %}
 		{% for post in posts %}
 			<div class="col-lg-4 mt-3 mt-lg-0">
 				<div class="card shadow-sm">

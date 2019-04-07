@@ -8,7 +8,7 @@
 			<li data-target="#carouselHome" data-slide-to="2"></li>
 		</ol>
 
-		{% query 'posts', {type: 'news'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
+		{% query 'posts', {type: 'news'}, {sort: [[['date', -1]]], limit: 3}, 'posts' %}
 		{% for post in posts %}
 			{% lookup 'users', {_id: post.author}, 'author' %}
 			<div class="carousel-item {% if loop.first %}active{% endif %}">
@@ -41,7 +41,7 @@
 			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
 		</div>
 
-		{% query 'posts', {type: 'featured_content'}, {sort: [['date', -1]], limit: 3}, 'posts' %}
+		{% query 'posts', {type: 'featured_content'}, {sort: [[['date', -1]]], limit: 3}, 'posts' %}
 		{% for post in posts %}
 			<div class="col-lg-4 mt-3 mt-lg-0">
 				<div class="card shadow-sm">

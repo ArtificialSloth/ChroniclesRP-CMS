@@ -37,7 +37,7 @@ module.exports = (crp) => {
 		},
 		desc: {
 			type: String,
-			maxlength: 140
+			maxlength: 200
 		},
 		category: crp.db.Schema.Types.ObjectId,
 		order: {

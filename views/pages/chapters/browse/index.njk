@@ -1,5 +1,5 @@
-{% query 'games', {}, {sort: [['name', 1]]}, 'games' %}
-{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+{% query 'games', {}, {sort: [[['name', 1]]]}, 'games' %}
+{% query 'chapters', {}, {sort: [[['name', 1]]]}, 'chapters' %}
 
 <nav class="nav nav-tabs justify-content-center mt-3">
 	<a href="/chapters" class="nav-item nav-link active">All Chapters</a>
@@ -25,16 +25,16 @@
 
 			<div class="col-lg-3 mb-3">
 				<div class="card shadow-sm">
-					{% if crp.chapters.getMember(chapter, user._id).role >= 2 or user.role >= 3 %}
+					{% if chapter.getMember(user._id).role >= 2 or user.role >= 3 %}
 						<a href="/chapters/{{chapter.nicename}}/settings" class="position-absolute w-100 text-right pr-1">Edit</a>
 					{% endif %}
 
-					<a href="{{crp.chapters.getURL(chapter)}}" class="card-img-top">
-						<img src="{{crp.chapters.getProfilePic(chapter)}}" class="d-block mx-auto my-1" width="200" height="200" alt="{{chapter.name}}">
+					<a href="{{chapter.getURL()}}" class="card-img-top">
+						<img src="{{chapter.getProfilePic()}}" class="d-block mx-auto my-1" width="200" height="200" alt="{{chapter.name}}">
 					</a>
 
 					<div class="card-header border-top text-center">
-						<h5><a href="{{crp.chapters.getURL(chapter)}}" {% if chapter.type == 'hosted' or chapter.type == 'url' %}target="_blank"{% endif %}>{{chapter.name}}</a></h5>
+						<h5><a href="{{chapter.getURL()}}" {% if chapter.type == 'hosted' or chapter.type == 'url' %}target="_blank"{% endif %}>{{chapter.name}}</a></h5>
 						<a href="/chapters/{{game.slug}}" class="font-italic">{{game.name}}</a>
 					</div>
 

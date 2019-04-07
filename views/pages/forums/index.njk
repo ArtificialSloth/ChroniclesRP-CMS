@@ -9,8 +9,8 @@
 	<div class="row">
 		<div class="col-lg-9">
 			<div class="container bg-white shadow-sm">
-				{% query 'categories', {}, {sort: [['order', 1]]}, 'categories' %}
-				{% query 'forums', {}, {sort: [['order', 1]]}, 'forums' %}
+				{% query 'categories', {}, {sort: [[['order', 1]]]}, 'categories' %}
+				{% query 'forums', {}, {sort: [[['order', 1]]]}, 'forums' %}
 				{% getTopics {}, false, 'topics' %}
 				{% for category in categories %}
 					{% if not category.role or user.role >= category.role %}

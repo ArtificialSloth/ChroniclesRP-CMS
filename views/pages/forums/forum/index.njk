@@ -14,7 +14,7 @@
 	</nav>
 
 	<div class="row">
-		{% set member = crp.chapters.getMember(chapter, user._id) %}
+		{% if chapter %}{% set member = chapter.getMember(user._id) %}{% endif %}
 		{% if (not chapter or (member and member.role >= 1)) and (not category.role or user.role >= category.role) %}
 			<div class="col-lg-9">
 				{% if topics[0] %}
@@ -27,7 +27,7 @@
 
 						{% for topic in topics %}
 							{% lookup 'users', {_id: topic.author}, 'author' %}
-							{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
+							{% query 'replies', {parent: topic._id}, {sort: [[['date', -1]]]}, 'replies' %}
 
 							<div class="row p-2">
 								<div class="col col-lg-8">

@@ -43,6 +43,103 @@ async.waterfall([
 ], (err, crp) => {
 	if (err) return console.error(err);
 
+	var mongodb = require('mongodb');
+	mongodb.MongoClient.connect(process.env.MONGODB_URL, (err, db) => {
+		if (err) return console.error(err);
+
+		crp.db.connection.dropDatabase((err) => {
+			db.collection('CRP_site').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.sites(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+				});
+			});
+
+			db.collection('CRP_games').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.games(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+
+					db.collection('CRP_chapters').find().toArray((err, coll) => {
+						if (err) return console.error(err);
+
+						crp.async.each(coll, (doc, cb) => {
+							new crp.chapters(doc).save(cb);
+						}, (err) => {
+							if (err) return console.error(err);
+						});
+					});
+				});
+			});
+
+			db.collection('CRP_users').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.users(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+				});
+			});
+
+			db.collection('CRP_posts').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.posts(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+				});
+			});
+
+			db.collection('CRP_categories').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.categories(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+				});
+			});
+
+			db.collection('CRP_forums').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.forums(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+				});
+			});
+
+			db.collection('CRP_topics').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.topics(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+				});
+			});
+
+			db.collection('CRP_replies').find().toArray((err, coll) => {
+				if (err) return console.error(err);
+
+				crp.async.each(coll, (doc, cb) => {
+					new crp.replies(doc).save(cb);
+				}, (err) => {
+					if (err) return console.error(err);
+				});
+			});
+		});
+	});
+
 	crp.express.ready((err) => {
 		if (err) return console.error(err);
 

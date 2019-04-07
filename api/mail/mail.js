@@ -10,7 +10,7 @@ module.exports = (crp) => {
 	};
 
 	crp.mail.msgTemplate = (subject, msg, cb) => {
-		crp.db.findOne('site', {}, (err, site) => {
+		crp.sites.findOne({}, (err, site) => {
 			if (err) return cb(err);
 
 			var keys = [

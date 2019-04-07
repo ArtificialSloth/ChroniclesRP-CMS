@@ -1,6 +1,6 @@
 {% lookup 'users', {_id: profileid}, 'profile' %}
-{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
-{% set invites = crp.chapters.getInvites(chapters, profile._id) %}
+{% query 'chapters', {}, {sort: [[['name', 1]]]}, 'chapters' %}
+{% set invites = profile.getChapterInvites(chapters) %}
 
 <div class="container">
 	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
@@ -17,7 +17,7 @@
 				{% for chapter in invites %}
 					<div class="card shadow-sm mb-3">
 						<div class="card-body d-flex flex-wrap">
-							<img class="mx-auto mx-lg-0" src="{{crp.chapters.getProfilePic(chapter)}}" width="40" height="40" alt="{{chapter.name}}" />
+							<img class="mx-auto mx-lg-0" src="{{chapter.getProfilePic()}}" width="40" height="40" alt="{{chapter.name}}" />
 							<span class="mt-2 ml-lg-3">You've been invited to join <a href="/chapters/{{chapter.slug}}">{{chapter.name}}</a>.</span>
 							<div class="ml-auto w-lg-100">
 								<button class="btn btn-danger" onclick="declineChapterInvite('{{chapter._id}}')">Decline</button>
@@ -30,15 +30,15 @@
 
 			{% set inChapter = false %}
 			{% for chapter in chapters %}
-					{% if crp.chapters.getMember(chapter, profile._id).role > 0 %}
+					{% if chapter.getMember(profile._id).role > 0 %}
 						{% set inChapter = true %}
 						{% lookup 'games', {_id: chapter.game}, 'game' %}
 
 						<div class="card shadow-sm mb-3">
 							<div class="card-body d-flex flex-wrap">
-								<img src="{{crp.chapters.getProfilePic(chapter)}}" width="75" height="75" alt="{{chapter.name}}" />
+								<img src="{{chapter.getProfilePic()}}" width="75" height="75" alt="{{chapter.name}}" />
 								<div class="ml-lg-3">
-									<a href="{{crp.chapters.getURL(chapter)}}" {% if chapter.type == 'hosted' or chapter.type == 'url' %}target="_blank"{% endif %}>{{chapter.name}}</a>
+									<a href="{{chapter.getURL()}}" {% if chapter.type == 'hosted' or chapter.type == 'url' %}target="_blank"{% endif %}>{{chapter.name}}</a>
 									<p class="text-muted">{{chapter.tagline}}</p>
 								</div>
 								<span class="ml-lg-auto w-auto"><a href="/chapters/{{game.slug}}">{{game.name}}</a></span>

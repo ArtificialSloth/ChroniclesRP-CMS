@@ -3,7 +3,7 @@ module.exports = (crp) => {
 		type: {
 			type: String,
 			required: true,
-			enum: ['group', 'page', 'url']
+			enum: ['hosted', 'group', 'page', 'url']
 		},
 		name: {
 			type: String,
@@ -56,17 +56,32 @@ module.exports = (crp) => {
 		},
 		tagline: {
 			type: String,
-			minlength: 4,
-			maxlength: 140
+			maxlength: 140,
+			validate: {
+				msg: 'Path \'{PATH}\' ({VALUE}) is shorter that the minimum allowed length ({MINLENGTH})',
+				validator: function(val) {
+					return val ? ((val.length == 0) ? true : ((val.length >= 4) ? true : false)) : true;
+				}
+			}
 		},
 		desc: {
 			type: String,
-			minlength: 4
+			validate: {
+				msg: 'Path \'{PATH}\' ({VALUE}) is shorter that the minimum allowed length ({MINLENGTH})',
+				validator: function(val) {
+					return val ? ((val.length == 0) ? true : ((val.length >= 4) ? true : false)) : true;
+				}
+			}
 		},
 		discord: {
 			type: String,
-			minlength: 19,
-			maxlength: 19
+			maxlength: 19,
+			validate: {
+				msg: 'Path \'{PATH}\' ({VALUE}) is shorter that the minimum allowed length ({MINLENGTH})',
+				validator: function(val) {
+					return val ? ((val.length == 0) ? true : ((val.length >= 19) ? true : false)) : true;
+				}
+			}
 		},
 		img: {
 			profile: {
@@ -123,7 +138,7 @@ module.exports = (crp) => {
 
 	schema.methods.getURL = function() {
 		if (this.type == 'url') return this.slug;
-		return `/chapters/${chapter.nicename}`;
+		return `/chapters/${this.slug}`;
 	};
 
 	schema.methods.getProfilePic = function() {
@@ -145,7 +160,7 @@ module.exports = (crp) => {
 			role: 2
 		});
 
-		crp.db.find('games', {}, {}, (err, games) => {
+		crp.games.find({}, (err, games) => {
 			if (err) return cb(err);
 
 			for (var i in games) {
@@ -160,26 +175,26 @@ module.exports = (crp) => {
 
 				for (var i in chapters) {
 					if (chapters[i].type == 'group') {
-						if (slug == `/chapters/${chapters[i].nicename}`) return cb(null, {
+						if (slug == `/chapters/${chapters[i].slug}`) return cb(null, {
 							path: '/chapters/profile/index.njk',
 							subPage: '/chapters/profile/about/index.njk',
 							context: {chapterid: chapters[i]._id}
 						});
 
-						if (slug == `/chapters/${chapters[i].nicename}/forums`) return cb(null, {
+						if (slug == `/chapters/${chapters[i].slug}/forums`) return cb(null, {
 							path: '/chapters/profile/index.njk',
 							subPage: `/chapters/profile/forums/index.njk`,
 							context: {chapterid: chapters[i]._id}
 						});
 					}
 
-					if (slug == `/chapters/${chapters[i].nicename}/members`) return cb(null, {
+					if (slug == `/chapters/${chapters[i].slug}/members`) return cb(null, {
 						path: '/chapters/profile/index.njk',
 						subPage: `/chapters/profile/members/index.njk`,
 						context: {chapterid: chapters[i]._id}
 					});
 
-					if (slug == `/chapters/${chapters[i].nicename}/settings`) return cb(null, {
+					if (slug == `/chapters/${chapters[i].slug}/settings`) return cb(null, {
 						path: '/chapters/profile/index.njk',
 						subPage: `/chapters/profile/settings/index.njk`,
 						context: {chapterid: chapters[i]._id}

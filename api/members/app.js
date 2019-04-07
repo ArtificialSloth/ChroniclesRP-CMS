@@ -41,12 +41,12 @@ module.exports = (crp, callback) => {
 	crp.app.post('/api/register', (req, res) => {
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
 			crp.users.findById(req.user, (err, user) => {
-				if (err) return res.send(err);
+				if (err) return res.send({findById: err});
 				if (user) return res.send('user');
 				if (req.body.pass && req.body.pass.length < 6) return res.send('passLength');
 
 				crp.auth.bcrypt.hash(req.body.pass, 10, (err, hash) => {
-					if (err) return res.send(err);
+					if (err) return res.send({hash: err});
 
 					var userData = {
 						login: req.body.login,
@@ -55,10 +55,10 @@ module.exports = (crp, callback) => {
 					};
 
 					new crp.users(userData).save((err, user) => {
-						if (err) return res.send(err);
+						if (err) return res.send({save: err});
 
 						req.login(user, (err) => {
-							if (err) return res.send(err);
+							if (err) return res.send({login: err});
 
 							crp.mail.sendConfirmCode(user._id, user.email);
 							res.send(true);

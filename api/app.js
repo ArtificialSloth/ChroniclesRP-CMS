@@ -21,7 +21,7 @@ module.exports = (crp, callback) => {
 		};
 
 		this.run = (context, model, filter, options, key, cb) => {
-			crp[model].find(filter, options, (err, result) => {
+			crp[model].find(filter, {}, options, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});
