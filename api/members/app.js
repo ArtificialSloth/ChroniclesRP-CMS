@@ -80,14 +80,16 @@ module.exports = (crp, callback) => {
 			if (!activation || activation.code != req.body.code) return res.send(false);
 
 			if (user.role == 0) {
-				crp.users.updateOne({_id: user._id}, {email: activation.email, role: 1}, {runValidators: true}, (err, user) => {
+				user.set({email: activation.email, role: 1});
+				user.save((err, user) => {
 					if (err) return res.send(err);
 
 					crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);
 					res.send(true);
 				});
 			} else {
-				crp.users.updateOne({_id: user._id}, {email: activation.email}, {runValidators: true}, (err, user) => {
+				user.set({email: activation.email});
+				user.save((err, user) => {
 					if (err) return res.send(err);
 
 					crp.mail.activations.splice(crp.mail.activations.indexOf(activation), 1);

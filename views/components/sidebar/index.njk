@@ -5,8 +5,8 @@
 
 		<ul class="pl-3">
 			{% set i = 0 %}
-			{% getTopics {}, false, 'topics' %}
-			{% for topic in topics %}
+			{% getTopics {}, false, 'sidebarTopics' %}
+			{% for topic in sidebarTopics %}
 				{% if i < 5 %}
 					{% lookup 'users', {_id: topic.author}, 'author' %}
 					{% lookup 'forums', {_id: topic.parent}, 'forum' %}

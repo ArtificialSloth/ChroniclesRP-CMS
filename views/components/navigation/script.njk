@@ -71,6 +71,7 @@
 
 	$('#register-form').submit((e) => {
 		e.preventDefault();
+		$('#registerModal').modal('hide');
 		$('#register-form-captcha').removeClass('is-invalid');
 		$('#register-form-login').removeClass('is-invalid');
 		$('#register-form-email').removeClass('is-invalid');

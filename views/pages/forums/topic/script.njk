@@ -2,7 +2,7 @@
 	function removeTopic(topicid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/remove-topic', {topicid: topicid}, (res) => {
-				if (typeof res == 'object') {
+				if (res === true) {
 					crpGetPage('/forums');
 				} else {
 					console.error(res);
@@ -14,7 +14,7 @@
 	function removeReply(replyid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/remove-reply', {replyid: replyid}, (res) => {
-				if (typeof res == 'object') {
+				if (res === true) {
 					crpGetPage(window.location.pathname);
 				} else {
 					console.error(res);
@@ -25,7 +25,7 @@
 
 	function subToTopic(topicid) {
 		crpAjax('/api/subscribe-topic', {topicid: topicid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
 				console.error(res);
@@ -35,7 +35,7 @@
 
 	function unSubToTopic(topicid) {
 		crpAjax('/api/unsubscribe-topic', {topicid: topicid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
 				console.error(res);
@@ -131,7 +131,7 @@
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/edit-reply', formData, (res) => {
-			if (res.content) {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else if (res == 'bodyLength') {
 				$(e.target).find('.edit-reply-form-body').next('.invalid-feedback').html('Reply must be at least 4 characters!');

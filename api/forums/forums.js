@@ -1,5 +1,5 @@
 module.exports = (crp) => {
-	crp.categories = crp.db.model('category', new crp.db.Schema({
+	var category = new crp.db.Schema({
 		name: {
 			type: String,
 			required: true,
@@ -19,9 +19,9 @@ module.exports = (crp) => {
 				});
 			}
 		}
-	}));
+	});
 
-	crp.forums = crp.db.model('forum', new crp.db.Schema({
+	var forum = new crp.db.Schema({
 		name: {
 			type: String,
 			required: true,
@@ -51,9 +51,9 @@ module.exports = (crp) => {
 				});
 			}
 		}
-	}));
+	});
 
-	crp.topics = crp.db.model('topic', new crp.db.Schema({
+	var topic = new crp.db.Schema({
 		parent: crp.db.Schema.Types.ObjectId,
 		author: crp.db.Schema.Types.ObjectId,
 		title: {
@@ -77,9 +77,9 @@ module.exports = (crp) => {
 			default: Date.now()
 		},
 		subs: [crp.db.Schema.Types.ObjectId]
-	}));
+	});
 
-	crp.replies = crp.db.model('reply', new crp.db.Schema({
+	var reply = new crp.db.Schema({
 		parent: crp.db.Schema.Types.ObjectId,
 		author: crp.db.Schema.Types.ObjectId,
 		content: {
@@ -91,7 +91,24 @@ module.exports = (crp) => {
 			type: Date,
 			default: Date.now()
 		}
-	}));
+	});
+
+	category.pre(/^delete/, function(next) {
+		crp.forums.deleteMany({category: this.getQuery()._id}, next);
+	});
+
+	forum.pre(/^delete/, function(next) {
+		crp.topics.deleteMany({parent: this.getQuery()._id}, next);
+	});
+
+	topic.pre(/^delete/, function(next) {
+		crp.replies.deleteMany({parent: this.getQuery()._id}, next);
+	});
+
+	crp.categories = new crp.db.model('category', category);
+	crp.forums = new crp.db.model('forum', forum);
+	crp.topics = new crp.db.model('topic', topic);
+	crp.replies = new crp.db.model('reply', reply);
 
 	crp.topics.sortTopics = (filter, type, cb) => {
 		crp.topics.find(filter, (err, topics) => {

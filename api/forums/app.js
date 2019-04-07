@@ -12,21 +12,19 @@ module.exports = (crp, callback) => {
 					if (!user) return res.send('noUser');
 
 					var member = chapter.getMember(user._id);
-					if ((member && member.role >= 2) || user.role >= 3) {
-						var forumData = {
-							name: req.body.name,
-							desc: req.body.desc,
-							category: req.body.category
-						};
+					if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
 
-						new crp.forums(forumData).save((err, forum) => {
-							if (err) return res.send(err);
+					var forumData = {
+						name: req.body.name,
+						desc: req.body.desc,
+						category: req.body.category
+					};
 
-							res.send(forum);
-						});
-					} else {
-						res.send('notAllowed');
-					}
+					new crp.forums(forumData).save((err, forum) => {
+						if (err) return res.send(err);
+
+						res.send(forum);
+					});
 				});
 			});
 		});
@@ -134,10 +132,7 @@ module.exports = (crp, callback) => {
 					title: req.body.title,
 					content: req.body.body,
 				};
-
-				if (user.role >= 2) {
-					topicData.type = req.body.type;
-				}
+				if (user.role >= 2) topicData.type = req.body.type;
 
 				crp.topics.updateOne({_id: topic._id}, topicData, {runValidators: true}, (err) => {
 					if (err) return res.send(err);
@@ -198,10 +193,7 @@ module.exports = (crp, callback) => {
 				if (err) return res.send(err);
 				if (!user || (!reply.author.equals(user._id) && user.role < 3)) return res.send('notAllowed');
 
-				var replyData = {
-					content: req.body.reply,
-				};
-
+				var replyData = {content: req.body.reply};
 				crp.replies.updateOne({_id: reply._id}, replyData, {runValidators: true}, (err) => {
 					if (err) return res.send(err);
 
@@ -229,7 +221,6 @@ module.exports = (crp, callback) => {
 
 						var member = chapter.getMember(user._id);
 						if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-						
 						crp.forums.deleteOne({_id: forum._id}, (err) => {
 							if (err) return res.send(err);
 

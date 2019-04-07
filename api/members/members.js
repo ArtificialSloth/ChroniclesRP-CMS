@@ -10,7 +10,7 @@ module.exports = (crp) => {
 				msg: 'Login {VALUE} is already in use.',
 				validator: function(val) {
 					return new Promise((resolve, reject) => {
-						crp.users.find({login: val}, (err, users) => {
+						crp.users.find({_id: {$not: {$eq: this._id}}, login: val}, (err, users) => {
 							if (err) return reject(err);
 							if (users && users.length > 0) return resolve(false);
 							resolve(true);
@@ -43,7 +43,7 @@ module.exports = (crp) => {
 					msg: '{VALUE} is already in use.',
 					validator: function(val) {
 						return new Promise((resolve, reject) => {
-							crp.users.find({email: val}, (err, users) => {
+							crp.users.find({_id: {$not: {$eq: this._id}}, email: val}, (err, users) => {
 								if (err) return reject(err);
 								if (users && users.length > 0) return resolve(false);
 								resolve(true);
