@@ -23,12 +23,15 @@
 		crpAjax('/api/new-topic', formData, (res) => {
 			if (res.title) {
 				crpGetPage(window.location.pathname);
-			} else if (res == 'titleLength') {
-				$('#new-topic-form-title').next('.invalid-feedback').html('Title must be at least 4 characters and no greater than 80 characters!');
-				$('#new-topic-form-title').addClass('is-invalid');
-			} else if (res == 'bodyLength') {
-				$('#new-topic-form-body').next('.invalid-feedback').html('Topic body must be at least 4 characters!');
-				$('#new-topic-form-body').addClass('is-invalid');
+			} else if (res.errors) {
+				if (res.errors.title) {
+					$('#new-topic-form-title').next('.invalid-feedback').html(res.errors.title.message);
+					$('#new-topic-form-title').addClass('is-invalid');
+				}
+				if (res.errors.content) {
+					$('#new-topic-form-body').next('.invalid-feedback').html(res.errors.content.message);
+					$('#new-topic-form-body').addClass('is-invalid');
+				}
 			} else {
 				console.error(res);
 				$('#new-topic-form-body').next('.invalid-feedback').html('Something went wrong :(');

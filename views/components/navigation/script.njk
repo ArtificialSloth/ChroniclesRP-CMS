@@ -71,7 +71,6 @@
 
 	$('#register-form').submit((e) => {
 		e.preventDefault();
-		$('#registerModal').modal('hide');
 		$('#register-form-captcha').removeClass('is-invalid');
 		$('#register-form-login').removeClass('is-invalid');
 		$('#register-form-email').removeClass('is-invalid');
@@ -115,25 +114,25 @@
 		var formData = $(e.target).serialize();
 		crpAjax('/api/register', formData, (res) => {
 			if (res === true) {
+				$('#registerModal').removeClass('fade');
+				$('#registerModal').modal('hide');
 				crpGetPage(window.location.pathname);
 			} else if (res == 'noCaptcha') {
 				$('#register-form-captcha').next('.invalid-feedback').html('Please click the captcha first.');
 				$('#register-form-captcha').addClass('is-invalid');
-			} else if (res == 'loginLength') {
-				$('#register-form-login').next('.invalid-feedback').html('Username must be at least 4 characters and no greater than 80 characters!');
-				$('#register-form-login').addClass('is-invalid');
-			} else if (res == 'loginTaken') {
-				$('#register-form-login').next('.invalid-feedback').html('Username is already in use!');
-				$('#register-form-login').addClass('is-invalid');
-			} else if (res == 'emailInvalid') {
-				$('#register-form-email').next('.invalid-feedback').html('Email address is invalid!');
-				$('#register-form-email').addClass('is-invalid');
-			} else if (res == 'emailTaken') {
-				$('#register-form-email').next('.invalid-feedback').html('Email address is already in use!');
-				$('#register-form-email').addClass('is-invalid');
-			} else if (res == 'passLength') {
-				$('#register-form-pass').next('.invalid-feedback').html('Password must be at least 6 characters!');
-				$('#register-form-pass').addClass('is-invalid');
+			} else if (res.save && res.save.errors) {
+				if (res.save.errors.login) {
+					$('#register-form-login').next('.invalid-feedback').html(res.save.errors.login.message);
+					$('#register-form-login').addClass('is-invalid');
+				}
+				if (res.save.errors.email) {
+					$('#register-form-email').next('.invalid-feedback').html(res.save.errors.email.message);
+					$('#register-form-email').addClass('is-invalid');
+				}
+				if (res.save.errors.pass) {
+					$('#register-form-pass').next('.invalid-feedback').html(res.save.errors.pass.message);
+					$('#register-form-pass').addClass('is-invalid');
+				}
 			} else {
 				console.error(res);
 				$('#register-form-captcha').next('.invalid-feedback').html('Something went wrong :(');

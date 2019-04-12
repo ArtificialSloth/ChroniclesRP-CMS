@@ -18,18 +18,31 @@
 		crpAjaxUpload('/api/edit-user', formData, (res) => {
 			if (res === true) {
 				crpGetPage(window.location.pathname);
-			} else if (res == 'displayNameLength') {
-				$('#account-form-display_name').next('.invalid-feedback').html('Display Name must be at least 4 characters and no greater than 80 characters!');
-				$('#account-form-display_name').addClass('is-invalid');
-			} else if (res == 'genderInvalid') {
-				$('#account-form-gender').next('.invalid-feedback').html('Invalid gender!');
-				$('#account-form-gender').addClass('is-invalid');
-			} else if (res == 'dobInvalid') {
-				$('#account-form-dob').next('.invalid-feedback').html('Date format invalid!');
-				$('#account-form-dob').addClass('is-invalid');
-			} else if (res == 'tzInvalid') {
-				$('#account-form-timezone').next('.invalid-feedback').html('Invalid timezone!');
-				$('#account-form-timezone').addClass('is-invalid');
+			} else if (res.errors) {
+				if (res.errors.display_name) {
+					$('#account-form-display_name').next('.invalid-feedback').html(res.errors.display_name.message);
+					$('#account-form-display_name').addClass('is-invalid');
+				}
+				if (res.errors.gender) {
+					$('#account-form-gender').next('.invalid-feedback').html(res.errors.gender.message);
+					$('#account-form-gender').addClass('is-invalid');
+				}
+				if (res.errors.date_of_birth) {
+					$('#account-form-dob').next('.invalid-feedback').html(res.errors.date_of_birth.message);
+					$('#account-form-dob').addClass('is-invalid');
+				}
+				if (res.errors.timezone) {
+					$('#account-form-timezone').next('.invalid-feedback').html(res.errors.timezone.message);
+					$('#account-form-timezone').addClass('is-invalid');
+				}
+				if (res.errors.email) {
+					$('#account-form-email').next('.invalid-feedback').html(res.errors.email.message);
+					$('#account-form-email').addClass('is-invalid');
+				}
+				if (res.errors.pass) {
+					$('#account-form-old-pass').next('.invalid-feedback').html(res.errors.pass.message);
+					$('#account-form-old-pass').addClass('is-invalid');
+				}
 			} else if (res == 'emailInvalid') {
 				$('#account-form-email').next('.invalid-feedback').html('Invalid email address!');
 				$('#account-form-email').addClass('is-invalid');

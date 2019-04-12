@@ -136,13 +136,8 @@ module.exports = (crp, callback) => {
 						gender: req.body.gender,
 						tagline: req.body.tagline,
 						about: req.body.about,
-						img: {}
+						img: profile.img
 					};
-
-					if (req.files) {
-						if (req.files.profile_pic) userData.img.profile = req.files.profile_pic;
-						if (req.files.cover_pic) userData.img.cover = req.files.cover_pic;
-					}
 
 					crp.async.parallel([
 						(callback) => {

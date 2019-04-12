@@ -2,7 +2,7 @@
 	function chaptersDeleteForum(forumid) {
 		if (window.confirm('Are you sure you want to delete this forum?')) {
 			crpAjax('/api/remove-forum', {forumid: forumid}, (res) => {
-				if (typeof res == 'object') {
+				if (res === true) {
 					crpGetPage(window.location.pathname);
 				} else {
 					console.error(res);
@@ -19,17 +19,21 @@
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/new-forum', formData, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
-			} else if (res == 'nameLength') {
-				$('#new-forum-form-name').next('.invalid-feedback').html('Forum Name must be at least 4 characters and no greater than 80 characters!');
-				$('#new-forum-form-name').addClass('is-invalid');
-			} else if (res == 'slugTaken') {
-				$('#new-forum-form-name').next('.invalid-feedback').html('Forum URL already in use!');
-				$('#new-forum-form-name').addClass('is-invalid');
-			} else if (res == 'descLength') {
-				$('#new-forum-form-desc').next('.invalid-feedback').html('Forum Description must be less that 140 characters!');
-				$('#new-forum-form-desc').addClass('is-invalid');
+			} else if (res.errors) {
+				if (res.errors.name) {
+					$('#new-forum-form-name').next('.invalid-feedback').html(res.errors.name.message);
+					$('#new-forum-form-name').addClass('is-invalid');
+				}
+				if (res.errors.slug) {
+					$('#new-forum-form-name').next('.invalid-feedback').html(res.errors.slug.message);
+					$('#new-forum-form-name').addClass('is-invalid');
+				}
+				if (res.errors.desc) {
+					$('#new-forum-form-desc').next('.invalid-feedback').html(res.errors.desc.message);
+					$('#new-forum-form-desc').addClass('is-invalid');
+				}
 			} else {
 				console.error(res);
 				$('#new-forum-form-desc').next('.invalid-feedback').html('Something went wrong :(');

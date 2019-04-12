@@ -33,9 +33,6 @@
 		$('.navbar .dropdown-toggle').each((i, e) => {
 			$(e).dropdown('hide');
 		});
-		$('.modal').each((i, e) => {
-			$(e).modal('hide');
-		});
 
 		var query = page.split('?')[1];
 		query = query ? `?${query}` : '';

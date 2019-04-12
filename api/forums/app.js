@@ -23,7 +23,7 @@ module.exports = (crp, callback) => {
 					new crp.forums(forumData).save((err, forum) => {
 						if (err) return res.send(err);
 
-						res.send(forum);
+						res.send(true);
 					});
 				});
 			});

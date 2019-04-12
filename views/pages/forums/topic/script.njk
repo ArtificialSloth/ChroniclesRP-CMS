@@ -69,8 +69,8 @@
 		crpAjax('/api/new-reply', formData, (res) => {
 			if (res.content) {
 				crpGetPage(window.location.pathname);
-			} else if (res == 'bodyLength') {
-				$('#new-reply-form-body').next('.invalid-feedback').html('Reply must be at least 4 characters!');
+			} else if (res.errors.content) {
+				$('#new-reply-form-body').next('.invalid-feedback').html(res.errors.content.message);
 				$('#new-reply-form-body').addClass('is-invalid');
 			} else {
 				console.error(res);
@@ -102,14 +102,17 @@
 		if (!isValid) return;
 		var formData = $(e.target).serialize();
 		crpAjax('/api/edit-topic', formData, (res) => {
-			if (res.title) {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
-			} else if (res == 'titleLength') {
-				$('#edit-topic-form-title').next('.invalid-feedback').html('Title must be at least 4 characters and no greater than 80 characters!');
-				$('#edit-topic-form-title').addClass('is-invalid');
-			} else if (res == 'bodyLength') {
-				$('#edit-topic-form-body').next('.invalid-feedback').html('Topic body must be at least 4 characters!');
-				$('#edit-topic-form-body').addClass('is-invalid');
+			} else if (res.errors) {
+				if (res.errors.title) {
+					$('#edit-topic-form-title').next('.invalid-feedback').html(res.errors.title.message);
+					$('#edit-topic-form-title').addClass('is-invalid');
+				}
+				if (res.errors.content) {
+					$('#edit-topic-form-body').next('.invalid-feedback').html(res.errors.content.message);
+					$('#edit-topic-form-body').addClass('is-invalid');
+				}
 			} else {
 				console.error(res);
 				$('#edit-topic-form-body').next('.invalid-feedback').html('Something went wrong :(');
@@ -133,8 +136,8 @@
 		crpAjax('/api/edit-reply', formData, (res) => {
 			if (res === true) {
 				crpGetPage(window.location.pathname);
-			} else if (res == 'bodyLength') {
-				$(e.target).find('.edit-reply-form-body').next('.invalid-feedback').html('Reply must be at least 4 characters!');
+			} else if (res.errors.content) {
+				$(e.target).find('.edit-reply-form-body').next('.invalid-feedback').html(res.errors.content.message);
 				$(e.target).find('.edit-reply-form-body').addClass('is-invalid');
 			} else {
 				console.error(res);

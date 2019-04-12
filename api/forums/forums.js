@@ -10,14 +10,7 @@ module.exports = (crp) => {
 		role: Number,
 		order: {
 			type: Number,
-			default: function() {
-				return new Promise((resolve, reject) => {
-					crp.categories.find({}, {sort: [['order', 1]]}, (err, categories) => {
-						if (err) return reject(err);
-						return resolve(categories[categories.length - 1].order + 1);
-					});
-				});
-			}
+			required: true
 		}
 	});
 
@@ -42,14 +35,7 @@ module.exports = (crp) => {
 		category: crp.db.Schema.Types.ObjectId,
 		order: {
 			type: Number,
-			default: function() {
-				return new Promise((resolve, reject) => {
-					crp.forums.find({}, {sort: [['order', 1]]}, (err, forums) => {
-						if (err) return reject(err);
-						return resolve(forums[forums.length - 1].order + 1);
-					});
-				});
-			}
+			required: true
 		}
 	});
 
@@ -103,6 +89,28 @@ module.exports = (crp) => {
 
 	topic.pre(/^delete/, function(next) {
 		crp.replies.deleteMany({parent: this.getQuery()._id}, next);
+	});
+
+	category.pre('validate', function(next) {
+		if (this.order != null) return next();
+
+		crp.categories.find({}, {}, {sort: [[['order', 1]]]}, (err, categories) => {
+			if (err) return next(err);
+
+			this.order = categories[categories.length - 1].order + 1;
+			next();
+		});
+	});
+
+	forum.pre('validate', function(next) {
+		if (this.order != null) return next();
+
+		crp.forums.find({category: this.category}, {}, {sort: [[['order', 1]]]}, (err, forums) => {
+			if (err) return next(err);
+
+			this.order = forums[forums.length - 1].order + 1;
+			next();
+		});
 	});
 
 	crp.categories = new crp.db.model('category', category);

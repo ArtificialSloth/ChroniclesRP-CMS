@@ -6,7 +6,7 @@ module.exports = (crp) => {
 	});
 
 	crp.mail.validateEmail = (email) => {
-		return (email instanceof String && email.includes('@') && email.lastIndexOf('.') > email.lastIndexOf('@'));
+		return (typeof email == 'string' && email.includes('@') && email.lastIndexOf('.') > email.lastIndexOf('@'));
 	};
 
 	crp.mail.msgTemplate = (subject, msg, cb) => {

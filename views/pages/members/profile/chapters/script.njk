@@ -1,7 +1,7 @@
 <script>
 	function acceptChapterInvite(chapterid) {
 		crpAjax('/api/accept-chapter-invite', {chapterid: chapterid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
 				console.log(res);
@@ -11,7 +11,7 @@
 
 	function declineChapterInvite(chapterid) {
 		crpAjax('/api/leave-chapter', {chapterid: chapterid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
 				console.log(res);

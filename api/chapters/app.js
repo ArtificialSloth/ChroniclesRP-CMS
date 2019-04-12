@@ -45,6 +45,7 @@ module.exports = (crp, callback) => {
 			crp.chapters.findById(req.body.chapterid, (err, chapter) => {
 				if (err) return res.send(err);
 				if (!chapter) return res.send('noChapter');
+				req.body.img = chapter.img;
 
 				crp.users.findById(req.user, (err, user) => {
 					if (err) return res.send(err);
@@ -52,10 +53,51 @@ module.exports = (crp, callback) => {
 
 					var member = chapter.getMember(user._id);
 					if ((!member || member.role < 2) && user.role < 3) return res.send('notAllowed');
-					crp.chapters.updateOne({_id: chapters._id}, req.body, {runValidators: true}, (err) => {
+					crp.async.parallel([
+						(callback) => {
+							if (!req.files.profile_pic) return callback();
+
+							crp.storage.delete(chapter.img.profile, (err) => {
+								if (err) return callback(err);
+
+								crp.storage.upload(req.files.profile_pic[0].path, `img/chapters/${chapter._id}/${req.files.profile_pic[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
+
+									crp.fs.unlink(req.files.profile_pic[0].path, (err) => {
+										if (err) return callback(err);
+
+										req.body.img.profile = file.name;
+										callback();
+									});
+								});
+							});
+						},
+						(callback) => {
+							if (!req.files.cover_pic) return callback();
+
+							crp.storage.delete(chapter.img.cover, (err) => {
+								if (err) return callback(err);
+
+								crp.storage.upload(req.files.cover_pic[0].path, `img/chapters/${chapter._id}/${req.files.cover_pic[0].originalname}`, (err, file) => {
+									if (err) return callback(err);
+
+									crp.fs.unlink(req.files.cover_pic[0].path, (err) => {
+										if (err) return callback(err);
+
+										req.body.img.cover = file.name;
+										callback();
+									});
+								});
+							});
+						}
+					], (err) => {
 						if (err) return res.send(err);
 
-						res.send(true);
+						crp.chapters.updateOne({_id: chapter._id}, req.body, {runValidators: true}, (err) => {
+							if (err) return res.send(err);
+
+							res.send(true);
+						});
 					});
 				});
 			});
@@ -141,7 +183,7 @@ module.exports = (crp, callback) => {
 				chapter.setMemberRole(req.user, 1, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(chapter);
+					res.send(true);
 				});
 			});
 		});
@@ -161,7 +203,7 @@ module.exports = (crp, callback) => {
 				chapter.setMemberRole(req.body.userid, 2, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(chapter);
+					res.send(true);
 				});
 			});
 		});
@@ -181,7 +223,7 @@ module.exports = (crp, callback) => {
 				chapter.setMemberRole(req.body.userid, 1, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(chapter);
+					res.send(true);
 				});
 			});
 		});
@@ -201,7 +243,7 @@ module.exports = (crp, callback) => {
 				chapter.addMember({_id: req.body.userid}, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(chapter);
+					res.send(true);
 				});
 			});
 		});;
@@ -221,7 +263,7 @@ module.exports = (crp, callback) => {
 				chapter.removeMember(req.body.userid, (err, chapter) => {
 					if (err) return res.send(err);
 
-					res.send(chapter);
+					res.send(true);
 				});
 			});
 		});;

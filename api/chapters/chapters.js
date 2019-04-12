@@ -75,11 +75,11 @@ module.exports = (crp) => {
 		},
 		discord: {
 			type: String,
-			maxlength: 19,
+			maxlength: 18,
 			validate: {
-				msg: 'Path \'{PATH}\' ({VALUE}) is shorter that the minimum allowed length ({MINLENGTH})',
+				msg: 'Path \'{PATH}\' ({VALUE}) is shorter that the minimum allowed length (19)',
 				validator: function(val) {
-					return val ? ((val.length == 0) ? true : ((val.length >= 19) ? true : false)) : true;
+					return val ? ((val.length == 0) ? true : ((val.length < 18) ? false : true)) : true;
 				}
 			}
 		},
