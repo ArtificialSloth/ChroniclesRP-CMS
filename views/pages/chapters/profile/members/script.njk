@@ -1,40 +1,40 @@
 <script>
 	function promoteChapterMember(chapterid, userid) {
 		crpAjax('/api/promote-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
-			if (typeof res == 'object') {
-				crpGetSubPage(window.location.pathname, '.chapter .content', true)
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
 			} else {
-				console.log(res);
+				console.error(res);
 			}
 		});
 	}
 
 	function demoteChapterMember(chapterid, userid) {
 		crpAjax('/api/demote-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
-			if (typeof res == 'object') {
-				crpGetSubPage(window.location.pathname, '.chapter .content', true)
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
 			} else {
-				console.log(res);
+				console.error(res);
 			}
 		});
 	}
 
 	function removeChapterMember(chapterid, userid) {
 		crpAjax('/api/remove-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
-			if (typeof res == 'object') {
-				crpGetSubPage(window.location.pathname, '.chapter .content', true)
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
 			} else {
-				console.log(res);
+				console.error(res);
 			}
 		});
 	}
 
 	function inviteChapterMember(chapterid, userid) {
 		crpAjax('/api/invite-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
-			if (typeof res == 'object') {
-				crpGetSubPage(window.location.pathname, '.chapter .content', true)
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
 			} else {
-				console.log(res);
+				console.error(res);
 			}
 		});
 	}

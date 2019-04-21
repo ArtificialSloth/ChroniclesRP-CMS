@@ -1,20 +1,20 @@
 <script>
 	function joinChapter(chapterid) {
 		crpAjax('/api/join-chapter', {chapterid: chapterid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
-				console.log(res);
+				console.error(res);
 			}
 		});
 	}
 
 	function leaveChapter(chapterid) {
 		crpAjax('/api/leave-chapter', {chapterid: chapterid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
-				console.log(res);
+				console.error(res);
 			}
 		});
 	}

@@ -151,7 +151,7 @@ module.exports = (crp, callback) => {
 			chapter.addMember({_id: req.user, role: 1}, (err, chapter) => {
 				if (err) return res.send(err);
 
-				res.send(chapter);
+				res.send(true);
 			});
 		});
 	});
@@ -164,7 +164,7 @@ module.exports = (crp, callback) => {
 			chapter.removeMember(req.user, (err, chapter) => {
 				if (err) return res.send(err);
 
-				res.send(chapter);
+				res.send(true);
 			});
 		});
 	});
