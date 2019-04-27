@@ -38,4 +38,17 @@
 			}
 		});
 	}
+
+	$(() => {
+		$('#search-user-filter').keyup((e) => {
+			var filter = $(e.target).val().toLowerCase();
+
+			$('.search-user-item').each((i, e) => {
+				$(e).addClass('d-none');
+				if (filter != '' && $(e).find('a').text().toLowerCase().includes(filter)) {
+					$(e).removeClass('d-none');
+				}
+			});
+		});
+	});
 </script>

@@ -22,10 +22,10 @@
 				<div class="col-lg-11">
 					<input type="search" class="form-control" id="search-user-filter" name="filter" placeholder="Search" />
 					<div class="invalid-feedback"></div>
-					<ul class="list-group position-absolute overflow-auto" style="z-index:2; max-height:500px;">
+					<ul class="list-group search-user-list position-absolute overflow-auto" style="z-index:2; max-height:500px;">
 						{% for member in users %}
 							{% if not chapter.getMember(member._id) %}
-								<li class="list-group-item list-group-item-action d-none">
+								<li class="list-group-item list-group-item-action search-user-item d-none">
 									<img src="{{member.getProfilePic()}}" class="mr-1" alt="{{member.display_name}}" width="30" height="30" />
 									<a href="/members/{{member.nicename}}">{{member.display_name}}</a>
 									<button type="button" class="btn btn-sm btn-primary float-right" onclick="inviteChapterMember('{{chapter._id}}', '{{member._id}}')">Invite</button>
