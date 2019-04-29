@@ -1,5 +1,6 @@
 module.exports = (crp, callback) => {
 	crp.app.post('/api/add-chapter', (req, res) => {
+		console.log(req.body['g-recaptcha-response']);
 		crp.express.recaptcha.validate(req.body['g-recaptcha-response']).then(() => {
 			crp.users.findById(req.user, (err, user) => {
 				if (err) return res.send(err);

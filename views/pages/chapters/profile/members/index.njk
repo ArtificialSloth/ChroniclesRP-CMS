@@ -37,7 +37,7 @@
 			</div>
 
 			<div class="row">
-				<div class="col overflow-auto" style="max-height:750px">
+				<div class="col-lg overflow-auto" style="max-height:750px">
 					{% for member in users %}
 						{% if chapter.getMember(member._id).role == 2 %}
 							<div class="card shadow-sm mb-3">
@@ -59,7 +59,7 @@
 					{% endfor %}
 				</div>
 
-				<div class="col overflow-auto" style="max-height:750px">
+				<div class="col-lg overflow-auto" style="max-height:750px">
 					{% for member in users %}
 						{% if chapter.getMember(member._id).role == 0 or chapter.getMember(member._id).role == 1 %}
 							<div class="card shadow-sm mb-3">
