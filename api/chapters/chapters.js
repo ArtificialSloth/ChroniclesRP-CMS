@@ -23,8 +23,15 @@ module.exports = (crp) => {
 				}
 			},
 			set: function(val) {
-				if (this.type != 'url') this.set('slug', crp.util.urlSafe(val));
+				if (this.type != 'url') this.set('nicename', crp.util.urlSafe(val));
 				return val;
+			}
+		},
+		nicename: {
+			type: String,
+			lowercase: true,
+			default: function() {
+				return crp.util.urlSafe(this.name);
 			}
 		},
 		slug: {
@@ -138,7 +145,7 @@ module.exports = (crp) => {
 
 	schema.methods.getURL = function() {
 		if (this.type == 'url') return this.slug;
-		return `/chapters/${this.slug}`;
+		return `/chapters/${this.nicename}`;
 	};
 
 	schema.methods.getProfilePic = function() {
@@ -175,26 +182,26 @@ module.exports = (crp) => {
 
 				for (var i in chapters) {
 					if (chapters[i].type == 'group') {
-						if (slug == `/chapters/${chapters[i].slug}`) return cb(null, {
+						if (slug == `/chapters/${chapters[i].nicename}`) return cb(null, {
 							path: '/chapters/profile/index.njk',
 							subPage: '/chapters/profile/about/index.njk',
 							context: {chapterid: chapters[i]._id}
 						});
 
-						if (slug == `/chapters/${chapters[i].slug}/forums`) return cb(null, {
+						if (slug == `/chapters/${chapters[i].nicename}/forums`) return cb(null, {
 							path: '/chapters/profile/index.njk',
 							subPage: `/chapters/profile/forums/index.njk`,
 							context: {chapterid: chapters[i]._id}
 						});
 					}
 
-					if (slug == `/chapters/${chapters[i].slug}/members`) return cb(null, {
+					if (slug == `/chapters/${chapters[i].nicename}/members`) return cb(null, {
 						path: '/chapters/profile/index.njk',
 						subPage: `/chapters/profile/members/index.njk`,
 						context: {chapterid: chapters[i]._id}
 					});
 
-					if (slug == `/chapters/${chapters[i].slug}/settings`) return cb(null, {
+					if (slug == `/chapters/${chapters[i].nicename}/settings`) return cb(null, {
 						path: '/chapters/profile/index.njk',
 						subPage: `/chapters/profile/settings/index.njk`,
 						context: {chapterid: chapters[i]._id}

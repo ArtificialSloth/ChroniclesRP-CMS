@@ -1,4 +1,16 @@
 <script>
+	function removeChapter(chapterid) {
+		if (window.confirm('Are you sure?')) {
+			crpAjax('/api/remove-chapter', {chapterid: chapterid}, (res) => {
+				if (res === true) {
+					crpGetPage('/chapters');
+				} else {
+					console.log(res);
+				}
+			});
+		}
+	}
+
 	$('#chapter-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();

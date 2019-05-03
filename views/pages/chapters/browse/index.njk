@@ -3,7 +3,9 @@
 
 <nav class="nav nav-tabs justify-content-center mt-3">
 	<a href="/chapters" class="nav-item nav-link active">All Chapters</a>
-	<a href="/chapters/create" class="nav-item nav-link">Create Chapter</a>
+	{% if user.role >= 2 %}
+		<a href="/chapters/create" class="nav-item nav-link">Create Chapter</a>
+	{% endif %}
 </nav>
 
 <nav class="nav nav-tabs d-block d-lg-flex justify-content-center text-center bg-white">

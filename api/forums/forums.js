@@ -108,7 +108,7 @@ module.exports = (crp) => {
 		crp.forums.find({category: this.category}, {}, {sort: [[['order', 1]]]}, (err, forums) => {
 			if (err) return next(err);
 
-			this.order = forums[forums.length - 1].order + 1;
+			this.order = forums[forums.length - 1] ? forums[forums.length - 1].order + 1 : 0;
 			next();
 		});
 	});

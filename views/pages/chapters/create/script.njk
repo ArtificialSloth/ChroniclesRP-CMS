@@ -7,35 +7,35 @@ $('.new-chapter-form').submit((e) => {
 	});
 
 	var formData = $(e.target).serialize();
-	crpAjaxUpload('/api/add-chapter', formData, (res) => {
+	crpAjax('/api/add-chapter', formData, (res) => {
 		if (res._id) {
 			if (res.type == 'group' || res.type == 'page') return crpGetPage('/chapters/' + res.slug);
 			crpGetPage('/chapters');
 		} else if (res.errors) {
 			if (res.errors.game) {
-				$(e).find('.new-chapter-form-game').next('.invalid-feedback').html(res.errors.game.message);
-				$(e).find('.new-chapter-form-game').addClass('is-invalid');
+				$(e.target).find('.new-chapter-form-game').next('.invalid-feedback').html(res.errors.game.message);
+				$(e.target).find('.new-chapter-form-game').addClass('is-invalid');
 			}
 			if (res.errors.name) {
-				$(e).find('.new-chapter-form-name').next('.invalid-feedback').html(res.errors.name.message);
-				$(e).find('.new-chapter-form-name').addClass('is-invalid');
+				$(e.target).find('.new-chapter-form-name').next('.invalid-feedback').html(res.errors.name.message);
+				$(e.target).find('.new-chapter-form-name').addClass('is-invalid');
 			}
 			if (res.errors.slug) {
-				$(e).find('.new-chapter-form-slug').next('.invalid-feedback').html(res.errors.slug.message);
-				$(e).find('.new-chapter-form-slug').addClass('is-invalid');
+				$(e.target).find('.new-chapter-form-slug').next('.invalid-feedback').html(res.errors.slug.message);
+				$(e.target).find('.new-chapter-form-slug').addClass('is-invalid');
 			}
 			if (res.errors.tagline) {
-				$(e).find('.new-chapter-form-tagline').next('.invalid-feedback').html(res.errors.tagline.message);
-				$(e).find('.new-chapter-form-tagline').addClass('is-invalid');
+				$(e.target).find('.new-chapter-form-tagline').next('.invalid-feedback').html(res.errors.tagline.message);
+				$(e.target).find('.new-chapter-form-tagline').addClass('is-invalid');
 			}
 			if (res.errors.discord) {
-				$(e).find('.new-chapter-form-discord').next('.invalid-feedback').html(res.errors.discord.message);
-				$(e).find('.new-chapter-form-discord').addClass('is-invalid');
+				$(e.target).find('.new-chapter-form-discord').next('.invalid-feedback').html(res.errors.discord.message);
+				$(e.target).find('.new-chapter-form-discord').addClass('is-invalid');
 			}
 		} else {
 			console.error(res);
-			$(e).find('.new-chapter-form-captcha').next('.invalid-feedback').html('Something went wrong :(');
-			$(e).find('.new-chapter-form-captcha').addClass('is-invalid');
+			$(e.target).find('.new-chapter-form-captcha').next('.invalid-feedback').html('Something went wrong :(');
+			$(e.target).find('.new-chapter-form-captcha').addClass('is-invalid');
 		}
 	});
 });
