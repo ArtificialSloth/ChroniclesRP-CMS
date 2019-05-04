@@ -1,27 +1,41 @@
 <script>
-	$('.new-post form').submit((e) => {
+	$('#new-topic-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 
-		if ($('.new-post input[type=text]').val().length < 4) return $('.new-post .topic-error').html('Title must be at least 4 characters!');
-		if ($('.new-post input[type=text]').val().length > 80) return $('.new-post .topic-error').html('Title cannot be more than 80 characters!');
-		if ($('.new-post textarea').val().length < 4) return $('.new-post .topic-error').html('Topic body must be at least 4 characters');
+		$('#new-topic-form-title').removeClass('is-invalid');
+		$('#new-topic-form-body').removeClass('is-invalid');
 
+		var isValid = true;
+		if ($('#new-topic-form-title').val().length < 4 || $('#new-topic-form-title').val().length > 80) {
+			$('#new-topic-form-title').next('.invalid-feedback').html('Title must be at least 4 characters and no greater than 80 characters!');
+			$('#new-topic-form-title').addClass('is-invalid');
+			isValid = false;
+		}
+		if ($('#new-topic-form-body').val().length < 4) {
+			$('#new-topic-form-body').next('.invalid-feedback').html('Topic body must be at least 4 characters!');
+			$('#new-topic-form-body').addClass('is-invalid');
+			isValid = false;
+		}
+
+		if (!isValid) return;
 		var formData = $(e.target).serialize();
 		crpAjax('/api/new-topic', formData, (res) => {
-			if (typeof res != 'object') {
-				if (res == 'titleShort') {
-					return $('.new-post .topic-error').html('Title must be at least 4 characters!');
-				} else if (res == 'titleLong') {
-					return $('.new-post .topic-error').html('Title cannot be more than 80 characters!');
-				} else if (res == 'bodyLength') {
-					return $('.new-post .topic-error').html('Topic body must be at least 4 characters');
-				} else {
-					console.error(res);
-					return $('.new-post .topic-error').html('Something went wrong :(');
+			if (res.title) {
+				crpGetPage(window.location.pathname);
+			} else if (res.errors) {
+				if (res.errors.title) {
+					$('#new-topic-form-title').next('.invalid-feedback').html(res.errors.title.message);
+					$('#new-topic-form-title').addClass('is-invalid');
+				}
+				if (res.errors.content) {
+					$('#new-topic-form-body').next('.invalid-feedback').html(res.errors.content.message);
+					$('#new-topic-form-body').addClass('is-invalid');
 				}
 			} else {
-				crpGetPage(window.location.pathname);
+				console.error(res);
+				$('#new-topic-form-body').next('.invalid-feedback').html('Something went wrong :(');
+				$('#new-topic-form-body').addClass('is-invalid');
 			}
 		});
 	});

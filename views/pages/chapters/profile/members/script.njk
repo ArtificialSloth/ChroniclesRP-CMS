@@ -1,0 +1,54 @@
+<script>
+	function promoteChapterMember(chapterid, userid) {
+		crpAjax('/api/promote-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
+	function demoteChapterMember(chapterid, userid) {
+		crpAjax('/api/demote-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
+	function removeChapterMember(chapterid, userid) {
+		crpAjax('/api/remove-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
+	function inviteChapterMember(chapterid, userid) {
+		crpAjax('/api/invite-chapter-member', {chapterid: chapterid, userid: userid}, (res) => {
+			if (res === true) {
+				crpGetSubPage(window.location.pathname, '.profile-content', true)
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
+	$(() => {
+		$('#search-user-filter').keyup((e) => {
+			var filter = $(e.target).val().toLowerCase();
+
+			$('.search-user-item').each((i, e) => {
+				$(e).addClass('d-none');
+				if (filter != '' && $(e).find('a').text().toLowerCase().includes(filter)) {
+					$(e).removeClass('d-none');
+				}
+			});
+		});
+	});
+</script>

@@ -2,7 +2,7 @@
 	function removeTopic(topicid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/remove-topic', {topicid: topicid}, (res) => {
-				if (typeof res == 'object') {
+				if (res === true) {
 					crpGetPage('/forums');
 				} else {
 					console.error(res);
@@ -14,7 +14,7 @@
 	function removeReply(replyid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/remove-reply', {replyid: replyid}, (res) => {
-				if (typeof res == 'object') {
+				if (res === true) {
 					crpGetPage(window.location.pathname);
 				} else {
 					console.error(res);
@@ -25,7 +25,7 @@
 
 	function subToTopic(topicid) {
 		crpAjax('/api/subscribe-topic', {topicid: topicid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
 				console.error(res);
@@ -35,7 +35,7 @@
 
 	function unSubToTopic(topicid) {
 		crpAjax('/api/unsubscribe-topic', {topicid: topicid}, (res) => {
-			if (typeof res == 'object') {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
 			} else {
 				console.error(res);
@@ -43,86 +43,106 @@
 		});
 	}
 
-	function editToggle(e) {
+	function editToggle(e, id) {
 		if ($(e).html() == 'Edit') {
 			$(e).html('Cancel');
 		} else {
 			$(e).html('Edit');
 		}
 
-		$(e).parents('.sub-header').next().find('li:nth-child(2)').toggleClass('edit');
+		$(id).toggleClass('d-none');
+		$(id).prev().toggleClass('d-none');
 	}
 
-	$('.new-post form').submit((e) => {
+	$('#new-reply-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 
-		if ($('.new-post textarea').val().length < 4) return $('.new-post .input-error').html('Reply must be at least 4 characters');
+		$('#new-reply-form-body').removeClass('is-invalid');
+		if ($('#new-reply-form-body').val().length < 4) {
+			$('#new-reply-form-body').next('.invalid-feedback').html('Reply must be at least 4 characters!');
+			$('#new-reply-form-body').addClass('is-invalid');
+			return;
+		}
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/new-reply', formData, (res) => {
-			if (typeof res != 'object') {
-				if (res == 'bodyLength') {
-					return $('.new-post .input-error').html('Reply must be at least 4 characters');
-				} else {
-					console.error(res);
-					return $('.new-post .input-error').html('Something went wrong :(');
-				}
-			} else {
+			if (res.content) {
 				crpGetPage(window.location.pathname);
+			} else if (res.errors.content) {
+				$('#new-reply-form-body').next('.invalid-feedback').html(res.errors.content.message);
+				$('#new-reply-form-body').addClass('is-invalid');
+			} else {
+				console.error(res);
+				$('#new-reply-form-body').next('.invalid-feedback').html('Something went wrong :(');
+				$('#new-reply-form-body').addClass('is-invalid');
 			}
 		});
 	});
 
-	$('.edit-topic').submit((e) => {
+	$('#edit-topic-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 
-		$(e.target).find('.input-error').html('');
-		if ($(e.target).find('input[name=title]').val().length < 4) return $(e.target).find('.input-error').html('Title must be at least 4 characters!');
-		if ($(e.target).find('input[name=title]').val().length > 80) return $(e.target).find('.input-error').html('Title cannot be more than 80 characters!');
-		if ($(e.target).find('textarea').val().length < 4) return $(e.target).find('.input-error').html('Topic body must be at least 4 characters!');
+		$('#edit-topic-form-title').removeClass('is-invalid');
+		$('#edit-topic-form-body').removeClass('is-invalid');
 
+		var isValid = true;
+		if ($('#edit-topic-form-title').val().length < 4 || $('#edit-topic-form-title').val().length > 80) {
+			$('#edit-topic-form-title').next('.invalid-feedback').html('Title must be at least 4 characters and no greater than 80 characters!');
+			$('#edit-topic-form-title').addClass('is-invalid');
+			isValid = false;
+		}
+		if ($('#edit-topic-form-body').val().length < 4) {
+			$('#edit-topic-form-body').next('.invalid-feedback').html('Topic body must be at least 4 characters!');
+			$('#edit-topic-form-body').addClass('is-invalid');
+			isValid = false;
+		}
+
+		if (!isValid) return;
 		var formData = $(e.target).serialize();
 		crpAjax('/api/edit-topic', formData, (res) => {
-			if (typeof res != 'object') {
-				switch (res) {
-					case 'titleLength':
-						return $(e.target).find('.input-error').html('Topic title must be at least 4 characters, but no more that 80 characters!');
-						break;
-					case 'bodyLength':
-						return $(e.target).find('.input-error').html('Topic body must be at least 4 characters!');
-						break;
-					default:
-						console.error(res);
-						return $(e.target).find('.input-error').html('Something went wrong :(');
+			if (res === true) {
+				crpGetPage(window.location.pathname);
+			} else if (res.errors) {
+				if (res.errors.title) {
+					$('#edit-topic-form-title').next('.invalid-feedback').html(res.errors.title.message);
+					$('#edit-topic-form-title').addClass('is-invalid');
+				}
+				if (res.errors.content) {
+					$('#edit-topic-form-body').next('.invalid-feedback').html(res.errors.content.message);
+					$('#edit-topic-form-body').addClass('is-invalid');
 				}
 			} else {
-				crpGetPage(window.location.pathname);
+				console.error(res);
+				$('#edit-topic-form-body').next('.invalid-feedback').html('Something went wrong :(');
+				$('#edit-topic-form-body').addClass('is-invalid');
 			}
 		});
 	});
 
-	$('.edit-reply').submit((e) => {
+	$('.edit-reply-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 
-		$(e.target).find('.input-error').html('');
-		if ($(e.target).find('textarea').val().length < 4) return $(e.target).find('.input-error').html('Reply must be at least 4 characters');
+		$(e.target).find('.edit-reply-form-body').removeClass('is-invalid');
+		if ($(e.target).find('.edit-reply-form-body').val().length < 4) {
+			$(e.target).find('.edit-reply-form-body').next('.invalid-feedback').html('Reply must be at least 4 characters!');
+			$(e.target).find('.edit-reply-form-body').addClass('is-invalid');
+			return;
+		}
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/edit-reply', formData, (res) => {
-			if (typeof res != 'object') {
-				switch (res) {
-					case 'bodyLength':
-						return $(e.target).find('.input-error').html('Reply must be at least 4 characters');
-						break;
-					default:
-						console.error(res);
-						return $(e.target).find('.input-error').html('Something went wrong :(');
-				}
-			} else {
+			if (res === true) {
 				crpGetPage(window.location.pathname);
+			} else if (res.errors.content) {
+				$(e.target).find('.edit-reply-form-body').next('.invalid-feedback').html(res.errors.content.message);
+				$(e.target).find('.edit-reply-form-body').addClass('is-invalid');
+			} else {
+				console.error(res);
+				$(e.target).find('.edit-reply-form-body').next('.invalid-feedback').html('Something went wrong :(');
+				$(e.target).find('.edit-reply-form-body').addClass('is-invalid');
 			}
 		});
 	});

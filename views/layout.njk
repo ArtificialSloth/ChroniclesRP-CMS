@@ -1,26 +1,32 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{% lookup 'site', {}, 'site' %}
+		{% lookup 'sites', {}, 'site' %}
 		<title>{{site.name}} - {{site.tagline}}</title>
 		<link rel="icon" href="{{crp.storage.getUrl(css.img.ico)}}" type="image/png" />
 
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
 		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:400,700" />
 		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700,700italic" />
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
 		<script src="/js/tinymce/tinymce.min.js"></script>
 		<script src="{{crp.storage.getUrl('js/nunjucks.js')}}"></script>
 		<script src="{{crp.storage.getUrl('js/modernizr.js')}}"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
- 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
 		{% include "./script.njk" %}
 	</head>
-	<body>
+	<body class="bg-light">
 		{% block body %}{% endblock %}
 
-		{% if not crp.prod %}
+		{% if not crp.prod and crp.browserRefresh %}
 			<script src="{{crp.browserRefresh}}"></script>
 		{% endif %}
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>
 </html>

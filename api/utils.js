@@ -7,7 +7,8 @@ module.exports = (crp, callback) => {
 
 		for (var i in array) {
 			for (var k in array[i]) {
-				if (filter[k] && filter[k] == array[i][k]) result.push(array[i]);
+				var x = (crp.db.Types.ObjectId.isValid(filter[k])) ? filter[k].toString() : filter[k];
+				if (x && x == array[i][k]) result.push(array[i]);
 			}
 		}
 
@@ -16,7 +17,8 @@ module.exports = (crp, callback) => {
 
 	crp.util.findObjectInArray = (array, key, val) => {
 		for (var i in array) {
-			if (array[i][key] == val) {
+			var x = (crp.db.Types.ObjectId.isValid(array[i][key])) ? array[i][key].toString() : array[i][key];
+			if (x == val) {
 				return array[i];
 			}
 		}
@@ -42,7 +44,7 @@ module.exports = (crp, callback) => {
 
 	crp.util.idInArray = (array, id) => {
 		for (var i in array) {
-			if (array[i].equals(id)) return true;
+			if (crp.db.Types.ObjectId.isValid(array[i]) && array[i].equals(id)) return true;
 		}
 		return false;
 	};
@@ -65,16 +67,20 @@ module.exports = (crp, callback) => {
 		return array;
 	};
 
-	crp.util.sanitizeObject = (object) => {
-		for (var k in object) {
-			if (typeof object[k] == 'object') {
-				object[k] = crp.util.sanitizeObject(object[k]);
-			} else {
-				object[k] = crp.db.sanitize(object[k]);
-			}
+	crp.util.chunkArray = (array, size) => {
+		var result = [];
+		if (size == 0) return result;
+
+		for (var i = 0; i < array.length; i += size) {
+			result.push(array.slice(i, i + size));
 		}
 
-		return object;
+		return result;
+	};
+
+	crp.util.paginateArray = (array, length, offset = 1) => {
+		var index = length * (offset - 1);
+		return array.slice(index, index + length);
 	};
 
 	crp.util.parseString = (str, keys) => {
@@ -118,22 +124,7 @@ module.exports = (crp, callback) => {
 	};
 
 	crp.util.editSite = (data, cb) => {
-		crp.db.findOne('site', {}, (err, site) => {
-			if (err) return cb(err);
-
-			var newSite = {
-				name: data.name || site.name,
-				tagline: data.tagline || site.tagline,
-				mail_template: data.mail_template || site.mail_template,
-				css: site.css
-			};
-
-			newSite = crp.util.sanitizeObject(newSite);
-			crp.db.replaceOne('site', {}, newSite, (err, result) => {
-				cb(err, site)
-			});
-
-		});
+		crp.sites.updateOne({}, data, {runValidators: true}, cb);
 	};
 
 	callback(null, crp);

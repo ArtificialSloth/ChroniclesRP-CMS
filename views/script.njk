@@ -28,9 +28,18 @@
 	}
 
 	function crpGetPage(page) {
+		$('#navbarNavDropdown').collapse('hide');
 		$('.content-blackout').addClass('active');
-		crpAjax('/api/get-page', {page: page}, (res) => {
-			$('.content-main').html(res);
+		$('.navbar .dropdown-toggle').each((i, e) => {
+			$(e).dropdown('hide');
+		});
+
+		var query = page.split('?')[1];
+		query = query ? `?${query}` : '';
+		crpAjax('/api/get-page' + query, {page: page}, (res) => {
+			$('main').html(res.page);
+			$('#navbar').html(res.nav);
+			window.scrollTo({top: 0});
 			$('.content-blackout').removeClass('active');
 
 			window.history.pushState({page: page}, page + ' - The Chronicles RP', page);
@@ -38,7 +47,9 @@
 	}
 
 	function crpGetSubPage(page, container, newUrl) {
-		crpAjax('/api/get-subpage', {page: page}, (res) => {
+		var query = page.split('?')[1];
+		query = query ? `?${query}` : '';
+		crpAjax('/api/get-subpage' + query, {page: page}, (res) => {
 			$(container).html(res);
 			if (newUrl) window.history.pushState({page: page}, page + ' - The Chronicles RP', page);
 		});
@@ -58,16 +69,6 @@
 				]
 			});
 		}, 0);
-	}
-
-	function crpActivateUser(code) {
-		crpAjax('/api/activate', {code: code}, (res) => {
-			if (typeof res == 'object') {
-				location.reload();
-			} else {
-				console.error(res)
-			}
-		});
 	}
 
 	function crpScrollTo(selector) {
@@ -140,6 +141,8 @@
 	}
 
 	$(() => {
+		$('[data-toggle="tooltip"]').tooltip();
+
 		window.onpopstate = (e) => {
 			if (e.state) {
 				var page = e.state.page;
@@ -150,15 +153,11 @@
 
 		$(document).on('click', 'a', (e) => {
 			var target = $(e.target).closest('a');
-			if (target.hasClass('redirect') || !target.prop('href') || !target.prop('href').startsWith(`${window.location.protocol}//${window.location.hostname}`)) return true;
+			if (target.hasClass('redirect') || !target.prop('href') || target.prop('href').includes('#') || !target.prop('href').startsWith(`${window.location.protocol}//${window.location.hostname}`)) return true;
 
 			var href = target.prop('href').replace(`${window.location.protocol}//${window.location.hostname}`, '');
 			if (target.attr('container')) {
-				crpGetSubPage(
-					href,
-					target.attr('container'),
-					target.attr('newurl')
-				);
+				crpGetSubPage(href, target.attr('container'), target.attr('newurl'));
 
 				return false;
 			}

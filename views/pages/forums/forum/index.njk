@@ -1,122 +1,116 @@
-<div class="page">
-	<ul class="forum">
-		{% include "./style.njk" %}
+{% lookup 'forums', {_id: forumid}, 'forum' %}
+{% lookup 'categories', {_id: forum.category}, 'category' %}
+{% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
+{% getTopics {parent: forum._id}, true, 'allTopics' %}
+{% set topics = crp.util.paginateArray(allTopics, 20, query.page) %}
 
-		{% lookup 'users', {_id: userid}, 'user' %}
-		{% lookup 'forums', {_id: forumid}, 'forum' %}
-		{% lookup 'categories', {_id: forum.category}, 'category' %}
-		{% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
-		{% getTopics {parent: forum._id, type: 'sticky'}, 'sticky' %}
-		{% getTopics {parent: forum._id, type: 'normal'}, 'normal' %}
+<div class="container mt-3">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Home</a></li>
+			<li class="breadcrumb-item"><a href="/forums">Index</a></li>
+			<li class="breadcrumb-item active" aria-current="page">{{forum.name}}</li>
+		</ol>
+	</nav>
 
-		<p class="breadcrumbs">
-			<a href="/">Home</a>
-			<span>›</span>
-			<a href="/forums">Index</a>
-			<span>›</span>
-			<span>{{forum.name}}</span>
-		</p>
+	<div class="row">
+		{% if chapter %}{% set member = chapter.getMember(user._id) %}{% endif %}
+		{% if (not chapter or (member and member.role >= 1)) and (not category.role or user.role >= category.role) or user.role >= 3 %}
+			<div class="col-lg-9">
+				{% if topics[0] %}
+					<div class="container bg-white shadow-sm">
+						<div class="row bg-primary text-light border-bottom border-secondary p-2">
+							<div class="col col-lg-8">{{forum.name}}</div>
+							<div class="col-lg-2 text-center d-none d-lg-block">Replies</div>
+							<div class="col col-lg-2 text-center">Most Recent</div>
+						</div>
 
-		{% set member = crp.chapters.getMember(chapter, user._id) %}
-		{% if (not chapter or (member and member.role >= 1)) and not category.role or category.role == user.role or user.role >= 3 %}
-			{% if topics.length != 0 %}
-				<li class="header">
-					<ul>
-						<li>Topic</li>
-						<li>Replies</li>
-						<li>Most Recent</li>
-					</ul>
-				</li>
+						{% for topic in topics %}
+							{% lookup 'users', {_id: topic.author}, 'author' %}
+							{% query 'replies', {parent: topic._id}, {sort: [[['date', -1]]]}, 'replies' %}
 
-				{% for topic in sticky %}
-					{% lookup 'users', {_id: topic.author}, 'author' %}
-					{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
-					<li class="topic sticky">
-						<ul>
-							<li>
-								<a class="topic-name" href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
-								<div class="topic-author">
-									Started By: <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+							<div class="row p-2">
+								<div class="col col-lg-8">
+									<a href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
+									{% if topic.type == 'sticky' %}
+										<span class="badge badge-warning">Sticky</span>
+									{% endif %}
+									{% if crp.moment().diff(crp.moment(topic.date), 'days') < 3 %}
+										<span class="badge badge-primary">New</span>
+									{% endif %}
+									<p class="m-0">Started By: <a href="/members/{{author.nicename}}">{{author.display_name}}</a></p>
 								</div>
-							</li>
-							<li>{{replies.length}}</li>
-							<li>
-								{% if replies[0] %}
-									{% lookup 'users', {_id: replies[0].author}, 'author' %}
-									<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
-									<br />
-									{{crp.moment(replies[0].date).fromNow()}}
-								{% else %}
-									No Replies
-								{% endif %}
-							</li>
-						</ul>
-					</li>
-				{% endfor %}
+								<div class="col-lg-2 text-center d-none d-lg-block">{{replies.length}}</div>
+								<div class="col col-lg-2 text-center">
+									{% if replies[0] %}
+										{% lookup 'users', {_id: replies[0].author}, 'author' %}
 
-				{% if sticky.length > 0 %}
-					<li class="topic divider"></li>
+										<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
+										<br />
+										{{crp.moment(replies[0].date).fromNow()}}
+									{% else %}
+										No Replies
+									{% endif %}
+								</div>
+							</div>
+							{% if not loop.last %}<hr class="m-0" />{% endif %}
+						{% endfor %}
+					</div>
+
+					{% if allTopics.length > 20 %}
+						<div class="pb-5">
+							{% set pageUrl = '/forums/' + forum.slug %}
+							{% set chunks = crp.util.chunkArray(allTopics, 20) %}
+							{% include "components/pagination/index.njk" %}
+						</div>
+					{% endif %}
+				{% else %}
+					<div class="alert alert-warning" role="alert">This forum has no topics.</div>
 				{% endif %}
 
-				{% for topic in normal %}
-					{% lookup 'users', {_id: topic.author}, 'author' %}
-					{% query 'replies', {parent: topic._id}, {sort: [['date', -1]]}, 'replies' %}
-					<li class="topic">
-						<ul>
-							<li>
-								<a class="topic-name" href="/forums/{{forum.slug}}/{{topic._id}}">{{topic.title}}</a>
-								<div class="topic-author">
-									Started By: <a href="/members/{{author.nicename}}">{{author.display_name}}</a>
-								</div>
-							</li>
-							<li>{{replies.length}}</li>
-							<li>
-								{% if replies[0] %}
-									{% lookup 'users', {_id: replies[0].author}, 'author' %}
-									<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
-									<br />
-									{{crp.moment(replies[0].date).fromNow()}}
-								{% else %}
-									No Replies
-								{% endif %}
-							</li>
-						</ul>
-					</li>
-				{% endfor %}
-			{% else %}
-				<div class="warning">This forum has no topics.</div>
-			{% endif %}
+				{% if user and user.role >= 1 %}
+					<form class="bg-white rounded shadow-sm mt-3 p-3" id="new-topic-form">
+						<h6 class="font-italic">Create New Topic in {{forum.name}}</h6>
+						<hr />
 
-			{% if user and user.role >= 1 %}
-				<fieldset class="new-post">
-					<legend>Create New Topic in {{forum.name}}</legend>
-					<form>
-						<label for="title">Topic Title (Max: 80)</label>
-						<input type="text" name="title" maxlength="80" />
-
-						<textarea name="body" class="tinymce"></textarea>
-						<script>crpTinyMCE()</script>
+						<div class="form-group">
+							<label for="new-topic-form-title">Topic Title (Max 80)</label>
+							<input type="text" class="form-control" id="new-topic-form-title" name="title" placeholder="Title" maxlength="80" />
+							<div class="invalid-feedback"></div>
+						</div>
 
 						{% if user.role >= 2 %}
-							<label for="type">Topic Type:</label>
-							<select name="type">
-								<option value="normal" selected>Normal</option>
-								<option value="sticky">Sticky</option>
-							</select>
+							<div class="form-group">
+								<label for="new-topic-form-type">Topic Type</label>
+								<select class="form-control" id="new-topic-form-type" name="type">
+									<option value="normal">Normal</option>
+									<option value="sticky">Sticky</option>
+								</select>
+								<div class="invalid-feedback"></div>
+							</div>
 						{% endif %}
 
+						<div class="form-group">
+							<textarea class="form-control tinymce" id="new-topic-form-body" name="body"></textarea>
+							<div class="invalid-feedback"></div>
+							<script>crpTinyMCE()</script>
+						</div>
+
 						<input type="hidden" name="parent" value="{{forum._id}}" />
-						<input type="submit" value="Post" />
-						<span class="topic-error"></span>
+						<button type="submit" class="btn btn-primary d-block ml-auto">Post</button>
 					</form>
-				</fieldset>
-			{% endif %}
-
-			{% include "./script.njk" %}
+				{% endif %}
+			</div>
 		{% else %}
-			<div class="warning">You're not allowed to view this forum.</div>
+			<div class="col-lg-9">
+				<div class="alert alert-warning" role="alert">You're not allowed to view this forum.</div>
+			</div>
 		{% endif %}
-	</ul>
 
-	{% include "components/sidebar/index.njk" %}
+		<div class="col-lg-3 d-none d-lg-block">
+			{% include "components/sidebar/index.njk" %}
+		</div>
+	</div>
 </div>
+
+{% include "./script.njk" %}

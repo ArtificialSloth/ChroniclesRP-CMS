@@ -1,0 +1,143 @@
+<script>
+	function resendActivation(e) {
+		crpAjax('/api/resend-activation', {}, (res) => {
+			if (res === true) {
+				$(e).replaceWith('Sent!')
+			} else {
+				console.error(res);
+				$('#activate-form-code').next('.invalid-tooltip').html('Something went wrong :(');
+				$('#activate-form-code').addClass('is-invalid');
+			}
+		});
+	}
+
+	$('#activate-form').submit((e) => {
+		e.preventDefault();
+		$('#activate-form-code').removeClass('is-invalid');
+
+		if ($('#activate-form-code').val().length < 6 || $('#activate-form-code').val().length > 6) {
+			$('#activate-form-code').next('.invalid-tooltip').html('Activation code must be 6 characters!');
+			$('#activate-form-code').addClass('is-invalid');
+			return;
+		}
+
+		var formData = $(e.target).serialize();
+		crpAjax('/api/activate', formData, (res) => {
+			if (res === true) {
+				crpGetPage(window.location.pathname);
+			} else if (res === false) {
+				$('#activate-form-code').next('.invalid-tooltip').html('Invalid activation code!');
+				$('#activate-form-code').addClass('is-invalid');
+			} else {
+				console.error(res);
+				$('#activate-form-code').next('.invalid-tooltip').html('Something went wrong :(');
+				$('#activate-form-code').addClass('is-invalid');
+			}
+		});
+	});
+
+	$('#login-form').submit((e) => {
+		e.preventDefault();
+		$('#login-form-login').removeClass('is-invalid');
+		$('#login-form-pass').removeClass('is-invalid');
+
+		if ($('#login-form-login').val() == '') {
+			$('#login-form-login').next('.invalid-tooltip').html('Username field cannot be empty!');
+			$('#login-form-login').addClass('is-invalid');
+			return;
+		}
+		if ($('#login-form-pass').val().length < 6) {
+			$('#login-form-pass').next('.invalid-tooltip').html('Passwords must be at least 6 characters!');
+			$('#login-form-pass').addClass('is-invalid');
+			return;
+		}
+
+		var formData = $(e.target).serialize();
+		crpAjax('/login', formData, (res) => {
+			if (res == 'valid') {
+				crpGetPage(window.location.pathname);
+			} else if (res == 'tooMany') {
+				$('#login-form-login').next('.invalid-tooltip').html('Too many failed login attempts. Please wait 5 minutes then try again.');
+				$('#login-form-login').addClass('is-invalid');
+			} else if (res == 'locked') {
+				$('#login-form-login').next('.invalid-tooltip').html('Your account has been locked.');
+				$('#login-form-login').addClass('is-invalid');
+			} else {
+				$('#login-form-login').next('.invalid-tooltip').html('Incorrect username or password');
+				$('#login-form-login').addClass('is-invalid');
+			}
+		});
+	});
+
+	$('#register-form').submit((e) => {
+		e.preventDefault();
+		$('#register-form-captcha').removeClass('is-invalid');
+		$('#register-form-login').removeClass('is-invalid');
+		$('#register-form-email').removeClass('is-invalid');
+		$('#register-form-email-confirm').removeClass('is-invalid');
+		$('#register-form-pass').removeClass('is-invalid');
+		$('#register-form-pass-confirm').removeClass('is-invalid');
+
+		var isValid = true;
+		if (!$('#register-form-login').val() || $('#register-form-login').val().length < 4 || $('#register-form-login').val().length > 80) {
+			$('#register-form-login').next('.invalid-feedback').html('Username must be at least 4 characters and no greater than 80 characters!');
+			$('#register-form-login').addClass('is-invalid');
+			isValid = false;
+		}
+
+		var email = $('#register-form-email').val();
+		if (!email || !email.includes('@') || email.lastIndexOf('.') < email.lastIndexOf('@')) {
+			$('#register-form-email').next('.invalid-feedback').html('Email address is invalid!');
+			$('#register-form-email').addClass('is-invalid');
+			isValid = false;
+		}
+
+		if ($('#register-form-email-confirm').val() != email) {
+			$('#register-form-email-confirm').next('.invalid-feedback').html('Email addresses don\'t match!');
+			$('#register-form-email-confirm').addClass('is-invalid');
+			isValid = false;
+		}
+
+		if (!$('#register-form-pass').val() || $('#register-form-pass').val().length < 6) {
+			$('#register-form-pass').next('.invalid-feedback').html('Password must be at least 6 characters!');
+			$('#register-form-pass').addClass('is-invalid');
+			isValid = false;
+		}
+
+		if ($('#register-form-pass-confirm').val() != $('#register-form-pass').val()) {
+			$('#register-form-pass-confirm').next('.invalid-feedback').html('Passwords don\'t match!');
+			$('#register-form-pass-confirm').addClass('is-invalid');
+			isValid = false;
+		}
+
+		if (!isValid) return;
+		var formData = $(e.target).serialize();
+		crpAjax('/api/register', formData, (res) => {
+			if (res === true) {
+				$('#registerModal').removeClass('fade');
+				$('#registerModal').modal('hide');
+				crpGetPage(window.location.pathname);
+			} else if (res == 'noCaptcha') {
+				$('#register-form-captcha').next('.invalid-feedback').html('Please click the captcha first.');
+				$('#register-form-captcha').addClass('is-invalid');
+			} else if (res.save && res.save.errors) {
+				if (res.save.errors.login) {
+					$('#register-form-login').next('.invalid-feedback').html(res.save.errors.login.message);
+					$('#register-form-login').addClass('is-invalid');
+				}
+				if (res.save.errors.email) {
+					$('#register-form-email').next('.invalid-feedback').html(res.save.errors.email.message);
+					$('#register-form-email').addClass('is-invalid');
+				}
+				if (res.save.errors.pass) {
+					$('#register-form-pass').next('.invalid-feedback').html(res.save.errors.pass.message);
+					$('#register-form-pass').addClass('is-invalid');
+				}
+			} else {
+				console.error(res);
+				$('#register-form-captcha').next('.invalid-feedback').html('Something went wrong :(');
+				$('#register-form-captcha').addClass('is-invalid');
+			}
+		});
+	});
+</script>

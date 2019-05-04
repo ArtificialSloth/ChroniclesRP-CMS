@@ -1,9 +1,0 @@
-{% lookup 'users', {_id: profileid}, 'profile' %}
-
-<div class="standard-form">
-	<label class="fill">About</label>
-	<div class="standard-input fill">
-		{% lookup 'users', {_id: userid}, 'user' %}
-		{{profile.about | safe}}
-	</div>
-</div>

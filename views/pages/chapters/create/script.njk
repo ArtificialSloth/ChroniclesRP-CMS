@@ -1,92 +1,42 @@
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
-	$('.add-chapter .types input').change((e) => {
-		if (e.target.checked) {
-			switch (e.target.value) {
-				case 'hosted':
-					$('.add-chapter .cms').removeClass('disabled');
-					$('.add-chapter .nav .next').removeClass('disabled');
-					multistepNext($('.add-chapter .nav .next'));
-					$('.add-chapter .header').html('type › hosted');
-					break;
-				case 'group':
-					$('.add-chapter .group.details').removeClass('disabled');
-					$('.add-chapter .nav .next').removeClass('disabled');
-					multistepNext($('.add-chapter .nav .next'));
-					$('.add-chapter .header').html('type › group');
-					break;
-				case 'url':
-					$('.add-chapter .url.details').removeClass('disabled');
-					$('.add-chapter .nav .next').removeClass('disabled');
-					multistepNext($('.add-chapter .nav .next'));
-					$('.add-chapter .header').html('type › url');
-					break;
-				default:
-					console.log(e.target.value);
-			};
+$('.new-chapter-form').submit((e) => {
+	e.preventDefault();
+
+	$(e.target).find(':input').each((i, e) => {
+		$(e).removeClass('is-invalid');
+	});
+
+	var formData = $(e.target).serialize();
+	crpAjax('/api/add-chapter', formData, (res) => {
+		if (res._id) {
+			if (res.type == 'group' || res.type == 'page') return crpGetPage('/chapters/' + res.slug);
+			crpGetPage('/chapters');
+		} else if (res.errors) {
+			if (res.errors.game) {
+				$(e.target).find('.new-chapter-form-game').next('.invalid-feedback').html(res.errors.game.message);
+				$(e.target).find('.new-chapter-form-game').addClass('is-invalid');
+			}
+			if (res.errors.name) {
+				$(e.target).find('.new-chapter-form-name').next('.invalid-feedback').html(res.errors.name.message);
+				$(e.target).find('.new-chapter-form-name').addClass('is-invalid');
+			}
+			if (res.errors.slug) {
+				$(e.target).find('.new-chapter-form-slug').next('.invalid-feedback').html(res.errors.slug.message);
+				$(e.target).find('.new-chapter-form-slug').addClass('is-invalid');
+			}
+			if (res.errors.tagline) {
+				$(e.target).find('.new-chapter-form-tagline').next('.invalid-feedback').html(res.errors.tagline.message);
+				$(e.target).find('.new-chapter-form-tagline').addClass('is-invalid');
+			}
+			if (res.errors.discord) {
+				$(e.target).find('.new-chapter-form-discord').next('.invalid-feedback').html(res.errors.discord.message);
+				$(e.target).find('.new-chapter-form-discord').addClass('is-invalid');
+			}
+		} else {
+			console.error(res);
+			$(e.target).find('.new-chapter-form-captcha').next('.invalid-feedback').html('Something went wrong :(');
+			$(e.target).find('.new-chapter-form-captcha').addClass('is-invalid');
 		}
 	});
-
-	$('.add-chapter .details input[name=name]').on('keyup', (e) => {
-		crpMirror(e.target, '.add-chapter .details input[name=name]');
-	});
-
-	$('.add-chapter .details input[name=game]').on('keyup', (e) => {
-		crpMirror(e.target, '.add-chapter .details input[name=game]');
-	});
-
-	$('.add-chapter .details input[name=desc]').on('keyup', (e) => {
-		crpMirror(e.target, '.add-chapter .details input[name=tagline]');
-	});
-
-	$('.add-chapter .details input[name=discord]').on('keyup', (e) => {
-		crpMirror(e.target, '.add-chapter .details input[name=discord]');
-	});
-
-	$('.add-chapter .nav .previous').click((e) => {
-		multistepPrev(e.target);
-		if ($(e.target).hasClass('disabled')) $('.add-chapter .step:not(.types, .captcha)').addClass('disabled');
-	});
-
-	$('.add-chapter').submit((e) => {
-		e.preventDefault();
-		$('.add-chapter .error').removeClass('active');
-
-		var formData = $(e.target).find('.step:not(.disabled) input, .step:not(.disabled) select, .step:not(.disabled) textarea').serialize();
-		crpAjax('/api/add-chapter', formData, (res) => {
-			if (res._id) {
-				if (res.type == 'group' || res.type == 'page') return crpGetPage('/chapters/' + res.slug);
-				if (res.type == 'url') return crpGetPage('/chapters');
-
-				window.location = `//${res.slug}.${window.location.hostname}`;
-			} else {
-				switch (res) {
-					case 'noCaptcha':
-						$('.add-chapter .error').addClass('active').html('Please click the captcha first.');
-						break;
-					case 'nameTaken':
-						$('.add-chapter .error').addClass('active').html('That Chapter name is taken!');
-						break;
-					case 'noGame':
-						$('.add-chapter .error').addClass('active').html('You need to select a game!');
-						break;
-					case 'noType':
-						$('.add-chapter .error').addClass('active').html('You need to pick a type!');
-						break;
-					case 'noName':
-						$('.add-chapter .error').addClass('active').html('Your Chapter needs a name.');
-						break;
-					case 'badDomain':
-						$('.add-chapter .error').addClass('active').html('That Chapter name is not allowed.');
-						break;
-					case 'badTagline':
-						$('.add-chapter .error').addClass('active').html('Your Chapter\'s tagline cannot be more than 140 characters.');
-						break;
-					default:
-						console.log(res);
-						$('.add-chapter .error').addClass('active').html('Something went wrong :(');
-				}
-			}
-		});
-	});
+});
 </script>

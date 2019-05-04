@@ -1,126 +1,175 @@
-<div class="page">
-	<ul class="topic">
-		{% include "./style.njk" %}
+{% include "./style.njk" %}
+{% lookup 'topics', {_id: topicid}, 'topic' %}
+{% lookup 'forums', {_id: topic.parent}, 'forum' %}
+{% lookup 'categories', {_id: forum.category}, 'category' %}
+{% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
+{% lookup 'users', {_id: topic.author}, 'author' %}
 
-		{% lookup 'topics', {_id: topicid}, 'topic' %}
-		{% lookup 'forums', {_id: topic.parent}, 'forum' %}
-		{% lookup 'categories', {_id: forum.category}, 'category' %}
-		{% lookup 'chapters', {_id: category.chapter}, 'chapter' %}
-		{% lookup 'users', {_id: topic.author}, 'author' %}
-		{% lookup 'users', {_id: userid}, 'user' %}
+<div class="container mt-3">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Home</a></li>
+			<li class="breadcrumb-item"><a href="/forums">Index</a></li>
+			<li class="breadcrumb-item"><a href="/forums/{{forum.slug}}">{{forum.name}}</a></li>
+			<li class="breadcrumb-item active" aria-current="page">{{topic.title}}</li>
+		</ol>
+	</nav>
 
-		<p class="breadcrumbs">
-			<a href="/">Home</a>
-			<span>›</span>
-			<a href="/forums">Index</a>
-			<span>›</span>
-			<a href="/forums/{{forum.slug}}">{{forum.name}}</a>
-			<span>›</span>
-			<span>{{topic.title}}</span>
-		</p>
+	<div class="row">
+		{% if chapter %}{% set member = chapter.getMember(user._id) %}{% endif %}
+		{% if (not chapter or (member and member.role >= 1)) and (not category.role or user.role >= category.role) or user.role >= 3 %}
+			<div class="col-lg-9">
+				<div class="container bg-white shadow-sm">
+					<div class="row bg-primary text-light border-bottom border-secondary p-2">
+						<div class="col col-lg-2 d-none d-lg-block text-lg-center">Author</div>
+						<div class="col col-lg-10 text-lg-right">{{topic.title}}</div>
+					</div>
 
-		{% set member = crp.chapters.getMember(chapter, user._id) %}
-		{% if (not chapter or (member and member.role >= 1)) and not category.role or category.role == user.role or user.role >= 3 %}
-			<li class="header">
-				<ul>
-					<li>Author</li>
-					<li>{{topic.title}}</li>
-				</ul>
-			</li>
+					<div class="row p-2">
+						<div class="col-lg d-none d-lg-block">{{crp.util.dateToStr(topic.date, user.timezone)}}</div>
+						<div class="d-lg-none mb-3">
+							<img src="{{author.getProfilePic()}}" alt="{{author.display_name}}" width="30" height="30" />
+							<a href="/members/{{author.nicename}}" class="pl-1 pt-2">{{author.display_name}}</a>
+						</div>
+						<div class="col-lg text-lg-right p-0">
+							{% if author._id.equals(user._id) or user.role >= 3 %}
+								<button type="button" class="btn btn-sm btn-primary" onclick="editToggle(this, '.{{topic._id}}')">Edit</button>
+								<button type="button" class="btn btn-sm btn-primary" onclick="removeTopic('{{topic._id}}')">Delete</button>
+							{% endif %}
 
-			<li class="sub-header">
-				<ul>
-					<li>{{crp.util.dateToStr(topic.date, user.timezone)}}</li>
-					<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editToggle(this)">Edit</a> | <a onclick="removeTopic('{{topic._id}}')">Delete</a> | {% endif %}{% if topic.subs and crp.util.idInArray(topic.subs, user._id) %}<a onclick="unSubToTopic('{{topic._id}}')">Unsubscribe</a>{% else %}<a onclick="subToTopic('{{topic._id}}')">Subscribe</a>{% endif %} | <a onclick="crpScrollTo('.reply')">Reply</a></li>
-				</ul>
-			</li>
+							{% if topic.subs and crp.util.idInArray(topic.subs, user._id) %}
+								<button type="button" class="btn btn-sm btn-primary" onclick="unSubToTopic('{{topic._id}}')">Unsubscribe</button>
+							{% elif user and user.role >= 1 %}
+								<button type="button" class="btn btn-sm btn-primary" onclick="subToTopic('{{topic._id}}')">Subscribe</button>
+							{% endif %}
 
-			<li class="body">
-				<ul>
-					<li>
-						<img src="{{crp.members.getProfilePic(author)}}" width="80" height="80" />
-						<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
-						<div class="role">{{crp.members.parseRole(author.role)}}</div>
-					</li>
-					<li>{{topic.content | safe}}</li>
-					<li>
-						{% if author._id.equals(user._id) or user.role >= 3 %}
-							<script>crpTinyMCE()</script>
-							<form class="edit-topic">
-								<input type="text" name="title" value="{{topic.title}}" />
-								<textarea class="tinymce" name="body">{{topic.content}}</textarea>
+							{% if user and user.role >= 1 %}
+								<button type="button" class="btn btn-sm btn-primary" onclick="crpScrollTo('#new-reply-form')">Reply</button>
+							{% endif %}
+						</div>
+					</div>
+
+					<div class="row p-3">
+						<div class="col-lg-2 text-center d-none d-lg-block p-0">
+							<img class="d-block ml-auto mr-auto" src="{{author.getProfilePic()}}" alt="{{author.display_name}}" width="80" height="80" />
+							<a href="/members/{{author.nicename}}" class="mt-0">{{author.display_name}}</a>
+							<p class="font-italic m-0">{{author.parseRole()}}</p>
+						</div>
+
+						<div class="col-lg-10 body mt-3 mt-lg-0 p-0">
+							{{topic.content | safe}}
+						</div>
+
+						<div class="col-lg-10 d-none p-0 {{topic._id}}">
+							<form id="edit-topic-form">
+								<div class="form-group">
+									<label>Topic Title (Max 80)</label>
+									<input type="text" class="form-control" id="edit-topic-form-title" name="title" placeholder="Title" maxlength="80" value="{{topic.title}}" />
+									<div class="invalid-feedback"></div>
+								</div>
 
 								{% if user.role >= 2 %}
-									<label for="type">Type:</label>
-									<select name="type">
-										<option value="normal">Normal</option>
-										<option value="sticky" {% if topic.type == 'sticky' %}selected{% endif %}>Sticky</option>
-									</select>
+									<div class="form-group">
+										<label>Topic Type</label>
+										<select class="form-control" id="edit-topic-form-type" name="type">
+											<option value="normal">Normal</option>
+											<option value="sticky" {% if topic.type == 'sticky' %}selected{% endif %}>Sticky</option>
+										</select>
+										<div class="invalid-feedback"></div>
+									</div>
 								{% endif %}
 
+								<div class="form-group">
+									<textarea class="form-control tinymce" id="edit-topic-form-body" name="body">{{topic.content}}</textarea>
+									<div class="invalid-feedback"></div>
+								</div>
+
 								<input type="hidden" name="topicid" value="{{topic._id}}" />
-								<input type="submit" value="Save" />
-								<span class="input-error"></span>
+								<button type="submit" class="btn btn-primary d-block ml-auto">Save</button>
 							</form>
-						{% endif %}
-					</li>
-				</ul>
-			</li>
+						</div>
+					</div>
+					<div class="row d-lg-none font-italic text-muted p-3">{{crp.util.dateToStr(topic.date, user.timezone)}}</div>
 
-			{% query 'replies', {parent: topic._id}, {sort: [['date', 1]]}, 'replies' %}
-			{% for reply in replies %}
-				{% lookup 'users', {_id: reply.author}, 'author' %}
+					{% query 'replies', {parent: topic._id}, {sort: [[['date', 1]]]}, 'replies' %}
+					{% for reply in replies %}
+						{% lookup 'users', {_id: reply.author}, 'replyAuthor' %}
 
-				<li class="sub-header reply">
-					<ul>
-						<li>{{crp.util.dateToStr(reply.date, user.timezone)}}</li>
-						<li>{% if author._id.equals(user._id) or user.role >= 3 %}<a onclick="editToggle(this)">Edit</a> | <a onclick="removeReply('{{reply._id}}')">Delete</a> | {% endif %}<a onclick="crpScrollTo('.reply')">Reply</a></li>
-					</ul>
-				</li>
-				<li class="reply body">
-					<ul>
-						<li>
+						<hr class="m-0" />
+						<div class="row p-2">
+							<div class="col-lg d-none d-lg-block">{{crp.util.dateToStr(reply.date, user.timezone)}}</div>
+							<div class="d-lg-none mb-3">
+								<img src="{{replyAuthor.getProfilePic()}}" alt="{{replyAuthor.display_name}}" width="30" height="30" />
+								<a href="/members/{{replyAuthor.nicename}}" class="pl-1 pt-2">{{replyAuthor.display_name}}</a>
+							</div>
+							<div class="col-lg text-lg-right p-0">
+								{% if replyAuthor._id.equals(user._id) or user.role >= 3 %}
+									<button type="button" class="btn btn-sm btn-primary" onclick="editToggle(this, '.{{reply._id}}')">Edit</button>
+									<button type="button" class="btn btn-sm btn-primary" onclick="removeReply('{{reply._id}}')">Delete</button>
+								{% endif %}
 
-							<img src="{{crp.members.getProfilePic(author)}}" width="80" height="80" />
-							<a href="/members/{{author.nicename}}">{{author.display_name}}</a>
-							<div class="role">{{crp.members.parseRole(author.role)}}</div>
-						</li>
-						<li>{{reply.content | safe}}</li>
-						<li>
-							{% if author._id.equals(user._id) or user.role >= 3 %}
-								<script>crpTinyMCE()</script>
-								<form class="edit-reply">
-									<textarea class="tinymce" name="body">{{reply.content}}</textarea>
+								{% if user and user.role >= 1 %}
+									<button type="button" class="btn btn-sm btn-primary" onclick="crpScrollTo('#new-reply-form')">Reply</button>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="row p-3">
+							<div class="col-lg-2 text-center d-none d-lg-block p-0">
+								<img class="d-block ml-auto mr-auto" src="{{replyAuthor.getProfilePic()}}" alt="{{replyAuthor.display_name}}" width="80" height="80" />
+								<a href="/members/{{replyAuthor.nicename}}" class="mt-0">{{replyAuthor.display_name}}</a>
+								<p class="font-italic m-0">{{replyAuthor.parseRole()}}</p>
+							</div>
+
+							<div class="col-lg-10 body mt-3 mt-lg-0 p-0">
+								{{reply.content | safe}}
+							</div>
+
+							<div class="col-lg-10 d-none p-0 {{reply._id}}">
+								<form class="edit-reply-form">
+									<div class="form-group">
+										<textarea class="form-control tinymce edit-reply-form-body" name="reply">{{reply.content}}</textarea>
+										<div class="invalid-feedback"></div>
+										<script>crpTinyMCE()</script>
+									</div>
 
 									<input type="hidden" name="replyid" value="{{reply._id}}" />
-									<input type="submit" value="Save" />
-									<span class="input-error"></span>
+									<button type="submit" class="btn btn-primary d-block ml-auto">Save</button>
 								</form>
-							{% endif %}
-						</li>
-					</ul>
-				</li>
-			{% endfor %}
+							</div>
+						</div>
 
-			{% if user and user.role > 0 %}
-				<script>crpTinyMCE()</script>
-				<fieldset class="new-post">
-					<legend>Reply to: {{topic.title}}</legend>
-					<form>
-						<textarea name="reply" class="tinymce"></textarea>
+						<div class="row d-lg-none font-italic text-muted p-3">{{crp.util.dateToStr(reply.date, user.timezone)}}</div>
+					{% endfor %}
+				</div>
+
+				{% if user and user.role >= 1 %}
+					<form class="bg-white rounded shadow-sm mt-3 p-3" id="new-reply-form">
+						<h6 class="font-italic">Reply to {{topic.title}}</h6>
+						<hr />
+
+						<div class="form-group">
+							<textarea class="form-control tinymce" id="new-reply-form-body" name="reply"></textarea>
+							<div class="invalid-feedback"></div>
+							<script>crpTinyMCE()</script>
+						</div>
 
 						<input type="hidden" name="parent" value="{{topic._id}}" />
-						<input type="submit" value="Post" />
-						<span class="input-error"></span>
+						<button type="submit" class="btn btn-primary d-block ml-auto">Reply</button>
 					</form>
-				</fieldset>
-			{% endif %}
-
-			{% include "./script.njk" %}
+				{% endif %}
+			</div>
 		{% else %}
-			<div class="warning">You're not allowed to view this topic.</div>
+			<div class="col-lg-9">
+				<div class="alert alert-warning" role="alert">You're not allowed to view this topic.</div>
+			</div>
 		{% endif %}
-	</ul>
 
-	{% include "components/sidebar/index.njk" %}
+		<div class="col-lg-3 d-none d-lg-block">
+			{% include "components/sidebar/index.njk" %}
+		</div>
+	</div>
 </div>
+
+<script>crpTinyMCE()</script>
+{% include "./script.njk" %}

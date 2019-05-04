@@ -20,8 +20,8 @@ module.exports = (crp, callback) => {
 			return new nodes.CallExtensionAsync(this, 'run', args);
 		};
 
-		this.run = (context, collection, filter, options, key, cb) => {
-			crp.db.find(collection, filter, options, (err, result) => {
+		this.run = (context, model, filter, options, key, cb) => {
+			crp[model].find(filter, {}, options, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});
@@ -38,8 +38,9 @@ module.exports = (crp, callback) => {
 			return new nodes.CallExtensionAsync(this, 'run', args);
 		};
 
-		this.run = (context, collection, filter, key, cb) => {
-			crp.db.findOne(collection, filter, (err, result) => {
+		this.run = (context, model, filter, key, cb) => {
+			if (!crp[model]) return cb();
+			crp[model].findOne(filter, (err, result) => {
 				context.ctx[key] = result;
 				cb(err);
 			});
@@ -107,6 +108,7 @@ module.exports = (crp, callback) => {
 
 			crp.app.get('/*', (req, res) => {
 				crp.pages.processPage(req.url, req.user, (err, page) => {
+					if (req.query) page.context.query = req.query;
 					crp.nunjucks.render('index.njk', page.context, (err, result) => {
 						if (err) return console.error(err);
 
@@ -117,10 +119,15 @@ module.exports = (crp, callback) => {
 
 			crp.app.post('/api/get-page', (req, res) => {
 				crp.pages.processPage(req.body.page, req.user, (err, page) => {
-					crp.nunjucks.render('pages' + page.path, page.context, (err, result) => {
+					if (req.query) page.context.query = req.query;
+					crp.nunjucks.render('components/navigation/index.njk', page.context, (err, nav) => {
 						if (err) return console.error(err);
 
-						res.send(result);
+						crp.nunjucks.render('pages' + page.path, page.context, (err, result) => {
+							if (err) return console.error(err);
+
+							res.send({page: result, nav: nav});
+						});
 					});
 				});
 			});
@@ -128,6 +135,7 @@ module.exports = (crp, callback) => {
 			crp.app.post('/api/get-subpage', (req, res) => {
 				crp.pages.processPage(req.body.page, req.user, (err, page) => {
 					if (!page.context.subPage) page.context.subPage = '/404/index.njk';
+					if (req.query) page.context.query = req.query;
 					crp.nunjucks.render('pages' + page.context.subPage, page.context, (err, result) => {
 						if (err) return console.log(err);
 
@@ -151,14 +159,15 @@ module.exports = (crp, callback) => {
 			});
 
 			crp.app.post('/api/admin/edit-site', (req, res) => {
-				var site = {
-					name: req.body.site_name,
-					tagline: req.body.site_tagline,
-					mail_template: req.body.mail_template
-				};
+				crp.users.findById(req.user, (err, user) => {
+					if (err) return res.send(err);
+					if (!user || user.role < 3) return res.send('notAllowed');
 
-				crp.util.editSite(site, (err, result) => {
-					res.send(result);
+					crp.util.editSite(req.body, (err) => {
+						if (err) return res.send(err);
+
+						res.send(true);
+					});
 				});
 			});
 

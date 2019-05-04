@@ -1,28 +1,71 @@
-{% include "./style.njk" %}
 {% lookup 'users', {_id: profileid}, 'profile' %}
-{% query 'chapters', {}, {sort: [['name', 1]]}, 'chapters' %}
+{% query 'chapters', {}, {sort: [[['name', 1]]]}, 'chapters' %}
+{% set invites = profile.getChapterInvites(chapters) %}
 
-<ul class="chapters">
-	{% set chapterCount = 0 %}
-	{% for chapter in chapters %}
-		{% if crp.chapters.getMember(chapter, profile._id).role > 0 %}
-			{% set chapterCount = chapterCount + 1 %}
-			{% lookup 'games', {_id: chapter.game}, 'game' %}
-
-			<li class="chapter">
-				<ul>
-					<li><img src="{{crp.chapters.getProfilePic(chapter)}}" /></li>
-					<li>
-						{{crp.chapters.getLink(chapter) | safe}}
-						<p>{{chapter.tagline}}</p>
-					</li>
-					<li>Game: <a href="/chapters/{{game.slug}}">{{game.name}}</a></li>
-				</ul>
-			</li>
+<div class="container">
+	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
+		<a class="nav-link" href="/members/{{profile.nicename}}" container=".profile-content" newurl="true">Activity</a>
+		<a class="nav-link active" href="/members/{{profile.nicename}}/chapters" container=".profile-content" newurl="true">Chapters {% if invites.length > 0 %}<span class="badge badge-success">{{invites.length}}</span>{% endif %}</a>
+		{% if profile._id.equals(user._id) or user.role >= 3 %}
+			<a class="nav-link" href="/members/{{profile.nicename}}/account" container=".profile-content" newurl="true">Account</a>
 		{% endif %}
-	{% endfor %}
+	</nav>
 
-	{% if chapterCount == 0 %}
-		<div class="warning">You're not a member of any Chapters.</div>
-	{% endif %}
-</ul>
+	<div class="row mt-lg-3">
+		<div class="col-lg-9">
+			{% if profile._id.equals(user._id) and invites.length > 0 %}
+				{% for chapter in invites %}
+					<div class="card shadow-sm mb-3">
+						<div class="card-body d-flex flex-wrap">
+							<img class="mx-auto mx-lg-0" src="{{chapter.getProfilePic()}}" width="40" height="40" alt="{{chapter.name}}" />
+							<span class="mt-2 ml-lg-3">You've been invited to join <a href="/chapters/{{chapter.slug}}">{{chapter.name}}</a>.</span>
+							<div class="ml-auto w-lg-100">
+								<button class="btn btn-danger" onclick="declineChapterInvite('{{chapter._id}}')">Decline</button>
+								<button class="btn btn-success" onclick="acceptChapterInvite('{{chapter._id}}')">Accept</button>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			{% endif %}
+
+			{% set inChapter = false %}
+			{% for chapter in chapters %}
+					{% if chapter.getMember(profile._id).role > 0 %}
+						{% set inChapter = true %}
+						{% lookup 'games', {_id: chapter.game}, 'game' %}
+
+						<div class="card shadow-sm mb-3">
+							<div class="card-body d-flex flex-wrap">
+								<img src="{{chapter.getProfilePic()}}" width="75" height="75" alt="{{chapter.name}}" />
+								<div class="ml-lg-3">
+									<a href="{{chapter.getURL()}}" {% if chapter.type == 'hosted' or chapter.type == 'url' %}target="_blank"{% endif %}>{{chapter.name}}</a>
+									<p class="text-muted">{{chapter.tagline}}</p>
+								</div>
+								<span class="ml-lg-auto w-auto"><a href="/chapters/{{game.slug}}">{{game.name}}</a></span>
+							</div>
+						</div>
+					{% endif %}
+			{% endfor %}
+
+			{% if not inChapter %}
+				{% if profile._id.equals(user._id) %}
+					<div class="alert alert-warning" role="alert">You're not a member of any Chapters.</div>
+				{% else %}
+					<div class="alert alert-warning" role="alert">{{profile.display_name}} is not a member of any Chapters.</div>
+				{% endif %}
+			{% endif %}
+		</div>
+
+		<div class="col-lg-3">
+			<nav class="nav nav-tabs nav-vertical-tabs flex-column justify-content-center mt-2 d-none d-lg-block">
+				<a class="nav-link" href="/members/{{profile.nicename}}" container=".profile-content" newurl="true">Activity</a>
+				<a class="nav-link active" href="/members/{{profile.nicename}}/chapters" container=".profile-content" newurl="true">Chapters {% if invites.length > 0 %}<span class="badge badge-success">{{invites.length}}</span>{% endif %}</a>
+				{% if profile._id.equals(user._id) or user.role >= 3 %}
+					<a class="nav-link" href="/members/{{profile.nicename}}/account" container=".profile-content" newurl="true">Account</a>
+				{% endif %}
+			</nav>
+		</div>
+	</div>
+</div>
+
+{% include "./script.njk" %}

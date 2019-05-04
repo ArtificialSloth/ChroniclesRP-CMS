@@ -1,0 +1,111 @@
+{% lookup 'chapters', {_id: chapterid}, 'chapter' %}
+{% query 'users', {}, {sort: [[['display_name', 1]]]}, 'users' %}
+
+<div class="container">
+	<nav class="nav nav-tabs justify-content-center mt-3 d-lg-none">
+		{% if chapter.type == 'group' %}
+			<a class="nav-link" href="/chapters/{{chapter.nicename}}" container=".profile-content" newurl="true">Home</a>
+			<a class="nav-link" href="/chapters/{{chapter.nicename}}/forums" container=".profile-content" newurl="true">Forums</a>
+		{% endif %}
+		<a class="nav-link active" href="/chapters/{{chapter.nicename}}/members" container=".profile-content" newurl="true">Members</a>
+		{% if chapter.getMember(user._id).role >= 2 or user.role >= 3 %}
+			<a class="nav-link" href="/chapters/{{chapter.nicename}}/settings" container=".profile-content" newurl="true">Settings</a>
+		{% endif %}
+	</nav>
+
+	<div class="row mt-lg-3">
+		<div class="col-lg-9">
+			<div class="form-group row">
+				<div class="col-lg-1 pt-2 pl-4">
+					<label for="search-user-filter">Invite:</label>
+				</div>
+				<div class="col-lg-11">
+					<input type="search" class="form-control" id="search-user-filter" name="filter" placeholder="Search" />
+					<div class="invalid-feedback"></div>
+					<ul class="list-group search-user-list position-absolute overflow-auto" style="z-index:2; max-height:500px;">
+						{% for member in users %}
+							{% if not chapter.getMember(member._id) %}
+								<li class="list-group-item list-group-item-action search-user-item d-none">
+									<img src="{{member.getProfilePic()}}" class="mr-1" alt="{{member.display_name}}" width="30" height="30" />
+									<a href="/members/{{member.nicename}}">{{member.display_name}}</a>
+									<button type="button" class="btn btn-sm btn-primary float-right" onclick="inviteChapterMember('{{chapter._id}}', '{{member._id}}')">Invite</button>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-lg overflow-auto" style="max-height:750px">
+					{% for member in users %}
+						{% if chapter.getMember(member._id).role == 2 %}
+							<div class="card shadow-sm mb-3">
+								<div class="card-body d-flex">
+									<img src="{{member.getProfilePic()}}" alt="{{member.display_name}}" width="75" height="75" />
+									<div class="ml-3">
+										<h5 class="mb-0"><a href="/members/{{member.nicename}}">{{member.display_name}}</a></h5>
+										<i class="text-muted">Leader</i>
+									</div>
+									{% if chapter.getMember(user._id).role >= 2 or user.role >= 3 %}
+										<span class="ml-auto">
+											<button class="btn btn-sm btn-primary" onclick="removeChapterMember('{{chapter._id}}', '{{member._id}}')">Kick</button>
+											<button class="btn btn-sm btn-primary" onclick="demoteChapterMember('{{chapter._id}}', '{{member._id}}')">Demote</button>
+										</span>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+				</div>
+
+				<div class="col-lg overflow-auto" style="max-height:750px">
+					{% for member in users %}
+						{% if chapter.getMember(member._id).role == 0 or chapter.getMember(member._id).role == 1 %}
+							<div class="card shadow-sm mb-3">
+								<div class="card-body d-flex">
+									<img src="{{member.getProfilePic()}}" alt="{{member.display_name}}" width="75" height="75" />
+									<div class="ml-3">
+										<h5 class="mb-0"><a href="/members/{{member.nicename}}">{{member.display_name}}</a></h5>
+										<i class="text-muted">
+											{% if chapter.getMember(member._id).role == 0 %}
+												Invited
+											{% else %}
+												Member
+											{% endif %}
+										</i>
+									</div>
+									{% if chapter.getMember(user._id).role >= 2 or user.role >= 3 %}
+										<span class="ml-auto">
+											{% if chapter.getMember(member._id).role == 0 %}
+												<button class="btn btn-sm btn-primary" onclick="removeChapterMember('{{chapter._id}}', '{{member._id}}')">Uninvite</button>
+											{% else %}
+												<button class="btn btn-sm btn-primary" onclick="removeChapterMember('{{chapter._id}}', '{{member._id}}')">Kick</button>
+												<button class="btn btn-sm btn-primary" onclick="promoteChapterMember('{{chapter._id}}', '{{member._id}}')">Promote</button>
+											{% endif %}
+										</span>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-3">
+			<nav class="nav nav-tabs nav-vertical-tabs flex-column justify-content-center mt-2 d-none d-lg-block">
+				{% if chapter.type == 'group' %}
+					<a class="nav-link" href="/chapters/{{chapter.nicename}}" container=".profile-content" newurl="true">Home</a>
+					<a class="nav-link" href="/chapters/{{chapter.nicename}}/forums" container=".profile-content" newurl="true">Forums</a>
+				{% endif %}
+				<a class="nav-link active" href="/chapters/{{chapter.nicename}}/members" container=".profile-content" newurl="true">Members</a>
+				{% if chapter.getMember(user._id).role >= 2 or user.role >= 3 %}
+					<a class="nav-link" href="/chapters/{{chapter.nicename}}/settings" container=".profile-content" newurl="true">Settings</a>
+				{% endif %}
+			</nav>
+		</div>
+	</div>
+</div>
+
+{% include "./script.njk" %}

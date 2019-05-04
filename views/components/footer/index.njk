@@ -1,6 +1,3 @@
-<div class="footer">
-	{% include "./style.njk" %}
-
-	<p>© {{crp.moment().format('YYYY')}} <a href="/">{{site.name}}</a></p>
-	<i><a href="https://www.privacypolicies.com/privacy/view/9a581bfd3b1ceb6daee4ec7abcc40d52">Privacy Policy</a></i>
-</div>
+<footer class="footer bg-primary w-100 py-3 text-center" style="position:absolute; bottom:0">
+	<span class="text-muted">© {{crp.moment().format('YYYY')}} <a class="text-muted" href="/">{{site.name}}</a></span>
+</footer>
