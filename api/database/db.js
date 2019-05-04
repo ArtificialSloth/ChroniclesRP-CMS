@@ -5,6 +5,8 @@ module.exports = (crp, callback) => {
 		crp.sites = crp.db.model('site', new crp.db.Schema({
 			name: {type: String, required: true},
 			tagline: String,
+			about: String,
+			privacy_policy: String,
 			mail_template: {type: String, required: true},
 			css: {
 				colors: {
