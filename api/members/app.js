@@ -127,7 +127,7 @@ module.exports = (crp, callback) => {
 				crp.users.findById(req.body.userid, (err, profile) => {
 					if (err) return res.send(err);
 					if (!profile) return res.send('noUser');
-					if (!user._id.equals(profile._id) || user.role < 3) return res.send('notAllowed');
+					if (!user._id.equals(profile._id) && user.role < 3) return res.send('notAllowed');
 
 					var userData = {
 						display_name: req.body.display_name,

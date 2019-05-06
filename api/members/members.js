@@ -90,11 +90,11 @@ module.exports = (crp) => {
 			validate: {
 				msg: 'Invalid date format.',
 				validator: function(val) {
-					return crp.moment(new Date(val)).isValid();
+					return val == '' ? true : crp.moment(new Date(val)).isValid();
 				}
 			},
 			set: function(val) {
-				return crp.moment(new Date(val)).format('MM/DD/YYYY');
+				return val == '' ? '' : crp.moment(new Date(val)).format('MM/DD/YYYY');
 			}
 		},
 		gender: {
