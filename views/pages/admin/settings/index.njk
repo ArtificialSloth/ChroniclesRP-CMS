@@ -1,25 +1,49 @@
-{% include "./style.njk" %}
-{% lookup 'site', {}, 'site' %}
+{% lookup 'sites', {}, 'site' %}
 
-<form class="site-settings-form standard-form">
-	<label for="site_name">Site Title</label>
-	<div class="standard-input">
-		<input type="text" name="site_name" class="site_name" value="{{site.name}}" />
+<div class="row bg-white shadow-sm">
+	<div class="list-group col-lg-3 pr-0">
+		<a href="/admin/settings" class="list-group-item list-group-item-action border-right-0 rounded-0 active" container=".admin-content" newurl="true">Site</a>
+		<a href="/admin/users" class="list-group-item list-group-item-action border-right-0 rounded-0" container=".admin-content" newurl="true">Users</a>
+		<a href="/admin/forums" class="list-group-item list-group-item-action border-right-0 rounded-0" container=".admin-content" newurl="true">Forums</a>
+		<a href="/admin/posts" class="list-group-item list-group-item-action border-right-0 rounded-0" container=".admin-content" newurl="true">Posts</a>
 	</div>
 
-	<label for="site_tagline">Site Tagline</label>
-	<div class="standard-input">
-		<input type="text" name="site_tagline" class="site_tagline" value="{{site.tagline}}" />
-	</div>
+	<div class="col-lg-9 border-left p-3">
+		<form id="site-form" novalidate>
+			<div class="form-group">
+				<label for="site-form-name">Name</label>
+				<input type="text" class="form-control" id="site-form-name" name="name" value="{{site.name}}" />
+				<div class="invalid-feedback"></div>
+			</div>
 
-	<label for="mail_template">Email Template</label>
-	<div class="standard-input">
-		<textarea name="mail_template" class="mail_template tinymce">{{site.mail_template}}</textarea>
-		<script>crpTinyMCE()</script>
-	</div>
+			<div class="form-group">
+				<label for="site-form-tagline">Tagline</label>
+				<input type="text" class="form-control" id="site-form-tagline" name="tagline" value="{{site.tagline}}" />
+				<div class="invalid-feedback"></div>
+			</div>
 
-	<input type="submit" value="Save" />
-	<span class="site-saved">Saved!</span>
-</form>
+			<div class="form-group">
+				<label for="site-form-privacy_policy">Privacy Policy</label>
+				<input type="text" class="form-control" id="site-form-privacy_policy" name="privacy_policy" value="{{site.privacy_policy}}" />
+				<div class="invalid-feedback"></div>
+			</div>
+
+			<div class="form-group">
+				<label for="site-form-about">About</label>
+				<textarea class="form-control" id="site-form-about" name="about">{{site.about}}</textarea>
+				<div class="invalid-feedback"></div>
+			</div>
+
+			<div class="form-group">
+				<label for="site-form-mail_template">Email Template</label>
+				<textarea class="form-control tinymce" id="site-form-mail_template" name="mail_template">{{site.mail_template}}</textarea>
+				<div class="invalid-feedback"></div>
+				<script>crpTinyMCE()</script>
+			</div>
+
+			<button type="submit" class="btn btn-primary d-block ml-auto">Save</button>
+		</form>
+	</div>
+</div>
 
 {% include "./script.njk" %}

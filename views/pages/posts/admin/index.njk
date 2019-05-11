@@ -1,94 +1,14 @@
-{% include "./style.njk" %}
-{% lookup 'users', {_id: userid}, 'user' %}
-{% query 'posts', {}, {sort: [['date', -1]]}, 'posts' %}
-
-{% set pages = crp.util.filterObjectArray(posts, {type: 'page'}) %}
-{% set news = crp.util.filterObjectArray(posts, {type: 'news'}) %}
-{% set featured = crp.util.filterObjectArray(posts, {type: 'featured_content'}) %}
-
-<ul class="posts-menu noselect">
-	<li class="filter all active" onclick="postsToggleTypeFilter(this, 'all')">All ({{posts.length}})</li>
-
-	{% if pages.length > 0 %}
-		<li class="filter pages" onclick="postsToggleTypeFilter(this, 'pages')">Pages ({{pages.length}})</li>
-	{% endif %}
-
-	{% if news.length > 0 %}
-		<li class="filter news" onclick="postsToggleTypeFilter(this, 'news')">News ({{news.length}})</li>
-	{% endif %}
-
-	{% if featured.length > 0 %}
-		<li class="filter featured-content" onclick="postsToggleTypeFilter(this, 'featured-content')">Featured Content ({{featured.length}})</li>
-	{% endif %}
-</ul>
-
-<div class="posts-content">
-	<ul class="header">
-		<li>Title</li>
-		<li>Slug</li>
-		<li>Date</li>
-	</ul>
-
-	<div class="filter all active">
-		{% for post in posts %}
-			{% include "./loop.njk" %}
-		{% endfor %}
-	</div>
-	<div class="filter pages">
-		{% for post in pages %}
-			{% include "./loop.njk" %}
-		{% endfor %}
-	</div>
-	<div class="filter news">
-		{% for post in news %}
-			{% include "./loop.njk" %}
-		{% endfor %}
-	</div>
-	<div class="filter featured-content">
-		{% for post in featured %}
-			{% include "./loop.njk" %}
-		{% endfor %}
+{% query 'posts', {}, {sort: [[['date', -1]]]}, 'posts' %}
+<div class="row bg-white shadow-sm">
+	<div class="list-group col-lg-3 pr-0">
+		<a href="/admin/settings" class="list-group-item list-group-item-action border-right-0 rounded-0" container=".admin-content" newurl="true">Site</a>
+		<a href="/admin/users" class="list-group-item list-group-item-action border-right-0 rounded-0" container=".admin-content" newurl="true">Users</a>
+		<a href="/admin/forums" class="list-group-item list-group-item-action border-right-0 rounded-0" container=".admin-content" newurl="true">Forums</a>
+		<a href="/admin/posts" class="list-group-item list-group-item-action border-right-0 rounded-0 active" container=".admin-content" newurl="true">Posts</a>
 	</div>
 
-	<fieldset class="new-post">
-		<legend>Add New Post</legend>
-		<form class="add-post">
-			<label for="title">Title: </label>
-			<input type="text" name="title" />
+	<div class="col-lg-9 border-left p-3">
 
-			<br />
-
-			<label for="type">Type: </label>
-			<select name="type">
-				<option value="page">Page</option>
-				<option value="news">News</option>
-				<option value="featured_content">Featured Content</option>
-			</select>
-
-			<br />
-
-			<label for="slug">Slug: </label>
-			<input type="text" name="slug" />
-
-			<br />
-
-			<label for="date">Post Date: </label>
-			<input type="text" name="date" />
-
-			<br />
-
-			<label for="img">Featured Image: </label>
-			<input type="text" name="img" />
-			<input type="file" name="upload" />
-
-			<br />
-
-			<textarea name="content" class="tinymce"></textarea>
-			<script>crpTinyMCE()</script>
-
-			<input type="submit" value="Post" />
-		</form>
-	</fieldset>
+	</div>
 </div>
-
 {% include "./script.njk" %}

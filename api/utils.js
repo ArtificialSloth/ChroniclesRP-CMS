@@ -123,9 +123,5 @@ module.exports = (crp, callback) => {
 		});
 	};
 
-	crp.util.editSite = (data, cb) => {
-		crp.sites.updateOne({}, data, {runValidators: true}, cb);
-	};
-
 	callback(null, crp);
 };

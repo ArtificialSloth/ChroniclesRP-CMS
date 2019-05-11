@@ -163,7 +163,7 @@ module.exports = (crp, callback) => {
 					if (err) return res.send(err);
 					if (!user || user.role < 3) return res.send('notAllowed');
 
-					crp.util.editSite(req.body, (err) => {
+					crp.sites.updateOne({}, req.body, {runValidators: true}, (err) => {
 						if (err) return res.send(err);
 
 						res.send(true);
