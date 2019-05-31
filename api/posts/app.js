@@ -4,6 +4,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
+			if (req.body.slug == '') delete req.body.slug;
 			new crp.posts(req.body).save((err) => {
 				if (err) return res.send(err);
 
@@ -17,7 +18,7 @@ module.exports = (crp, callback) => {
 			if (err) return res.send(err);
 			if (!user || user.role < 3) return res.send('notAllowed');
 
-			crp.posts.updateOne({_id: req.body.postid}, req.body, {runValidators: true}, (err) => {
+			crp.posts.updateOne({_id: req.body.postid}, req.body, {runValidators: true, context: 'query'}, (err) => {
 				if (err) return res.send(err);
 
 				res.send(true);

@@ -21,11 +21,19 @@ module.exports = (crp) => {
 				msg: 'URL {VALUE} is already in use.',
 				validator: function(val) {
 					return new Promise((resolve, reject) => {
-						crp.posts.find({slug: val}, (err, posts) => {
-							if (err) return reject(err);
-							if (posts && posts.length > 0) return resolve(false);
-							resolve(true);
-						});
+						if (this.constructor.name === 'Query') {
+							crp.posts.find({_id: {$not: {$eq: this._conditions._id}}, slug: val}, (err, posts) => {
+								if (err) return reject(err);
+								if (posts && posts.length > 0) return resolve(false);
+								resolve(true);
+							});
+						} else {
+							crp.posts.find({slug: val}, (err, posts) => {
+								if (err) return reject(err);
+								if (posts && posts.length > 0) return resolve(false);
+								resolve(true);
+							});
+						}
 					});
 				}
 			}

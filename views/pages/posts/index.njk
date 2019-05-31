@@ -7,27 +7,29 @@
 	</header>
 	<div class="post-content">{{post.content | safe}}</div>
 
-	<div class="row mt-5">
-		<div class="col-lg-12">
-			<h4 class="font-family-montserrat text-capitalize">{{post.type.replace('_', ' ')}}</h4>
-			<hr />
-		</div>
+	{% if post.type != 'page' %}
+		<div class="row mt-5">
+			<div class="col-lg-12">
+				<h4 class="font-family-montserrat text-capitalize">{{post.type.replace('_', ' ')}}</h4>
+				<hr />
+			</div>
 
-		{% query 'posts', {type: post.type}, {sort: [[['date', -1]]], limit: 3}, 'posts' %}
-		{% for post in posts %}
-			<div class="col-lg-4 mt-3 mt-lg-0">
-				<div class="card shadow-sm">
-					<a class="card-img-container" href="{{post.slug}}">
-						<img class="card-img-top" src="{{post.img}}" alt="{{post.title}}" />
-					</a>
-					<div class="card-body">
-						<h5 class="card-title font-weight-bold"><a href="{{post.slug}}">{{post.title}}</a></h5>
-						<h6 class="card-subtitle text-muted font-italic">{{crp.moment(post.date).fromNow()}}</h6>
-						<p class="card-text">{{post.content | safe | striptags(true) | truncate(100)}}</p>
-						<a class="card-link font-weight-bold" href="{{post.slug}}">Read More</a>
+			{% query 'posts', {type: post.type}, {sort: [[['date', -1]]], limit: 3}, 'posts' %}
+			{% for post in posts %}
+				<div class="col-lg-4 mt-3 mt-lg-0">
+					<div class="card shadow-sm">
+						<a class="card-img-container" href="{{post.slug}}">
+							<img class="card-img-top" src="{{post.img}}" alt="{{post.title}}" />
+						</a>
+						<div class="card-body">
+							<h5 class="card-title font-weight-bold"><a href="{{post.slug}}">{{post.title}}</a></h5>
+							<h6 class="card-subtitle text-muted font-italic">{{crp.moment(post.date).fromNow()}}</h6>
+							<p class="card-text">{{post.content | safe | striptags(true) | truncate(100)}}</p>
+							<a class="card-link font-weight-bold" href="{{post.slug}}">Read More</a>
+						</div>
 					</div>
 				</div>
-			</div>
-		{% endfor %}
-	</div>
+			{% endfor %}
+		</div>
+	{% endif %}
 </div>

@@ -1,31 +1,56 @@
 <script>
-	$('.post-settings-form').submit((e) => {
+	$('.edit-post-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 
 		var formData = $(e.target).serialize();
 		crpAjax('/api/admin/edit-post', formData, (res) => {
-			if (typeof res == 'object') {
-				$('.' + res._id + ' .title').html(res.title);
-				$('.' + res._id + ' .slug').html(res.slug);
-				$(e.target).find('.post-saved').addClass('active');
-
-				setTimeout(() => {
-					$(e.target).find('.post-saved').removeClass('active');
-				}, 5000);
+			if (res === true) {
+				crpGetPage(window.location.pathname);
 			} else {
 				console.error(res);
 			}
 		});
 	});
 
-	$('.add-post').submit((e) => {
+	$('#new-post-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();
 
 		var formData = $(e.target).serialize();
-		crpAjax('/api/admin/add-post', formData, (response) => {
-			if (response) crpGetSubPage('/admin/posts', '.admin-content', true);
+		crpAjax('/api/admin/add-post', formData, (res) => {
+			if (res === true) {
+				$('#newPostModal').removeClass('fade');
+				$('#newPostModal').modal('hide');
+				crpGetPage(window.location.pathname);
+			} else {
+				if (res.errors) {
+					if (res.errors.title) {
+						$('#new-post-form-title').next('.invalid-feedback').html(res.errors.title.message);
+						$('#new-post-form-title').addClass('is-invalid');
+					}
+					if (res.errors.type) {
+						$('#new-post-form-type').next('.invalid-feedback').html(res.errors.type.message);
+						$('#new-post-form-type').addClass('is-invalid');
+					}
+					if (res.errors.slug) {
+						$('#new-post-form-slug').next('.invalid-feedback').html(res.errors.slug.message);
+						$('#new-post-form-slug').addClass('is-invalid');
+					}
+					if (res.errors.img) {
+						$('#new-post-form-img').next('.invalid-feedback').html(res.errors.img.message);
+						$('#new-post-form-img').addClass('is-invalid');
+					}
+					if (res.errors.content) {
+						$('#new-post-form-content').next('.invalid-feedback').html(res.errors.content.message);
+						$('#new-post-form-content').addClass('is-invalid');
+					}
+				} else {
+					console.error(res);
+					$('#new-post-form-title').next('.invalid-feedback').html('Something went wrong :(');
+					$('#new-post-form-title').addClass('is-invalid');
+				}
+			}
 		});
 	});
 
@@ -42,19 +67,11 @@
 		});
 	});
 
-	function postsRemove(postid) {
+	function removePost(postid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/admin/remove-post', {postid: postid}, (response) => {
 				if (response) crpGetSubPage('/admin/posts', '.admin-content', true);
 			});
 		}
-	}
-
-	function postsToggleTypeFilter(tab, type) {
-		$('.posts-menu .active').removeClass('active');
-		$(tab).addClass('active');
-
-		$('.posts-content .filter.active').removeClass('active');
-		$('.posts-content .filter.' + type).addClass('active');
 	}
 </script>
