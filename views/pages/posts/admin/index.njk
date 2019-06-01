@@ -1,5 +1,6 @@
 {% query 'users', {}, {}, 'users' %}
 {% query 'posts', {}, {sort: [[['date', -1]]]}, 'posts' %}
+{% set filtered = crp.util.filterObjectArray(posts, filter) %}
 {% set pages = crp.util.filterObjectArray(posts, {type: 'page'}) %}
 {% set news = crp.util.filterObjectArray(posts, {type: 'news'}) %}
 {% set featured = crp.util.filterObjectArray(posts, {type: 'featured_content'}) %}
@@ -14,10 +15,10 @@
 
 	<div class="col-lg-9 border-left p-3">
 		<nav class="nav nav-tabs d-block d-lg-flex text-center bg-white">
-			<a href="#all-posts" class="nav-item nav-link border-bottom rounded-0 pointer active" id="all-tab" data-toggle="tab" role="tab" aria-controls="all" aria-selected="true">All ({{posts.length}})</a>
-			<a href="#page-posts" class="nav-item nav-link border-bottom rounded-0 pointer" id="page-tab" data-toggle="tab" role="tab" aria-controls="page" aria-selected="false">Page ({{pages.length}})</a>
-			<a href="#news-posts" class="nav-item nav-link border-bottom rounded-0 pointer" id="news-tab" data-toggle="tab" role="tab" aria-controls="news" aria-selected="false">News ({{news.length}})</a>
-			<a href="#featured-posts" class="nav-item nav-link border-bottom rounded-0 pointer" id="featured-tab" data-toggle="tab" role="tab" aria-controls="featured" aria-selected="false">Featured Content ({{featured.length}})</a>
+			<a href="/admin/posts" class="nav-item nav-link border-bottom rounded-0 pointer {% if not filter.type %}active{% endif %}" container=".admin-content" newurl="true">All ({{posts.length}})</a>
+			<a href="/admin/posts/page" class="nav-item nav-link border-bottom rounded-0 pointer {% if filter.type == 'page' %}active{% endif %}" container=".admin-content" newurl="true">Page ({{pages.length}})</a>
+			<a href="/admin/posts/news" class="nav-item nav-link border-bottom rounded-0 pointer {% if filter.type == 'news' %}active{% endif %}" container=".admin-content" newurl="true">News ({{news.length}})</a>
+			<a href="/admin/posts/featured_content" class="nav-item nav-link border-bottom rounded-0 pointer {% if filter.type == 'featured_content' %}active{% endif %}" container=".admin-content" newurl="true">Featured Content ({{featured.length}})</a>
 			<button type="button" class="btn btn-primary btn-sm ml-auto my-1" data-toggle="modal" data-target="#newPostModal">New Post</button>
 		</nav>
 
@@ -29,27 +30,57 @@
 				<div class="col-1"></div>
 			</div>
 
-			<div class="row list-group tab-pane fade show active" id="all-posts" role="tabpanel" aria-labelledby="all-tab">
-				{% for post in posts %}
-					{% include "./loop.njk" %}
-				{% endfor %}
-			</div>
+			<div class="row list-group">
+				{% for post in filtered %}
+					<button type="button" class="list-group-item list-group-item-action pointer" data-toggle="collapse" data-target="#collapse{{posts.indexOf(post)}}" aria-expanded="false" aria-controls="collapse{{posts.indexOf(post)}}">
+						<div class="row">
+							<div class="col-6"><a href="{{post.slug}}" onclick="event.stopPropagation()" class="redirect" target="_blank">{{post.title}}</a></div>
+							<div class="col-2"><a href="/members/{{author.nicename}}" onclick="event.stopPropagation()">{{author.display_name}}</a></div>
+							<div class="col-3">{{crp.util.dateToStr(post.date, user.timezone)}}</div>
+							<div class="col-1 text-center"><a onclick="event.stopPropagation(); removePost('{{post._id}}')" class="fas fa-trash-alt muted-hover"></a></div>
+						</div>
+					</button>
 
-			<div class="row list-group tab-pane fade" id="page-posts" role="tabpanel" aria-labelledby="page-tab">
-				{% for post in pages %}
-					{% include "./loop.njk" %}
-				{% endfor %}
-			</div>
+					<div class="collapse border p-3" id="collapse{{posts.indexOf(post)}}">
+						<form class="edit-post-form" id="{{post._id}}" novalidate>
+							<div class="form-group">
+								<label for="{{post._id}}-title">Title</label>
+								<input type="text" class="form-control edit-post-form-title" id="{{post._id}}-title" name="title" value="{{post.title}}" />
+								<div class="invalid-feedback"></div>
+							</div>
 
-			<div class="row list-group tab-pane fade" id="news-posts" role="tabpanel" aria-labelledby="news-tab">
-				{% for post in news %}
-					{% include "./loop.njk" %}
-				{% endfor %}
-			</div>
+							<div class="form-group">
+								<label for="{{post._id}}-type">Type</label>
+								<select class="form-control edit-post-form-type" id="{{post._id}}-type" name="type">
+									<option value="page" {% if post.type == 'page' %}selected{% endif %}>Page</option>
+									<option value="news" {% if post.type == 'news' %}selected{% endif %}>News</option>
+									<option value="featured_content" {% if post.type == 'featured_content' %}selected{% endif %}>Featured Content</option>
+								</select>
+								<div class="invalid-feedback"></div>
+							</div>
 
-			<div class="row list-group tab-pane fade" id="featured-posts" role="tabpanel" aria-labelledby="featured-tab">
-				{% for post in featured %}
-					{% include "./loop.njk" %}
+							<div class="form-group">
+								<label for="{{post._id}}-slug">Slug</label>
+								<input type="text" class="form-control edit-post-form-slug" id="{{post._id}}-slug" name="slug" value="{{post.slug}}" />
+								<div class="invalid-feedback"></div>
+							</div>
+
+							<div class="form-group">
+								<label for="{{post._id}}-img">Featured Image</label>
+								<input type="text" class="form-control edit-post-form-img" id="{{post._id}}-img" name="img" value="{{post.img}}" />
+								<input type="file" class="form-control-file" name="upload" />
+								<div class="invalid-feedback"></div>
+							</div>
+
+							<div class="form-group">
+								<textarea class="form-control edit-post-form-content tinymce" id="{{post._id}}-content" name="content">{{post.content}}</textarea>
+								<div class="invalid-feedback"></div>
+							</div>
+
+							<input type="hidden" name="postid" value="{{post._id}}" />
+							<button type="submit" class="btn btn-success d-block ml-auto">Save</button>
+						</form>
+					</div>
 				{% endfor %}
 			</div>
 		</div>

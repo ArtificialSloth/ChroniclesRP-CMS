@@ -54,8 +54,19 @@ module.exports = (crp) => {
 		if (slug == '/admin/posts') return cb(null, {
 			path: '/admin/index.njk',
 			subPage: '/posts/admin/index.njk',
+			context: {filter: {}},
 			role: 3
 		});
+
+		var types = ['page', 'news', 'featured_content'];
+		for (var i in types) {
+			if (slug == `/admin/posts/${types[i]}`) return cb(null, {
+				path: '/admin/index.njk',
+				subPage: '/posts/admin/index.njk',
+				context: {filter: {type: types[i]}},
+				role: 3
+			});
+		}
 
 		crp.posts.find({}, (err, posts) => {
 			if (err) return cb(err);
