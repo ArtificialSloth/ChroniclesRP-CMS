@@ -32,6 +32,8 @@
 
 			<div class="row list-group">
 				{% for post in filtered %}
+					{% set author = crp.util.findObjectInArray(users, '_id', post.author) %}
+					
 					<button type="button" class="list-group-item list-group-item-action pointer" data-toggle="collapse" data-target="#collapse{{posts.indexOf(post)}}" aria-expanded="false" aria-controls="collapse{{posts.indexOf(post)}}">
 						<div class="row">
 							<div class="col-6"><a href="{{post.slug}}" onclick="event.stopPropagation()" class="redirect" target="_blank">{{post.title}}</a></div>
