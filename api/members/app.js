@@ -219,6 +219,28 @@ module.exports = (crp, callback) => {
 		});
 	});
 
+	crp.app.post('/api/admin/edit-user', (req, res) => {
+		crp.users.findById(req.user, (err, user) => {
+			if (err) return res.send(err);
+			if (!user || user.role < 3) return res.send('notAllowed');
+
+			crp.users.findById(req.body.userid, (err, profile) => {
+				if (err) return res.send(err);
+				if (!profile) return res.send('noUser');
+
+				var userData = {
+					role: req.body.role
+				};
+
+				crp.users.updateOne({_id: profile._id}, userData, {runValidators: true}, (err) => {
+					if (err) return res.send(err);
+
+					res.send(true);
+				});
+			});
+		});
+	});
+
 	crp.app.post('/api/admin/add-user', (req, res) => {
 		crp.users.findById(req.user, (err, user) => {
 			if (err) return res.send(err);

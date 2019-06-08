@@ -157,8 +157,18 @@ module.exports = (crp) => {
 		if (slug == '/admin/users') return cb(null, {
 			path: '/admin/index.njk',
 			subPage: '/members/admin/index.njk',
+			context: {filter: {}},
 			role: 3
 		});
+
+		for (var i = 0; i <= 3; i++) {
+			if (slug == `/admin/users/${i}`) return cb(null, {
+				path: '/admin/index.njk',
+				subPage: '/members/admin/index.njk',
+				context: {filter: {role: i}},
+				role: 3
+			});
+		}
 
 		crp.users.find({}, (err, users) => {
 			if (err) return cb(err);

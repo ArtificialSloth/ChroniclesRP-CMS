@@ -1,4 +1,10 @@
-{% query 'users', {}, {}, 'users' %}
+{% query 'users', {}, {sort: [[['login', 1]]]}, 'users' %}
+{% set filtered = crp.util.filterObjectArray(users, filter) %}
+{% set pending = crp.util.filterObjectArray(users, {role: 0}) %}
+{% set members = crp.util.filterObjectArray(users, {role: 1}) %}
+{% set chapterLeaders = crp.util.filterObjectArray(users, {role: 2}) %}
+{% set admins = crp.util.filterObjectArray(users, {role: 3}) %}
+
 <div class="row bg-white shadow-sm">
 	<div class="list-group col-lg-3 pr-0">
 		<a href="/admin/settings" class="list-group-item list-group-item-action border-right-0 rounded-0" container=".admin-content" newurl="true">Site</a>
@@ -8,7 +14,45 @@
 	</div>
 
 	<div class="col-lg-9 border-left p-3">
+		<nav class="nav nav-tabs d-block d-lg-flex text-center bg-white">
+			<a href="/admin/users" class="nav-item nav-link border-bottom rounded-0 pointer {% if not filter.role %}active{% endif %}" container=".admin-content" newurl="true">All ({{users.length}})</a>
+			<a href="/admin/users/0" class="nav-item nav-link border-bottom rounded-0 pointer {% if filter.role == 0 %}active{% endif %}" container=".admin-content" newurl="true">Pending ({{pending.length}})</a>
+			<a href="/admin/users/1" class="nav-item nav-link border-bottom rounded-0 pointer {% if filter.role == 1 %}active{% endif %}" container=".admin-content" newurl="true">Members ({{members.length}})</a>
+			<a href="/admin/users/2" class="nav-item nav-link border-bottom rounded-0 pointer {% if filter.role == 2 %}active{% endif %}" container=".admin-content" newurl="true">Chapter Leaders ({{chapterLeaders.length}})</a>
+			<a href="/admin/users/3" class="nav-item nav-link border-bottom rounded-0 pointer {% if filter.role == 3 %}active{% endif %}" container=".admin-content" newurl="true">Admins ({{admins.length}})</a>
+		</nav>
 
+		<div class="container mt-3">
+			<div class="row">
+				<div class="col-2">Login</div>
+				<div class="col-4">Email</div>
+				<div class="col-3">Registered</div>
+				<div class="col-2">Role</div>
+				<div class="col-1"></div>
+			</div>
+
+			<ul class="row list-group flex-nowrap">
+				{% for usr in filtered %}
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-2"><a href="/members/{{usr.nicename}}" class="redirect" target="_blank">{{usr.login}}</a></div>
+							<div class="col-4">{{usr.email}}</div>
+							<div class="col-3">{{crp.util.dateToStr(usr.register_date, user.timezone)}}</div>
+							<div class="col-2">
+								<select class="custom-select custom-select-sm user-role-select" id="{{usr._id}}" name="role">
+									<option value="0" {% if usr.role == 0 %}selected{% endif %}>Pending</option>
+									<option value="1" {% if usr.role == 1 %}selected{% endif %}>Member</option>
+									<option value="2" {% if usr.role == 2 %}selected{% endif %}>Chapter Leader</option>
+									<option value="3" {% if usr.role == 3 %}selected{% endif %}>Admin</option>
+								</select>
+								<div class="invalid-feedback"></div>
+							</div>
+							<div class="col-1 text-center"><a onclick="removeUser('{{usr._id}}')" class="fas fa-trash-alt muted-hover pointer"></a></div>
+						</div>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
 	</div>
 </div>
 {% include "./script.njk" %}

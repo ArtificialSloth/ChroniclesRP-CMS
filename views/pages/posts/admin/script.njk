@@ -62,15 +62,19 @@
 				$(e.target).val('');
 				$(e.target).prev().val(res);
 			} else {
-				console.log(res);
+				console.error(res);
 			}
 		});
 	});
 
 	function removePost(postid) {
 		if (window.confirm('Are you sure?')) {
-			crpAjax('/api/admin/remove-post', {postid: postid}, (response) => {
-				if (response) crpGetSubPage('/admin/posts', '.admin-content', true);
+			crpAjax('/api/admin/remove-post', {postid: postid}, (res) => {
+				if (res === true) {
+					crpGetSubPage(window.location.pathname, '.admin-content', true);
+				} else {
+					console.error(res)
+				}
 			});
 		}
 	}
