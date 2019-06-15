@@ -33,6 +33,7 @@ async.waterfall([
 		require('./api/auth/auth.js')(crp);
 		require('./api/mail/mail.js')(crp);
 		require('./api/posts/posts.js')(crp);
+		require('./api/events/events.js')(crp);
 		require('./api/forums/forums.js')(crp);
 		require('./api/members/members.js')(crp);
 		require('./api/storage/storage.js')(crp);

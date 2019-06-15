@@ -1,5 +1,4 @@
 module.exports = (crp) => {
-	var schema =
 	crp.posts = crp.db.model('post', new crp.db.Schema({
 		author: crp.db.Schema.Types.ObjectId,
 		title: {

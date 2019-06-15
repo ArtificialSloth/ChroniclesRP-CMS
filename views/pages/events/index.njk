@@ -1,0 +1,9 @@
+{% include "./style.njk" %}
+{% query 'events', {}, {}, 'events' %}
+
+<div id="calendar" class="container bg-white shadow-sm rounded mt-3">
+	{% set offset = 0 %}
+	{% include "./calendar/index.njk" %}
+</div>
+
+{% include "./script.njk" %}

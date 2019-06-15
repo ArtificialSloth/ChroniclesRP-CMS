@@ -1,0 +1,36 @@
+{% set moment = crp.moment().add(offset, 'months') %}
+
+<div class="row bg-primary text-center text-light p-2 rounded-top">
+	<div class="col-1"></div>
+	<div class="col-10">
+		<h5 class="mb-0">{{moment.format('MMMM, YYYY')}}</h5>
+	</div>
+	<div class="col-1"></div>
+</div>
+
+<div class="row border-bottom">
+	<div class="col p-2">Sun</div>
+	<div class="col border-left p-2">Mon</div>
+	<div class="col border-left p-2">Tue</div>
+	<div class="col border-left p-2">Wed</div>
+	<div class="col border-left p-2">Thu</div>
+	<div class="col border-left p-2">Fri</div>
+	<div class="col border-left p-2">Sat</div>
+</div>
+
+{% set month = crp.calendar(offset) %}
+{% for week in month %}
+	{% set firstWeek = loop.first %}
+	<div class="row">
+		{% for day in week %}
+			<div class="col day {% if not firstWeek %}border-top{% endif %} {% if not loop.first %}border-left{% endif %} {% if not crp.moment(day).isSame(moment, 'month') %}bg-light{% endif %}">
+				<div class="row p-2">
+					<div class="rounded-circle ml-auto py-1 px-2 {% if crp.moment(day).isSame(crp.moment(), 'day') %}bg-primary text-light{% endif %}">
+						{{crp.moment(day).format('DD')}}
+					</div>
+				</div>
+				
+			</div>
+		{% endfor %}
+	</div>
+{% endfor %}
