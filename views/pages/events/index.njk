@@ -44,11 +44,11 @@
 									<label for="new-event-form-startDate">Start Time:</label>
 									<div class="form-row">
 										<div class="form-group col">
-											<input type="date" class="form-control" id="new-event-form-startDate" name="startDate" value="{{crp.moment().format('YYYY-MM-DD')}}" />
+											<input type="date" class="form-control" id="new-event-form-startDate" name="startDate" />
 											<div class="invalid-feedback"></div>
 										</div>
 										<div class="form-group col">
-											<input type="time" class="form-control" id="new-event-form-startTime" name="startTime" value="{{crp.moment().format('HH:mm')}}" />
+											<input type="time" class="form-control" id="new-event-form-startTime" name="startTime" />
 											<div class="invalid-feedback"></div>
 										</div>
 									</div>
@@ -56,11 +56,11 @@
 									<label for="new-event-form-endDate">End Time:</label>
 									<div class="form-row">
 										<div class="form-group col">
-											<input type="date" class="form-control" id="new-event-form-endDate" name="endDate" value="{{crp.moment().add(1, 'hours').format('YYYY-MM-DD')}}" />
+											<input type="date" class="form-control" id="new-event-form-endDate" name="endDate" />
 											<div class="invalid-feedback"></div>
 										</div>
 										<div class="form-group col">
-											<input type="time" class="form-control" id="new-event-form-endTime" name="endTime" value="{{crp.moment().add(1, 'hours').format('HH:mm')}}" />
+											<input type="time" class="form-control" id="new-event-form-endTime" name="endTime" />
 											<div class="invalid-feedback"></div>
 										</div>
 									</div>

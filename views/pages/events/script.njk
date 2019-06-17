@@ -1,4 +1,11 @@
 <script>
+	$(() => {
+		$('#new-event-form-startDate').val(moment().format('YYYY-MM-DD'));
+		$('#new-event-form-startTime').val(moment().format('HH:mm'));
+		$('#new-event-form-endDate').val(moment().add(1, 'hours').format('YYYY-MM-DD'));
+		$('#new-event-form-endTime').val(moment().add(1, 'hours').format('HH:mm'));
+	});
+
 	$('#new-event-form').submit((e) => {
 		e.preventDefault();
 
