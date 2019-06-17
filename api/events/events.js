@@ -127,5 +127,7 @@ module.exports = (crp) => {
 				});
 			}
 		});
+
+		cb();
 	});
 };
