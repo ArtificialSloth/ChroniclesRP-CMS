@@ -6,27 +6,32 @@
 		{% query 'chapters', {}, {}, 'chapters' %}
 		{% set gt = {$gt: crp.moment().toDate()} %}
 		{% query 'events', {startDate: gt}, {sort: [[['startDate', 1]]], limit: 5}, 'events' %}
-		{% for event in events %}
-			{% set chapter = crp.util.findObjectInArray(chapters, '_id', event.chapter) %}
-			{% set startDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
-			<div class="pb-2">
-				<a href="/events/{{event._id}}" class="font-weight-bold">{{event.name}}</a>
-				<span class="float-right">
-					<img src="{{chapter.getProfilePic()}}" class="mb-1" alt="{{chapter.name}}" width="20" height="20" />
-					<a href="{{chapter.getURL()}}">{{chapter.name}}</a>
-				</span>
-				<br />
-				<span class="text-muted" style="font-size:.9rem">
-					{% if startDate.isSame(crp.moment(), 'day') %}
-						Today at {{startDate.format('h:mm A')}}
-					{% elseif startDate.isSame(crp.moment(), 'week') %}
-						{{startDate.format('dddd [at] h:mm A')}}
-					{% else %}
-						{{startDate.format('ddd, MMMM Do [at] h:mm A')}}
-					{% endif %}
-				</span>
-			</div>
-		{% endfor %}
+		{% if events.length > 0 %}
+			{% for event in events %}
+				{% set chapter = crp.util.findObjectInArray(chapters, '_id', event.chapter) %}
+				{% set startDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
+				<div class="pb-2">
+					<a href="/events/{{event._id}}" class="font-weight-bold">{{event.name}}</a>
+					<span class="float-right">
+						<img src="{{chapter.getProfilePic()}}" class="mb-1" alt="{{chapter.name}}" width="20" height="20" />
+						<a href="{{chapter.getURL()}}">{{chapter.name}}</a>
+					</span>
+					<br />
+					<span class="text-muted" style="font-size:.9rem">
+						{% if startDate.isSame(crp.moment(), 'day') %}
+							Today at {{startDate.format('h:mm A')}}
+						{% elseif startDate.isSame(crp.moment(), 'week') %}
+							{{startDate.format('dddd [at] h:mm A')}}
+						{% else %}
+							{{startDate.format('ddd, MMMM Do [at] h:mm A')}}
+						{% endif %}
+					</span>
+				</div>
+			{% endfor %}
+		{% else %}
+			<i>There are no upcoming events.</i>
+		{% endif %}
+
 	</div>
 
 	<div class="bg-white shadow-sm rounded mt-3 p-3">

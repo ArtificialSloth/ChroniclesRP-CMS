@@ -126,8 +126,8 @@ module.exports = (crp) => {
 					context: {eventid: events[i]._id}
 				});
 			}
-		});
 
-		cb();
+			cb();
+		});
 	});
 };
