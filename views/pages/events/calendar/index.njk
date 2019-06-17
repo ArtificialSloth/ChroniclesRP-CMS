@@ -1,6 +1,6 @@
 {% query 'events', {}, {sort: [[['startDate', 1]]]}, 'events' %}
 {% set offset = query.offset or 0 %}
-{% set moment = crp.moment().add(offset, 'months') %}
+{% set moment = crp.moment().tz(user.timezone or 'America/New_York').add(offset, 'months') %}
 
 <div class="row bg-primary text-center text-light p-2 rounded-top">
 	<a href="/events?offset={{offset|int - 1}}" class="col-1 text-left text-light" container="#calendar" newurl="true">
@@ -31,19 +31,20 @@
 		{% for day in week %}
 			<div class="col day pb-1 {% if not firstWeek %}border-top{% endif %} {% if not loop.first %}border-left{% endif %} {% if not crp.moment(day).isSame(moment, 'month') %}bg-light{% endif %}">
 				<div class="row p-2">
-					<div class="rounded-circle ml-auto px-2 py-1 {% if crp.moment(day).isSame(crp.moment(), 'day') %}bg-primary text-light{% endif %}">
+					<div class="rounded-circle ml-auto px-2 py-1 {% if crp.moment(day).tz(user.timezone or 'America/New_York').isSame(crp.moment(), 'day') %}bg-primary text-light{% endif %}">
 						{{crp.moment(day).format('DD')}}
 					</div>
 				</div>
 
 				{% set hasEvent = false %}
 				{% for event in events %}
-					{% if crp.moment(event.startDate).isSame(crp.moment(day), 'day') %}
+					{% set startDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
+					{% if startDate.isSame(crp.moment(day), 'day') %}
 						{% if not hasEvent %}<hr class="m-0" />{% endif %}
 						<div class="row px-2 {% if not hasEvent %}pt-2{% endif %} pb-1">
 							<a href="/events/{{event._id}}" class="flex-fill bg-primary text-light rounded px-2 py-1">
 								<span>{{event.name}}</span>
-								<span class="float-right">{{crp.moment(event.startDate).tz(user.timezone or 'America/New_York').format('h:mm A')}}</span>
+								<span class="float-right">{{startDate.format('h:mm A')}}</span>
 							</a>
 						</div>
 						{% set hasEvent = true %}

@@ -46,8 +46,8 @@ module.exports = (crp) => {
 
 	crp.calendar = (offset = 0) => {
 		var calendar = [];
-		var startDay = crp.moment().add(offset, 'months').startOf('month').startOf('week');
-		var endDay = crp.moment().add(offset, 'months').endOf('month').endOf('week');
+		var startDay = crp.moment().tz('America/New_York').add(offset, 'months').startOf('month').startOf('week');
+		var endDay = crp.moment().tz('America/New_York').add(offset, 'months').endOf('month').endOf('week');
 
 		var index = startDay.subtract(1, 'days');
 		while (index.isBefore(endDay, 'day')) {
