@@ -3,7 +3,7 @@
 {% if user.role < 3 %}
 	{% set memberObject = {_id: user._id, role: 2} %}
 	{% set elemMatch = {$elemMatch: memberObject} %}
-	{% query 'chapters', {members: elemMatch}, {sort: [[['name', 1]]]}, 'memberChapters' %}
+	{% query 'chapters', {members: elemMatch}, {sort: [[['name', 1]]]}, 'chapters' %}
 {% else %}
 	{% query 'chapters', {}, {sort: [[['name', 1]]]}, 'chapters' %}
 {% endif %}

@@ -27,7 +27,6 @@ module.exports = (crp, callback) => {
 				if (err) return cb(err);
 				if (!page) page = {path: '/404/index.njk'};
 
-				context.path = page.path;
 				if (page.subPage) context.subPage = page.subPage;
 				if (page.context) context = Object.assign(context, page.context);
 
@@ -36,6 +35,7 @@ module.exports = (crp, callback) => {
 					if ((!user && page.role) || (user && page.role && user.role < page.role) || (user && page.role && user.role < 3)) page = {path: '/404/index.njk'};
 
 					context.user = user;
+					context.path = page.path;
 					cb(null, {path: page.path, context: context});
 				});
 			});
