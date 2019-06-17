@@ -33,7 +33,7 @@
 						</h6>
 					</div>
 					<div class="col-3 col-lg-1 text-right mt-lg-2 pr-0 pr-lg-3">
-						{% if user._id.equals(creator._id) or user.role >= 3 %}
+						{% if user and (user._id.equals(creator._id) or user.role >= 3) %}
 							<a onclick="event.stopPropagation(); removeEvent('{{event._id}}')" class="fas fa-trash-alt pointer muted-hover" data-toggle="tooltip" data-placement="right" title="Delete Event"></a>
 						{% endif %}
 					</div>
