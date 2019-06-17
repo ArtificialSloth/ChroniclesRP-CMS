@@ -1,5 +1,8 @@
 {% include "./style.njk" %}
 {% lookup 'sites', {}, 'site' %}
+{% query 'chapters', {}, {}, 'chapters' %}
+{% set gt = {$gt: crp.moment().toDate()} %}
+{% query 'events', {startDate: gt}, {sort: [[['startDate', 1]]], limit: 3}, 'events' %}
 
 <div class="carousel slide" id="carouselHome" data-ride="carousel">
 	<div class="carousel-inner">
@@ -75,6 +78,31 @@
 			</div>
 		</div>
 
+		<div class="d-lg-none">
+			<div class="col">
+				<h4 class="font-family-montserrat d-block">Upcoming Events</h4>
+				<hr />
+
+				{% for event in events %}
+					{% set chapter = crp.util.findObjectInArray(chapters, '_id', event.chapter) %}
+					{% set startDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
+
+					<h5><a href="/events/{{event._id}}">{{event.name}}</a></h5>
+					<h6 class="text-muted font-italic">
+						<a href="{{chapter.getURL()}}">{{chapter.name}}</a> -
+						{% if startDate.isSame(crp.moment(), 'day') %}
+							Today at {{startDate.format('h:mm A')}}
+						{% elseif startDate.isSame(crp.moment(), 'week') %}
+							{{startDate.format('dddd [at] h:mm A')}}
+						{% else %}
+							{{startDate.format('ddd, MMMM Do [at] h:mm A')}}
+						{% endif %}
+					</h6>
+					<hr />
+				{% endfor %}
+			</div>
+		</div>
+
 		<div class="col-lg-6 recent-posts">
 			<h4 class="font-family-montserrat">Recent Posts</h4>
 			<hr />
@@ -105,6 +133,33 @@
 
 		<div class="col-lg-3">
 			<div class="d-none d-lg-block bg-white shadow-sm rounded p-3">
+				<h4 class="font-weight-bold">Upcoming Events</h4>
+				<hr />
+
+				{% for event in events %}
+					{% set chapter = crp.util.findObjectInArray(chapters, '_id', event.chapter) %}
+					{% set startDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
+					<div class="pb-2">
+						<a href="/events/{{event._id}}" class="font-weight-bold">{{event.name}}</a>
+						<span class="float-right">
+							<img src="{{chapter.getProfilePic()}}" class="mb-1" alt="{{chapter.name}}" width="20" height="20" />
+							<a href="{{chapter.getURL()}}">{{chapter.name}}</a>
+						</span>
+						<br />
+						<span class="text-muted" style="font-size:.9rem">
+							{% if startDate.isSame(crp.moment(), 'day') %}
+								Today at {{startDate.format('h:mm A')}}
+							{% elseif startDate.isSame(crp.moment(), 'week') %}
+								{{startDate.format('dddd [at] h:mm A')}}
+							{% else %}
+								{{startDate.format('ddd, MMMM Do [at] h:mm A')}}
+							{% endif %}
+						</span>
+					</div>
+				{% endfor %}
+			</div>
+
+			<div class="d-none d-lg-block bg-white shadow-sm rounded mt-3 p-3">
 				<h4 class="font-weight-bold">About</h4>
 				<hr />
 				<p>{{site.about}}</p>

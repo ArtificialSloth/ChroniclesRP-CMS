@@ -1,0 +1,71 @@
+{% lookup 'events', {_id: eventid}, 'event' %}
+{% lookup 'users', {_id: event.creator}, 'creator' %}
+{% lookup 'chapters', {_id: event.chapter}, 'chapter' %}
+{% set localStartDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
+{% set localEndDate = crp.moment(event.endDate).tz(user.timezone or 'America/New_York') %}
+
+<div class="container my-3">
+	<div class="row">
+		<div class="col-lg-9">
+			<div class="container bg-white rounded shadow-sm">
+				<div class="row bg-primary text-light rounded-top">
+					<a href="/events" class="col-1 text-left text-light">
+						<i class="fas fa-angle-left fa-2x mt-1"></i>
+					</a>
+					<div class="col-10 text-center p-2">
+						<h5 class="m-0">{{event.name}}</h5>
+					</div>
+					<div class="col-1"></div>
+				</div>
+
+				<div class="row p-3 border-bottom">
+					<i class="col-1 far fa-clock fa-2x pr-4 pr-lg-0"></i>
+					<div class="col-7 col-lg-10">
+						<b>{{localStartDate.format('dddd, MMMM Do')}}</b>
+						<br />
+						<h6 class="font-weight-bold" style="font-size:.9rem">
+							{{localStartDate.format('h:mma')}} -
+							{% if localEndDate.isSame(localStartDate, 'day') %}
+								{{localEndDate.format('h:mma')}}
+							{% else %}
+								{{localEndDate.format('MMM D, h:mma')}}
+							{% endif %}
+						</h6>
+					</div>
+					<div class="col-3 col-lg-1 text-right mt-lg-2 pr-0 pr-lg-3">
+						{% if user._id.equals(creator._id) or user.role >= 3 %}
+							<a onclick="event.stopPropagation(); removeEvent('{{event._id}}')" class="fas fa-trash-alt pointer muted-hover" data-toggle="tooltip" data-placement="right" title="Delete Event"></a>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="row p-3 border-bottom">
+					<div class="col-1 pr-4 pr-lg-0"><img class="" src="{{chapter.getProfilePic()}}" width="30" height="30" /></div>
+					<span class="col-10 font-weight-bold"><a href="{{chapter.getURL()}}">{{chapter.name}}</a></span>
+				</div>
+
+				<div class="row p-3 border-bottom">
+					<div class="col-1 pr-4 pr-lg-0"><img class="" src="{{creator.getProfilePic()}}" width="30" height="30" /></div>
+					<span class="col-10 font-weight-bold">Created by <a href="/members/{{creator.nicename}}">{{creator.display_name}}</a></span>
+				</div>
+
+				<div class="row p-3">
+					<i class="col-1 fas fa-align-left fa-2x pr-4 pr-lg-0"></i>
+					<p class="col-10">
+						{% if event.desc and event.desc != '' %}
+							{{event.desc}}
+						{% else %}
+							<i>No description</i>
+						{% endif %}
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-3 d-none d-lg-block">
+			{% include "components/sidebar/index.njk" %}
+		</div>
+	</div>
+</div>
+
+{% include "./script.njk" %}

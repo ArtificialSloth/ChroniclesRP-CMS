@@ -81,66 +81,8 @@
 		$(selector).val($(e).val());
 	}
 
-	function usersParseRole(role) {
-		switch (role) {
-			case 0:
-				return 'Pending';
-				break;
-			case 1:
-				return 'Member';
-				break;
-			case 2:
-				return 'Chapter Leader';
-				break;
-			case 3:
-				return 'Administrator';
-				break;
-			default:
-				return 'Guest';
-		}
-	}
-
-	function multistepPrev(e) {
-		if ($(e).hasClass('disabled')) return;
-
-		var prev = $(e).parents('.multistep').find('.step.active').prevAll('.step:not(.disabled)').first();
-		if (prev.length > 0) {
-			$(e).parents('.multistep').find('.step.active').removeClass('active');
-			prev.addClass('active');
-			$(e).next('.next').removeClass('disabled');
-
-			if (prev.prevAll('.step:not(.disabled)').first().length == 0) $(e).addClass('disabled');
-			$(e).next('.next').removeClass('hidden');
-			$(e).next('.next').next('.submit').addClass('hidden');
-		}
-	}
-
-	function multistepNext(e) {
-		if ($(e).hasClass('disabled')) return;
-
-		var next = $(e).parents('.multistep').find('.step.active').nextAll('.step:not(.disabled)').first();
-		if (next.length > 0) {
-			$(e).parents('.multistep').find('.step.active').removeClass('active');
-			next.addClass('active');
-			$(e).prev('.previous').removeClass('disabled');
-
-			if (next.nextAll('.step:not(.disabled)').first().length == 0) $(e).addClass('disabled');
-			if (next.hasClass('final')) {
-				$(e).addClass('hidden');
-				$(e).next('.submit').removeClass('hidden');
-			}
-		}
-	}
-
-	function labelClick(e) {
-		var input = $(e).siblings('input[name=' + $(e).prop('for') + ']');
-		if (input.prop('disabled')) return;
-
-		input.prop('checked', 'checked');
-		input.change();
-	}
-
 	$(() => {
+		$('[data-toggle="popover"]').popover();
 		$('[data-toggle="tooltip"]').tooltip();
 
 		window.onpopstate = (e) => {

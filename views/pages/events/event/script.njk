@@ -1,0 +1,13 @@
+<script>
+	function removeEvent(eventid) {
+		if (window.confirm('Are you sure?')) {
+			crpAjax('/api/remove-event', {eventid: eventid}, (res) => {
+				if (res === true) {
+					crpGetPage('/events');
+				} else {
+					console.error(res);
+				}
+			});
+		}
+	}
+</script>

@@ -6,6 +6,7 @@ async.waterfall([
 			async: async,
 			root: __dirname,
 			fs: require('fs'),
+			cron: require('cron').CronJob,
 			request: require('request'),
 			moment: require('moment-timezone'),
 			cmd: require('child_process').exec,

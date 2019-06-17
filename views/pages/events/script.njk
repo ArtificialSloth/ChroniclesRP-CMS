@@ -1,3 +1,45 @@
 <script>
-	
+	$('#new-event-form').submit((e) => {
+		e.preventDefault();
+
+		var query = new URLSearchParams($(e.target).serialize());
+		query.set('startDate', new Date(`${query.get('startDate')} ${query.get('startTime')}`));
+		query.set('endDate', new Date(`${query.get('endDate')} ${query.get('endTime')}`));
+
+		var formData = query.toString();
+		crpAjax('/api/add-event', formData, (res) => {
+			if (res === true) {
+				$('#eventModal').removeClass('fade');
+				$('#eventModal').modal('hide');
+				crpGetPage(window.location.pathname);
+			} else {
+				if (res.errors) {
+					if (res.errors.name) {
+						$('#new-event-form-name').next('.invalid-feedback').html(res.errors.name.message);
+						$('#new-event-form-name').addClass('is-invalid');
+					}
+					if (res.errors.chapter) {
+						$('#new-event-form-chapter').next('.invalid-feedback').html(res.errors.chapter.message);
+						$('#new-event-form-chapter').addClass('is-invalid');
+					}
+					if (res.errors.starDate) {
+						$('#new-event-form-starDate').next('.invalid-feedback').html(res.errors.starDate.message);
+						$('#new-event-form-starDate').addClass('is-invalid');
+					}
+					if (res.errors.endDate) {
+						$('#new-event-form-endDate').next('.invalid-feedback').html(res.errors.endDate.message);
+						$('#new-event-form-endDate').addClass('is-invalid');
+					}
+					if (res.errors.desc) {
+						$('#new-event-form-desc').next('.invalid-feedback').html(res.errors.desc.message);
+						$('#new-event-form-desc').addClass('is-invalid');
+					}
+				} else {
+					console.error(res);
+					$('#new-event-form-name').next('.invalid-feedback').html('Something went wrong :(');
+					$('#new-event-form-name').addClass('is-invalid');
+				}
+			}
+		});
+	});
 </script>

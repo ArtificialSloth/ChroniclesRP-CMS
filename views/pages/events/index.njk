@@ -1,9 +1,96 @@
 {% include "./style.njk" %}
-{% query 'events', {}, {}, 'events' %}
 
-<div id="calendar" class="container bg-white shadow-sm rounded mt-3">
-	{% set offset = 0 %}
-	{% include "./calendar/index.njk" %}
+{% if user.role < 3 %}
+	{% set memberObject = {_id: user._id, role: 2} %}
+	{% set elemMatch = {$elemMatch: memberObject} %}
+	{% query 'chapters', {members: elemMatch}, {sort: [[['name', 1]]]}, 'memberChapters' %}
+{% else %}
+	{% query 'chapters', {}, {sort: [[['name', 1]]]}, 'chapters' %}
+{% endif %}
+
+<div class="container my-3">
+	<div class="row">
+		<div class="col-lg-9">
+			{% if chapters or user.role >= 3 %}
+				<button type="button" class="btn btn-success d-block mt-3 ml-auto" data-toggle="modal" data-target="#eventModal">+ Add Event</button>
+				<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="eventModalLabel">Add Event</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+
+							<div class="modal-body">
+								<form id="new-event-form" novalidate>
+									<div class="form-group">
+										<label for="new-event-form-name">Name:</label>
+										<input type="text" class="form-control" id="new-event-form-name" name="name" placeholder="Event Name" />
+										<div class="invalid-feedback"></div>
+									</div>
+
+									<div class="form-group">
+										<label for="new-event-form-chapter">Chapter:</label>
+										<select class="form-control" id="new-event-form-chapter" name="chapter">
+											{% for chapter in chapters %}
+												<option value="{{chapter._id}}">{{chapter.name}}</option>
+											{% endfor %}
+										</select>
+										<div class="invalid-feedback"></div>
+									</div>
+
+									<label for="new-event-form-startDate">Start Time:</label>
+									<div class="form-row">
+										<div class="form-group col">
+											<input type="date" class="form-control" id="new-event-form-startDate" name="startDate" value="{{crp.moment().format('YYYY-MM-DD')}}" />
+											<div class="invalid-feedback"></div>
+										</div>
+										<div class="form-group col">
+											<input type="time" class="form-control" id="new-event-form-startTime" name="startTime" value="{{crp.moment().format('HH:mm')}}" />
+											<div class="invalid-feedback"></div>
+										</div>
+									</div>
+
+									<label for="new-event-form-endDate">End Time:</label>
+									<div class="form-row">
+										<div class="form-group col">
+											<input type="date" class="form-control" id="new-event-form-endDate" name="endDate" value="{{crp.moment().add(1, 'hours').format('YYYY-MM-DD')}}" />
+											<div class="invalid-feedback"></div>
+										</div>
+										<div class="form-group col">
+											<input type="time" class="form-control" id="new-event-form-endTime" name="endTime" value="{{crp.moment().add(1, 'hours').format('HH:mm')}}" />
+											<div class="invalid-feedback"></div>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label for="new-event-form-desc">Description:</label>
+										<textarea class="form-control" id="new-event-form-desc" name="desc" placeholder="Event Description"></textarea>
+										<div class="invalid-feedback"></div>
+									</div>
+								</form>
+							</div>
+
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<button type="submit" class="btn btn-success" form="new-event-form">Create</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+
+			<div id="calendar" class="container bg-white shadow-sm rounded mt-3">
+				{% include "pages" + subPage %}
+			</div>
+		</div>
+
+		<div class="col-lg-3 d-none d-lg-block">
+			{% include "components/sidebar/index.njk" %}
+		</div>
+	</div>
 </div>
 
 {% include "./script.njk" %}
