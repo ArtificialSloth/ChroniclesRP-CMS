@@ -37,6 +37,10 @@
 						$('#new-event-form-endDate').next('.invalid-feedback').html(res.errors.endDate.message);
 						$('#new-event-form-endDate').addClass('is-invalid');
 					}
+					if (res.errors.recurring) {
+						$('#new-event-form-recurring').next('.invalid-feedback').html(res.errors.recurring.message);
+						$('#new-event-form-recurring').addClass('is-invalid');
+					}
 					if (res.errors.desc) {
 						$('#new-event-form-desc').next('.invalid-feedback').html(res.errors.desc.message);
 						$('#new-event-form-desc').addClass('is-invalid');

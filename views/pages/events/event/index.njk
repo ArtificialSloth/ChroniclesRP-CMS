@@ -21,7 +21,17 @@
 				<div class="row p-3 border-bottom">
 					<i class="col-1 far fa-clock fa-2x pr-4 pr-lg-0"></i>
 					<div class="col-7 col-lg-10">
-						<b>{{localStartDate.format('dddd, MMMM Do')}}</b>
+						<b>
+							{% if event.recurring == 'none' %}
+								{{localStartDate.format('dddd, MMMM Do')}}
+							{% elif event.recurring == 'daily' %}
+								Everyday
+							{% elif event.recurring == 'weekly' %}
+								Every {{localStartDate.format('dddd')}}
+							{% elif event.recurring == 'monthly' %}
+								Every {{localStartDate.format('Do')}}
+							{% endif %}
+						</b>
 						<br />
 						<h6 class="font-weight-bold" style="font-size:.9rem">
 							{{localStartDate.format('h:mma')}} -

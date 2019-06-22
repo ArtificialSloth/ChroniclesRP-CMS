@@ -41,6 +41,11 @@ module.exports = (crp) => {
 				}
 			}
 		},
+		recurring: {
+			type: String,
+			required: true,
+			enum: ['none', 'daily', 'weekly', 'monthly']
+		},
 		desc: String
 	}));
 
@@ -71,6 +76,33 @@ module.exports = (crp) => {
 
 				crp.discord.send(this.msg, process.env.DISCORD_ANNOUNCEMENTS, (err, result) => {
 					if (err) console.error(err);
+
+					if (event.recurring == 'none') return;
+					if (crp.moment().isSameOrAfter(event.startDate)) {
+						var dates = {};
+						if (event.recurring == 'daily') {
+							dates = {
+								startDate: crp.moment(event.startDate).add(1, 'days').toDate(),
+								endDate: crp.moment(event.endDate).add(1, 'days').toDate()
+							};
+						} else if (event.recurring == 'weekly') {
+							dates = {
+								startDate: crp.moment(event.startDate).add(1, 'weeks').toDate(),
+								endDate: crp.moment(event.endDate).add(1, 'weeks').toDate()
+							};
+						} else if (event.recurring == 'monthly') {
+							dates = {
+								startDate: crp.moment(event.startDate).add(1, 'months').toDate(),
+								endDate: crp.moment(event.endDate).add(1, 'months').toDate()
+							};
+						}
+
+						crp.events.updateOne({_id: event._id}, dates, {runValidators: true}, (err, event) => {
+							if (err) return console.error(err);
+
+							crp.events.addJobs(event);
+						});
+					}
 				});
 			});
 		});

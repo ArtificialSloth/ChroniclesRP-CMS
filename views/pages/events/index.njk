@@ -66,6 +66,17 @@
 									</div>
 
 									<div class="form-group">
+										<label for="new-event-form-recurring">Recurring:</label>
+										<select class="form-control" id="new-event-form-recurring" name="recurring">
+											<option value="none">None</option>
+											<option value="daily">Daily</option>
+											<option value="weekly">Weekly</option>
+											<option value="monthly">Monthly</option>
+										</select>
+										<div class="invalid-feedback"></div>
+									</div>
+
+									<div class="form-group">
 										<label for="new-event-form-desc">Description:</label>
 										<textarea class="form-control" id="new-event-form-desc" name="desc" placeholder="Event Description"></textarea>
 										<div class="invalid-feedback"></div>

@@ -39,7 +39,7 @@
 				{% set hasEvent = false %}
 				{% for event in events %}
 					{% set startDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
-					{% if startDate.isSame(crp.moment(day), 'day') %}
+					{% if startDate.isSame(crp.moment(day), 'day') or (crp.moment(day).isAfter(startDate) and (event.recurring == 'daily' or (event.recurring == 'weekly' and startDate.day() == crp.moment(day).day()) or (event.recurring == 'monthly' and startDate.date() == crp.moment(day).date()))) %}
 						{% if not hasEvent %}<hr class="m-0" />{% endif %}
 						<div class="row px-2 {% if not hasEvent %}pt-2{% endif %} pb-1">
 							<a href="/events/{{event._id}}" class="flex-fill bg-primary text-light rounded px-2 py-1">
