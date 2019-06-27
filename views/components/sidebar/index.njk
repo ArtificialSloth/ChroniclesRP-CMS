@@ -81,7 +81,7 @@
 
 	<div class="shadow-sm mt-3">
 		{% if user.role >= 1 %}
-			<a href="/discord" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%" /></a>
+			<a href="/discord" class="redirect" target="_blank"><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%" /></a>
 		{% else %}
 			<a><img src="{{crp.storage.getUrl(css.img.discord)}}" width="100%" data-toggle="tooltip" data-placement="right" title="Please register and confirm your email address first, before joining our Discord." /></a>
 		{% endif %}
