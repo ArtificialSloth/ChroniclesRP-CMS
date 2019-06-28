@@ -32,7 +32,7 @@ module.exports = (crp, callback) => {
 
 				crp.users.findById(userid, (err, user) => {
 					if (err) return cb(err);
-					if ((!user && page.role) || (user && page.role && user.role < page.role) || (user && page.role && user.role < 3)) page = {path: '/404/index.njk'};
+					if ((!user && page.role) || (user && page.role && user.role < page.role) || (user && page.role && user.role < page.role && user.role < 3)) page = {path: '/404/index.njk'};
 
 					context.user = user;
 					context.path = page.path;
