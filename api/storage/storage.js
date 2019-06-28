@@ -1,10 +1,10 @@
 module.exports = (crp) => {
 	crp.storage = {};
 
-	var storage = new require('@google-cloud/storage')({
-		projectId: process.env.GOOGLE_PROJECT_ID,
-		credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
-	});
+	var {Storage} = require('@google-cloud/storage');
+	var creds = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+	var storage = new Storage({projectId: creds.project_id, credentials: creds});
+
 	crp.storage.bucket = storage.bucket(process.env.GOOGLE_BUCKET);
 
 	crp.storage.upload = (file, dest, cb) => {
@@ -15,7 +15,7 @@ module.exports = (crp) => {
 		if (typeof file == 'string') file = crp.storage.getFile(file);
 		if (!file) return cb();
 
-		file.delete(file, cb);
+		file.delete(cb);
 	};
 
 	crp.storage.rmdir = (dir, cb) => {
