@@ -19,11 +19,7 @@ module.exports = (crp, callback) => {
 			}
 			crp.auth.failedLogins[req.ip].count = 0;
 
-			req.session.cookie.maxAge = 24 * 60 * 60 * 1000;
-			if (req.body.remember_me) {
-				req.session.cookie.maxAge = 90 * 24 * 60 * 60 * 1000;
-			}
-
+			req.session.cookie.maxAge = 90 * 24 * 60 * 60 * 1000;
 			req.login(user, (err) => {
 				if (err) return next(err);
 				if (user.locked) return res.send('locked');
