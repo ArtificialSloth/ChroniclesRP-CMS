@@ -225,7 +225,8 @@ module.exports = (crp, callback) => {
 				if (!profile) return res.send('noUser');
 
 				var userData = {
-					role: req.body.role
+					role: req.body.role || profile.role,
+					locked: req.body.locked || profile.locked
 				};
 
 				crp.users.updateOne({_id: profile._id}, userData, {runValidators: true}, (err) => {

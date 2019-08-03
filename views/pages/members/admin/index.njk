@@ -26,25 +26,30 @@
 			<div class="row">
 				<div class="col-2">Login</div>
 				<div class="col-4">Email</div>
-				<div class="col-3">Registered</div>
+				<div class="col-2">Registered</div>
 				<div class="col-2">Role</div>
+				<div class="col-1">Locked</div>
 				<div class="col-1"></div>
 			</div>
 
 			<ul class="row list-group flex-nowrap">
 				{% for usr in filtered %}
 					<li class="list-group-item">
-						<div class="row">
+						<div class="row {% if usr.locked %}text-muted{% endif %}">
 							<div class="col-2"><a href="/members/{{usr.nicename}}" class="redirect" target="_blank">{{usr.login}}</a></div>
 							<div class="col-4">{{usr.email}}</div>
-							<div class="col-3">{{crp.util.dateToStr(usr.register_date, user.timezone)}}</div>
+							<div class="col-2">{{crp.moment(usr.register_date).tz(user.timezone).format('M/D/YYYY')}}</div>
 							<div class="col-2">
-								<select class="custom-select custom-select-sm user-role-select" id="{{usr._id}}" name="role">
+								<select class="custom-select custom-select-sm user-role-select" _id="{{usr._id}}" name="role">
 									<option value="0" {% if usr.role == 0 %}selected{% endif %}>Pending</option>
 									<option value="1" {% if usr.role == 1 %}selected{% endif %}>Member</option>
 									<option value="2" {% if usr.role == 2 %}selected{% endif %}>Chapter Leader</option>
 									<option value="3" {% if usr.role == 3 %}selected{% endif %}>Admin</option>
 								</select>
+								<div class="invalid-feedback"></div>
+							</div>
+							<div class="col-1 text-center">
+								<input type="checkbox" class="user-locked-toggle pointer" _id="{{usr._id}}" name="locked" {% if usr.locked %}checked{% endif %} />
 								<div class="invalid-feedback"></div>
 							</div>
 							<div class="col-1 text-center"><a onclick="removeUser('{{usr._id}}')" class="fas fa-trash-alt muted-hover pointer"></a></div>

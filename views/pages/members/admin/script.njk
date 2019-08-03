@@ -1,6 +1,17 @@
 <script>
 	$('.user-role-select').change((e) => {
-		var formData ={userid: $(e.target).attr('id'), role: $(e.target).val()};
+		var formData = {userid: $(e.target).attr('_id'), role: $(e.target).val()};
+		crpAjax('/api/admin/edit-user', formData, (res) => {
+			if (res !== true) {
+				console.error(res)
+				$(e.target).next('.invalid-feedback').html('Something went wrong :(');
+				$(e.target).addClass('is-invalid');
+			}
+		});
+	});
+
+	$('.user-locked-toggle').change((e) => {
+		var formData = {userid: $(e.target).attr('_id'), locked: $(e.target).is(':checked')};
 		crpAjax('/api/admin/edit-user', formData, (res) => {
 			if (res !== true) {
 				console.error(res)
