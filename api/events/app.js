@@ -14,9 +14,14 @@ module.exports = (crp, callback) => {
 
 				new crp.events(req.body).save((err, event) => {
 					if (err) return res.send(err);
-
 					crp.events.addJobs(event);
-					res.send(true);
+
+					var msg = `**${user.display_name}** has created an event for **${chapter.name}**: ***${event.name}*** (${crp.moment(event.startDate).tz('America/New_York').format('dddd, MMMM Do h:mma')} - ${crp.moment(event.endDate).tz('America/New_York').format('h:mma z')}).\nYou can RSVP to this event here: https://chroniclesrp.com/events/${event._id}`;
+					crp.discord.send(msg, process.env.DISCORD_ANNOUNCEMENTS, (err, result) => {
+						if (err) return res.send(err);
+
+						res.send(true);
+					});
 				});
 			});
 		});
