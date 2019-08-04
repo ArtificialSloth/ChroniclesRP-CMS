@@ -11,6 +11,12 @@
 		}
 	}
 
+	chapterPickr.on('save', (color, pickr) => {
+		var hex = color.toHEXA().toString();
+		$('#sample-event').css('background-color', hex);
+		$('#chapter-form-color').val(hex);
+	});
+
 	$('#chapter-form').submit((e) => {
 		e.preventDefault();
 		tinymce.triggerSave();

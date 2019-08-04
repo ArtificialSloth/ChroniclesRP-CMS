@@ -1,6 +1,7 @@
 {% lookup 'events', {_id: eventid}, 'event' %}
 {% lookup 'users', {_id: event.creator}, 'creator' %}
 {% lookup 'chapters', {_id: event.chapter}, 'chapter' %}
+{% query 'users', {}, {sort: [[['display_name', 1]]]}, 'users' %}
 {% set localStartDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
 {% set localEndDate = crp.moment(event.endDate).tz(user.timezone or 'America/New_York') %}
 
@@ -57,6 +58,35 @@
 				<div class="row p-3 border-bottom">
 					<div class="col-1 pr-4 pr-lg-0"><img class="" src="{{creator.getProfilePic()}}" width="30" height="30" /></div>
 					<span class="col-10 font-weight-bold">Created by <a href="/members/{{creator.nicename}}">{{creator.display_name}}</a></span>
+				</div>
+
+				<div class="row p-3 border-bottom">
+					<div class="col-1 pr-4 pr-lg-0">
+						<i class="fas fa-users fa-2x"></i>
+					</div>
+					<span class="col-11 d-flex flex-wrap">
+						{% if event.rsvp and event.rsvp.length > 0 %}
+							{% for userid in event.rsvp %}
+								{% set rsvp = crp.util.findObjectInArray(users, '_id', userid) %}
+								<div class="mr-2 mb-2">
+									<img class="" src="{{rsvp.getProfilePic()}}" width="30" height="30" />
+									<a href="/members/{{rsvp.nicename}}">{{rsvp.display_name}}</a>
+								</div>
+							{% endfor %}
+						{% else %}
+							<i>No one has RSVP'd yet :(</i>
+						{% endif %}
+
+						<div class="align-self-end ml-auto">
+							{% if not creator._id.equals(user._id) and crp.moment().isBefore(event.startDate) %}
+								{% if crp.util.idInArray(event.rsvp, user._id) %}
+									<button type="button" class="btn btn-sm btn-success" onclick="unRSVP('{{event._id}}')">Not Going</button>
+								{% else %}
+									<button type="button" class="btn btn-sm btn-success" onclick="RSVP('{{event._id}}')">RSVP</button>
+								{% endif %}
+							{% endif %}
+						</div>
+					</span>
 				</div>
 
 				<div class="row p-3">

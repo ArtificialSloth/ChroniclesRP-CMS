@@ -71,6 +71,31 @@
 		}, 0);
 	}
 
+	function crpPickr(defaultColor = '#53377F') {
+		return Pickr.create({
+			el: '.pickr',
+			theme: 'nano',
+			lockOpacity: true,
+			default: defaultColor,
+			swatches: null,
+			components: {
+				preview: true,
+				opacity: false,
+				hue: true,
+				interaction: {
+					hex: true,
+					rgba: false,
+					hsla: false,
+					hsva: false,
+					cmyk: false,
+					input: true,
+					clear: true,
+					save: true
+		        }
+			}
+		});
+	}
+
 	function crpScrollTo(selector) {
 		$('html, body').animate({
 	        scrollTop: $(selector).offset().top

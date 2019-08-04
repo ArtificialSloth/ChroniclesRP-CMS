@@ -69,6 +69,27 @@
 							</div>
 
 							<div class="form-group row">
+								<label for="chapter-form-color" class="col-lg-2 col-form-label">Event Color</label>
+								<div class="col-lg-10">
+									<div class="d-inline-block">
+										<span class="pickr"></span>
+									</div>
+									<input type="hidden" id="chapter-form-color" name="eventColor" value="{{chapter.eventColor or '#53377F'}}" />
+									<script>var chapterPickr = crpPickr('{{chapter.eventColor or "#53377F"}}')</script>
+									<div class="invalid-feedback"></div>
+
+									<div class="d-flex w-25 float-right">
+										<span class="flex-fill text-light rounded pointer px-2 py-1" id="sample-event" style="background-color:{{chapter.eventColor or '#53377F'}}">
+											<span>Sample Event</span>
+											<span class="float-right">{{crp.moment().tz(user.timezone or 'America/New_York').format('h:mm A')}}</span>
+										</span>
+									</div>
+								</div>
+							</div>
+
+							<hr />
+
+							<div class="form-group row">
 								<label for="chapter-form-profile_pic" class="col-lg-2 col-form-label">Chapter Picture</label>
 								<div class="col-lg-10">
 									{% if chapter.img.profile %}

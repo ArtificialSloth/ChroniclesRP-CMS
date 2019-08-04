@@ -1,3 +1,4 @@
+{% query 'chapters', {}, {sort: [[['name', 1]]]}, 'chapters' %}
 {% query 'events', {}, {sort: [[['startDate', 1]]]}, 'events' %}
 {% set offset = query.offset or 0 %}
 {% set moment = crp.moment().tz(user.timezone or 'America/New_York').add(offset, 'months') %}
@@ -38,11 +39,12 @@
 
 				{% set hasEvent = false %}
 				{% for event in events %}
+					{% set chapter = crp.util.findObjectInArray(chapters, '_id', event.chapter) %}
 					{% set startDate = crp.moment(event.startDate).tz(user.timezone or 'America/New_York') %}
 					{% if startDate.isSame(crp.moment(day), 'day') or (crp.moment(day).isAfter(startDate) and (event.recurring == 'daily' or (event.recurring == 'weekly' and startDate.day() == crp.moment(day).day()) or (event.recurring == 'monthly' and startDate.date() == crp.moment(day).date()))) %}
 						{% if not hasEvent %}<hr class="m-0" />{% endif %}
 						<div class="row px-2 {% if not hasEvent %}pt-2{% endif %} pb-1">
-							<a href="/events/{{event._id}}" class="flex-fill bg-primary text-light rounded px-2 py-1">
+							<a href="/events/{{event._id}}" class="event flex-fill text-light rounded px-2 py-1" style="background-color:{{chapter.eventColor or '#53377F'}}">
 								<span>{{event.name}}</span>
 								<span class="float-right">{{startDate.format('h:mm A')}}</span>
 							</a>

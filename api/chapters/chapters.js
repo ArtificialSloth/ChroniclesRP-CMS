@@ -71,6 +71,7 @@ module.exports = (crp) => {
 				}
 			}
 		},
+		eventColor: String,
 		desc: {
 			type: String,
 			validate: {

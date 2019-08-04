@@ -46,7 +46,8 @@ module.exports = (crp) => {
 			required: true,
 			enum: ['none', 'daily', 'weekly', 'monthly']
 		},
-		desc: String
+		desc: String,
+		rsvp: [crp.db.Schema.Types.ObjectId]
 	}));
 
 	crp.calendar = (offset = 0) => {
@@ -121,11 +122,11 @@ module.exports = (crp) => {
 				try {
 					crp.events.jobs[event._id] = [];
 
-					var msg = `**${chapter.name}** event: *${event.name}*, is starting (${startDate.tz('America/New_York').format('h:mma')} to ${endDate.tz('America/New_York').format('h:mma z')}).\nSee event details here: https://chroniclesrp.com/events/${event._id}`;
+					var msg = `**${chapter.name}** event: ***${event.name}***, is starting (${startDate.tz('America/New_York').format('h:mma')} to ${endDate.tz('America/New_York').format('h:mma z')}).\nSee event details here: https://chroniclesrp.com/events/${event._id}`;
 					crp.events.jobs[event._id].push(new crp.cron(startDate, crp.events.cronJob, null, true, null, {eventid: event._id, msg: msg}));
 
 					if (beforeStartDate.isAfter(crp.moment())) {
-						msg = `**${chapter.name}** event: *${event.name}*, starts in 30 minutes (${startDate.tz('America/New_York').format('h:mma')} to ${endDate.tz('America/New_York').format('h:mma z')}).\nSee event details here: https://chroniclesrp.com/events/${event._id}`;
+						msg = `**${chapter.name}** event: ***${event.name}***, starts in 30 minutes (${startDate.tz('America/New_York').format('h:mma')} to ${endDate.tz('America/New_York').format('h:mma z')}).\nSee event details here: https://chroniclesrp.com/events/${event._id}`;
 						crp.events.jobs[event._id].push(new crp.cron(beforeStartDate, crp.events.cronJob, null, true, null, {eventid: event._id, msg: msg}));
 					}
 				} catch (e) {

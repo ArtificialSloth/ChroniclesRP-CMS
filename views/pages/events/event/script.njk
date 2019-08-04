@@ -1,4 +1,24 @@
 <script>
+	function RSVP(eventid) {
+		crpAjax('/api/rsvp-event', {eventid: eventid}, (res) => {
+			if (res === true) {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
+	function unRSVP(eventid) {
+		crpAjax('/api/unrsvp-event', {eventid: eventid}, (res) => {
+			if (res === true) {
+				crpGetPage(window.location.pathname);
+			} else {
+				console.error(res);
+			}
+		});
+	}
+
 	function removeEvent(eventid) {
 		if (window.confirm('Are you sure?')) {
 			crpAjax('/api/remove-event', {eventid: eventid}, (res) => {

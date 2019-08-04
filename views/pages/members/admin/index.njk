@@ -38,7 +38,7 @@
 						<div class="row {% if usr.locked %}text-muted{% endif %}">
 							<div class="col-2"><a href="/members/{{usr.nicename}}" class="redirect" target="_blank">{{usr.login}}</a></div>
 							<div class="col-4">{{usr.email}}</div>
-							<div class="col-2">{{crp.moment(usr.register_date).tz(user.timezone).format('M/D/YYYY')}}</div>
+							<div class="col-2">{{crp.moment(usr.register_date).tz(user.timezone or 'America/New_York').format('M/D/YYYY')}}</div>
 							<div class="col-2">
 								<select class="custom-select custom-select-sm user-role-select" _id="{{usr._id}}" name="role">
 									<option value="0" {% if usr.role == 0 %}selected{% endif %}>Pending</option>
