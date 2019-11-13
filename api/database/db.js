@@ -1,7 +1,7 @@
 module.exports = (crp, callback) => {
 	crp.db = require('mongoose');
 
-	crp.db.connect(process.env.MONGODB_URL, {useNewUrlParser: true}, (err) => {
+	crp.db.connect(process.env.MONGODB_URL, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
 		crp.sites = crp.db.model('site', new crp.db.Schema({
 			name: {type: String, required: true},
 			tagline: String,
