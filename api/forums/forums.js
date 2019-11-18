@@ -80,15 +80,33 @@ module.exports = (crp) => {
 	});
 
 	category.pre(/^delete/, function(next) {
-		crp.forums.deleteMany({category: this.getQuery()._id}, next);
+		crp.forums.find({category: this.getQuery()._id}, (err, forums) => {
+			if (err) return next(err);
+
+			crp.async.each(forums, (forum, cb) => {
+				crp.forums.deleteOne({_id: forum._id}, cb);
+			}, next);
+		});
 	});
 
 	forum.pre(/^delete/, function(next) {
-		crp.topics.deleteMany({parent: this.getQuery()._id}, next);
+		crp.topics.find({parent: this.getQuery()._id}, (err, topics) => {
+			if (err) return next(err);
+
+			crp.async.each(topics, (topic, cb) => {
+				crp.topics.deleteOne({_id: topic._id}, cb);
+			}, next);
+		});
 	});
 
 	topic.pre(/^delete/, function(next) {
-		crp.replies.deleteMany({parent: this.getQuery()._id}, next);
+		crp.replies.find({parent: this.getQuery()._id}, (err, replies) => {
+			if (err) return next(err);
+
+			crp.async.each(replies, (reply, cb) => {
+				crp.replies.deleteOne({_id: reply._id}, cb);
+			}, next);
+		});
 	});
 
 	category.pre('validate', function(next) {
