@@ -25,7 +25,7 @@
 		"express-session": "^1.17.0",
 		"helmet": "^3.21.2",
 		"mailgun-js": "^0.22.0",
-		"moment-timezone": "^0.5.27",
+		"moment-timezone": "^0.5.35",
 		"mongoose": "^5.7.10",
 		"multer": "^1.4.2",
 		"nunjucks": "^3.2.0",
